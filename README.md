@@ -93,6 +93,10 @@ Bos tutma bedeli gelir olarak subvansiyonu karsilar mi: tahsilat %60 varsayimiyl
 
 Duyarlilik (alt %40, a %30): bedel gelirinin subvansiyonu karsilamasi icin gereken en dusuk bedel (basabas) tahsilat %30'da %3,4-6,4, %60'ta %1,6-3,0, %90'da %1,0-1,9. Tahsilat %60 ve gelir artisi 1,65 iken %2,2. Sonuc en cok tahsilata, sonra gelir artisina bagli. Esdeger-hane katsayisinin etkisi daha kucuk.
 
+Duzeltme: tahsilat %60 varsayimini Irlanda'dan turetmistim, yanlisti. Irlanda'daki %59, beyan edilen bos konutlarin vergiye tabi olan payi. Gercek kayip daha onceki asamada: Revenue 50 binden fazla konutu isaretledi, sahipler 45 binini oturulu beyan etti, yaklasik 5 bini bos beyan etti, yaklasik 2 bini muafiyet istedi, yaklasik 3 bini vergiye tabi kaldi (~%6, kendi beyan). Tahsilat sorunu odeme gucu degil, tespit, beyan ve muafiyet. Etkin tahsilat basabas bedeli belirler: %6'da %25,7, %15'te %10,1, %30'da %4,8, %50'de %2,7, %60'ta %2,2, %90'da %1,5. Etkin tahsilat tespit x muafiyet disi pay x odeme oraninin carpimidir, uc oran da Turkiye icin bilinmiyor.
+
+Bedelin gelire orani (deger 3,55 mn TL): %3 bedelde alt %10 hane gelirinin %37'si, medyan %13, ust %20 siniri %7. Odeme gucu sorunu alt gelirli sahipte gercek ama bos konut sahipleri genelde ust gelirde.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
