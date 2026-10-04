@@ -60,6 +60,66 @@ def owner_vacant_cost(obs: dict, tier: str) -> float:
     return cost / sum(u.count for u in units)
 
 
+def expected_real_growth(obs: dict, year: str | None = None) -> float:
+    """Sahibin reel fiyat beklentisi: son iki gozlemin ortalamasi. Kural varsayimdir."""
+    k = obs["kfe_reel_yillik"]
+    if year is None:
+        return (k["2025"] + k["2026_agustos_yillik"]) / 2
+    y = int(year)
+    return (k[str(y - 2)] + k[str(y - 1)]) / 2
+
+
+def participation(g_e: float, hold_cost: float, fee: float = 0.0, slope: float = 25.0, cap: float = 0.40) -> float:
+    """Senet reel getirisi 0. Tutma getirisi g_e - maliyet - bos tutma bedeli.
+    Katilim = cap * lojistik(slope * (maliyet + bedel - g_e)). slope ve cap kalibre degil, varsayimdir.
+    cap: bos stoktan finansal amacla tutulan ve kullanima uygun pay."""
+    import math
+    adv = hold_cost + fee - g_e
+    return cap / (1 + math.exp(-slope * adv))
+
+
+def hold_cost_ratio(obs: dict) -> float:
+    """Bos dairenin yillik gideri / deger, iki semtin agirlikli ortalamasi."""
+    vals = []
+    for tier in TIERS:
+        units = tier_units(obs, tier, sum(COUNTS.values()))
+        v = sum(u.count * u.price for u in units)
+        vals.append((owner_vacant_cost(obs, tier) * sum(u.count for u in units)) / v)
+    return sum(vals) / len(vals)
+
+
+def simulate_outcome(obs: dict) -> None:
+    tl = lambda v: f"{v:,.0f}".replace(",", ".")
+    bn = lambda v: f"{v / 1e9:,.1f}".replace(",", ".")
+    c = hold_cost_ratio(obs)
+    print(f"Sahibin bos tutma maliyeti: degerin yilda %{c:.2%}")
+    print()
+    print("Geriye donuk: o yil bu kural isleseydi katilim ne olurdu (cap %40, slope 25: varsayim)")
+    print(f"{'yil':<8}{'beklenen reel artis':>22}{'katilim (bedelsiz)':>20}")
+    for y in range(2020, 2027):
+        g = expected_real_growth(obs, str(y))
+        print(f"{y:<8}{g:>22.1%}{participation(g, c):>20.1%}")
+    g = expected_real_growth(obs)
+    print(f"{'bugun':<8}{g:>22.1%}{participation(g, c):>20.1%}")
+    print()
+    stok = obs["bos_stok"]
+    print("Bos tutma bedeli etkisi (yilda degerin yuzdesi), 225 bin / 450 bin bos stok, yari orta yari ucuz semt")
+    print(f"{"rejim":<26}{'bedel':>7}{'katilim':>9}{'daire (225b)':>14}{'daire (450b)':>14}{'giris mr (450b)':>17}{'20y odenen':>12}{'yuk mr (450b)':>15}")
+    regimes = (("bugun (durgun)", g), ("patlama (2023 beklentisi)", expected_real_growth(obs, "2023")))
+    for name, ge in regimes:
+        for fee in (0.0, 0.002, 0.01, 0.02):
+            p = participation(ge, c, fee)
+            n1, n2 = stok["elektrik_aboneligi_tabanli"] * p, stok["ibb_elektrik_su_tabanli"] * p
+            if n2 < 1:
+                print(f"{name:<26}{fee:>7.1%}{p:>9.1%}{tl(n1):>14}{tl(n2):>14}{'-':>17}{'-':>12}{'-':>15}")
+                continue
+            r = run(obs, {"orta": 0.5, "ucuz": 0.5}, n2)
+            print(f"{name:<26}{fee:>7.1%}{p:>9.1%}{tl(n1):>14}{tl(n2):>14}{bn(r.entry_value):>17}{r.real_eroded:>12.0%}{bn(r.total_fiscal_real):>15}")
+    print()
+    n = stok["ibb_elektrik_su_tabanli"] * participation(g, c, 0.01)
+    print(f"Ornek: bedel %1, bugunku rejim, 450 bin: {tl(n)} daire = Istanbul stokunun %{n / stok['istanbul_konut_stoku']:.1%}")
+
+
 def main() -> int:
     obs = load_obs()
     tl = lambda v: f"{v:,.0f}".replace(",", ".")
@@ -81,6 +141,8 @@ def main() -> int:
             units = v * take
             r = run(obs, {"orta": 0.5, "ucuz": 0.5}, units)
             print(f"{label:<26}{take:>9.0%}{tl(units):>10}{bn(r.entry_value):>17}{r.real_eroded:>12.0%}{bn(r.total_fiscal_real):>14}")
+    print()
+    simulate_outcome(obs)
     return 0
 
 

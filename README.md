@@ -59,6 +59,14 @@ Ucuz semtte geri odeme %100 cikmasi Esenyurt fiyatinin turetilmis olmasina dayan
 
 Bu blokta olmayanlar: tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, katilim karari, kademeli giris.
 
+### Katilim simulasyonu
+
+Sahip, bos tutmaktan beklenen reel getiri (son iki gozlemin reel KFE ortalamasi) ile senedin reel getirisini (0) karsilastirir. Katilim = tavan x lojistik(egim x (tutma maliyeti + bos tutma bedeli - beklenen reel artis)). Egim (25) ve tavan (%40) kalibre degil, varsayimdir. Tutma maliyeti degerin yilda %1,05'i.
+
+Geriye donuk, bu kural o yillarda islemis olsaydi: 2021 %7,8, 2022 %0,6, 2023 ve 2024 %0, 2025 %21,7, 2026 %34,1. Bugun %31,2.
+
+Bugunku rejimde 450 bin bos stoktan yaklasik 140 bin daire girer, 498 mr TL giris degeri, 20 yilda 227 mr TL yuk (bugunku TL, yaklasik yilda 11 mr TL). Patlama rejiminde katilim sifira yakin. Bos tutma bedeli %0-2 araliginda katilimi sadece %31'den %34'e cikarir: tavan sinirlayici, insentif degil.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.

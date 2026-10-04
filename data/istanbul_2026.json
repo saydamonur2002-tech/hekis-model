@@ -61,6 +61,11 @@
     "esenyurt_aidat_varsayim_tl_ay": 1450,
     "kaynak": "Istanbul boslugu: Buyukduman elektrik aboneligi 225 bin; IBB 450-750 bin; yontem farki, tek sayi degil. Stok 4,5 milyon, PREMAR 2025. Esenyurt aidati kaynaksiz, Catalca en ucuz rakami varsayim olarak alindi. Ortalama/ucuz semt payi bilinmiyor, senaryo girdisidir"
   },
+  "kfe_reel_yillik": {
+    "2018": -0.123, "2019": -0.018, "2020": 0.152, "2021": 0.202, "2022": 0.533,
+    "2023": 0.111, "2024": -0.104, "2025": -0.015, "2026_agustos_yillik": -0.065,
+    "kaynak": "TCMB KFE (EVDS) Aralik/Aralik, TUFE ile reel. Turkiye geneli, Istanbul degil. Detay data/KFE.md"
+  },
   "ovp_2027_2029": {
     "2026": 0.284, "2027": 0.21, "2028": 0.135, "2029": 0.09,
     "kaynak": "Hazine ve Maliye Bakanligi OVP 2027-2029, 6 Eylul 2026, haber aktarimi. 2029 sonrasi %9 sabit: model varsayimi"
