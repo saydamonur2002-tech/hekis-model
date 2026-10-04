@@ -45,7 +45,7 @@ def main() -> int:
     add("Yil 1 subvansiyon / hane", f"{per_hh:,.0f} TL".replace(",", "."), "karsilastirilacak resmi program yok", "DOGRULANAMAZ")
     # 7 kapsam
     eligible = politics.HOUSEHOLDS * politics.TENANT_SHARE * 0.4
-    add("Yerlesen / uygun kiraci hane (alt %40)", f"{base['N'] / eligible:.1%}", "TUIK kiraci payi %27", "UYUMLU: kapsam kucuk, kura gerekir")
+    add("Yerlesen / uygun kiraci hane (alt %40)", f"{base['N'] / eligible:.1%}", "Istanbul kiraci hane payi ulusal %27 varsayimi", "UYUMLU: kura gerekir")
     # 8 enflasyon
     ovp1 = inflation_paths(obs)["ovp"][0]
     add("Ilk yil enflasyon yolu", f"{ovp1:.1%}", "Agustos 2026 yillik %31,51; Eylul beklentisi ~%30,2", "UYARI: model yolu gozlenenin 2-3 puan altinda")

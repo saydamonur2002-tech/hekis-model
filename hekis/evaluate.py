@@ -14,7 +14,7 @@ from hekis.bind import load_obs
 
 # ad: (alt, mod, ust). Mod bugunku en iyi tahmin, alt-ust makul aralik. Hepsi veri degil.
 SPACE = {
-    "g_e": (-0.15, -0.065, 0.15),          # beklenen reel konut artisi
+    "g_e": (-0.15, -0.037, 0.15),          # beklenen reel konut artisi (Istanbul)
     "cap": (0.10, 0.40, 0.60),             # katilim tavani
     "slope": (10.0, 25.0, 50.0),           # katilim egimi
     "fee": (0.005, 0.01, 0.05),            # genel bos tutma bedeli

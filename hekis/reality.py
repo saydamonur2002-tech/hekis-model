@@ -15,6 +15,7 @@ INFL_AUG = 0.3151
 INFL_SEP_EXP = 0.3016
 INFL_YEAREND_EXP = 0.2966
 RR_NOW = (1 + POLICY_RATE) / (1 + INFL_AUG) - 1
+G_ISTANBUL = -0.037  # KFE -%6,5 + Endeksa Istanbul-Turkiye reel farki (+%2,8), data/KFE.md ve ANALOG
 
 # Faiz kanali: gecelik borc alma faizinin reel hali (data/FAIZ_KUR.md), reel konut artisi (data/KFE.md)
 RR_HIST = {2019: -0.012, 2020: 0.008, 2021: -0.173, 2022: -0.346, 2023: -0.144, 2024: 0.011, 2025: 0.043}
@@ -81,10 +82,10 @@ def main() -> int:
     print()
     g_use = max(-0.15, min(0.15, g_pred))
     scenarios = {
-        "en olasi (orta yaptirim, zayif tahsilat)": dict(g_e=-0.065, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=INFL_YEAREND_EXP),
+        "en olasi (orta yaptirim, zayif tahsilat)": dict(g_e=G_ISTANBUL, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=INFL_YEAREND_EXP),
         "en olasi, faiz kanali g_e": dict(g_e=g_use, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=INFL_YEAREND_EXP),
-        "iyimser (guclu yaptirim, iyi tahsilat)": dict(g_e=-0.065, cap=0.55, coll=0.60, fee=0.03, lux_fee=0.05, lux_coll=0.60, infl_first=INFL_YEAREND_EXP),
-        "kotumser (gonullu, zayif tahsilat)": dict(g_e=-0.065, cap=0.08, coll=0.15, fee=0.005, lux_fee=0.03, lux_coll=0.30, infl_first=INFL_YEAREND_EXP),
+        "iyimser (guclu yaptirim, iyi tahsilat)": dict(g_e=G_ISTANBUL, cap=0.55, coll=0.60, fee=0.03, lux_fee=0.05, lux_coll=0.60, infl_first=INFL_YEAREND_EXP),
+        "kotumser (gonullu, zayif tahsilat)": dict(g_e=G_ISTANBUL, cap=0.08, coll=0.15, fee=0.005, lux_fee=0.03, lux_coll=0.30, infl_first=INFL_YEAREND_EXP),
     }
     bn = lambda v: v / 1e9
     print("3) Senaryolar, guncel veriyle")
@@ -115,6 +116,7 @@ def main() -> int:
         print(f"   alt %{int(q * 100):<10}{inc:>16,.0f}{without:>12.0%}{pay / inc:>11.0%}{mk_rent + util - pay:>16,.0f}".replace(",", "."))
     print()
     tenants = politics.HOUSEHOLDS * politics.TENANT_SHARE
+    print(f"   Kapsam: Istanbul, {politics.HOUSEHOLDS / 1e6:.2f} mn hane, {tenants / 1e6:.2f} mn kiraci hane, uygun (alt %40) {tenants * 0.4 / 1e3:.0f} bin; kapsam %{N / (tenants * 0.4):.1%}")
     ds = N / tenants
     print("5) Kira piyasasi: yerlesenler piyasa talebinden cikar (veya arz eklenir). Kiraci hane " + f"{tenants / 1e6:.1f} mn, etki {ds:.2%}")
     for eps in (0.3, 0.6, 1.0):
