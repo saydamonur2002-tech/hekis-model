@@ -39,10 +39,12 @@ def inflation_paths(obs: dict, horizon: int = 20) -> dict[str, list[float]]:
     last = hist["2026_agustos_yoy"]
     hold = [last] * horizon
     disinflation = [last + (0.15 - last) * i / (horizon - 1) for i in range(horizon)]
-    return {"hold_last": hold, "disinflation_varsayim": disinflation, "realized_2021_2025": realized}
+    ovp = obs["ovp_2027_2029"]
+    ovp_path = [ovp["2026"], ovp["2027"], ovp["2028"]] + [ovp["2029"]] * (horizon - 3)
+    return {"hold_last": hold, "disinflation_varsayim": disinflation, "ovp": ovp_path, "realized_2021_2025": realized}
 
 
-def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik") -> tuple[list[UnitType], float]:
+def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik", aidat: float | None = None) -> tuple[list[UnitType], float]:
     price = prices_from_m2(obs)
     if rent_mode == "piyasa":
         rent = market_rents(obs)
@@ -65,7 +67,7 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik") -> tup
         tenant = rent
     else:
         raise ValueError(rent_mode)
-    aidat = obs["policy_rent"]["aidat"]
+    aidat = obs["aidat"]["turkiye_ortalama_tl_ay"] if aidat is None else aidat
     vacancy = obs["vacancy"]["elektrik_abonelik_avrupa_yakasi" if vacancy_key == "elektrik" else "ulusal_bos_stok_iddiasi"]
     units = []
     for name in ("2+1", "1+1", "1+0"):
@@ -94,7 +96,7 @@ SPECS = [
 ]
 
 
-def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool):
+def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool, aidat: float | None = None, bakim: float | None = None):
     """realistic: kira 12 aylik TUFE ortalamasiyla, bakim gideri ile. Degilse eski saf TUFE, gidersiz."""
     name, mode, rent_index, vacancy_key = spec
     paths = inflation_paths(obs)
@@ -102,14 +104,14 @@ def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool):
     index[2] = 0.9
     if realistic and rent_index == "tufe":
         rent_index = "tufe_ort12"
-    units, vacancy = build_units(obs, mode, vacancy_key)
+    units, vacancy = build_units(obs, mode, vacancy_key, aidat)
     params = Params(
         vacancy=vacancy,
         collection=0.98,
         rent_index=rent_index,
         settle_in_hekis=True,
         horizon=20,
-        opex_rate=obs["opex"]["bakim_orani_giris_degeri"] if realistic else 0.0,
+        opex_rate=(obs["opex"]["bakim_orani_giris_degeri"] if bakim is None else bakim) if realistic else 0.0,
         tax_rate=obs["opex"]["emlak_vergisi_orani"] if realistic else 0.0,
         unit_fixed=obs["opex"]["dask_tl_daire_yil"] if realistic else 0.0,
         vacant_aidat=realistic,
@@ -118,7 +120,7 @@ def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool):
     return simulate(units, paths[path_name], index, params, name=name)
 
 
-def run_bound(obs: dict | None = None, path_name: str = "disinflation_varsayim", realistic: bool = True) -> list[str]:
+def run_bound(obs: dict | None = None, path_name: str = "ovp", realistic: bool = True) -> list[str]:
     obs = obs or load_obs()
     return [format_report(run_one(obs, spec, path_name, realistic)) for spec in SPECS]
 
@@ -127,12 +129,31 @@ def matrix(obs: dict | None = None) -> str:
     """Eski donuk-TUFE kosusu ile gerceklige uyarlanmis kosunun yan yana karsilastirmasi."""
     obs = obs or load_obs()
     tl = lambda v: f"{v / 1e9:,.1f}".replace(",", ".")
-    cols = ("A) eski: donuk %31,5", "B) A + kira gecikmesi + gider", "C) B + dusen enflasyon")
+    cols = ("A) eski: donuk %31,5", "B) A + kira gecikmesi + gider", "C) B + OVP enflasyon yolu")
     lines = [f"{'kosu':<22}" + "".join(f"{c:>31}" for c in cols), f"{'':<22}" + f"{'odenen  yuk(mr TL, bugunku)':>31}" * 3]
     for spec in SPECS:
         cells = []
-        for path_name, realistic in (("hold_last", False), ("hold_last", True), ("disinflation_varsayim", True)):
+        for path_name, realistic in (("hold_last", False), ("hold_last", True), ("ovp", True)):
             r = run_one(obs, spec, path_name, realistic)
             cells.append(f"{r.real_eroded:5.0%}  {tl(r.total_fiscal_real):>8}")
         lines.append(f"{spec[0]:<22}" + "".join(f"{c:>31}" for c in cells))
+    return "\n".join(lines)
+
+
+def sensitivity(obs: dict | None = None) -> str:
+    """Aidat (semt araligi) ve bakim orani duyarliligi. OVP yolu, gercekci kosu."""
+    obs = obs or load_obs()
+    a = obs["aidat"]
+    aidats = (("TR ort.", a["turkiye_ortalama_tl_ay"]), ("Catalca", a["istanbul_en_ucuz_catalca_tl_ay"]),
+              ("Ist. ort.", a["istanbul_ortalama_tl_ay"]), ("Besiktas", a["istanbul_en_pahali_besiktas_tl_ay"]))
+    tl = lambda v: f"{v / 1e9:,.1f}".replace(",", ".")
+    lines = []
+    for spec in (SPECS[0], SPECS[2], SPECS[7]):
+        lines.append(f"{spec[0]}  (odenen % / yuk mr TL; bakim %0,5 | %1 | %2)")
+        for label, value in aidats:
+            cells = []
+            for bakim in (0.005, 0.01, 0.02):
+                r = run_one(obs, spec, "ovp", True, value, bakim)
+                cells.append(f"{r.real_eroded:4.0%}/{tl(r.total_fiscal_real):>5}")
+            lines.append(f"  {label:<10}{value:>6} TL/ay  " + "   ".join(cells))
     return "\n".join(lines)
