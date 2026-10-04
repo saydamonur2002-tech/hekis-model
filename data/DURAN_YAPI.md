@@ -20,6 +20,8 @@ Kentsel donusum bu modelin disindadir. Kendi finansman ve hak sahipligi sistemi 
 | Tamamlanma durumu | cogu "%80-90 tamamlanmis" iddiasi | Hurriyet basligi aktarimi, teyitsiz |
 | Esenyurt magdurlar | 10 bin uzerinde alici, ~8 yildir bekleyen | haber aktarimi |
 | Mevzuat | 7579 sayili Kanun, 22 Mayis 2026: kooperatif tapu ve yikik/agir hasarli yapi duzenlemesi | Resmi Gazete 33261 |
+BAZ KARARI: duran konut 30 bin (sektor iddiasi 100 bin'in ucte biri, kullanici karari). Sayinin kaynagi yok, dogrulanmadi.
+
 Yarim kalan plazalar (Tat Towers vb.) konut degildir, kapsam disi.
 
 ## 3. Tadilat (bos konut onarimi, ayri)

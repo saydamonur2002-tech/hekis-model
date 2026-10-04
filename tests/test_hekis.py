@@ -286,5 +286,20 @@ class ZoneTests(unittest.TestCase):
         self.assertLess(zones.run_three_zone(q_h=0.30)["N"], zones.run_three_zone(q_h=0.65)["N"])
 
 
+class StalledTests(unittest.TestCase):
+    def test_base_is_30k_and_below_claim(self):
+        from hekis import stalled
+        self.assertEqual(stalled.N_STALLED, 30_000)
+        self.assertLess(stalled.N_STALLED, stalled.N_CLAIM)
+
+    def test_unit_economics_positive_and_cheaper_capital_than_stock(self):
+        from hekis import stalled
+        ue = stalled.unit_economics(OBS)
+        self.assertGreater(ue["net"], 0)
+        c = 0.20 * stalled.COST_MID * stalled.AREA
+        self.assertLess(c, ue["value"])
+        self.assertLess(c / ue["net"], 10)  # geri odeme 10 yildan kisa
+
+
 if __name__ == "__main__":
     unittest.main()

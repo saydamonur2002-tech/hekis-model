@@ -13,7 +13,9 @@ from hekis import activation, politics, zones
 from hekis.bind import load_obs
 from hekis.model import holding_cost, pool_and_subsidy
 
-N_STALLED = 100_000        # sektor iddiasi, resmi sayi degil
+N_STALLED = 30_000         # BAZ: sektor iddiasi 100 bin, resmi sayi yok, kullanici karari ile ucte biri
+N_CLAIM = 100_000          # sektor iddiasi, ust sinir
+FEASIBLE_BASE = 0.50       # tamamlanabilir (hukuk, yapi guvenligi, tapu) pay: varsayim
 AREA = 100.0               # m2, varsayim (Endeksa Istanbul ortalama ~110)
 COST_LOW, COST_MID, COST_HIGH = 19_800.0, 26_000.0, 33_900.0   # TL/m2, KDV haric, 2026 yapi yaklasik birim maliyeti
 
@@ -64,6 +66,21 @@ def main() -> int:
             cap = n * c
             sub = n * ue["sub"]
             print(f"{feasible:>7.0%}{band:>6.2f}{tl(n):>9}{cap / 1e9:>12.1f}{sub / 1e9:>15.1f}{sub * 20 / 1e9:>15.0f}   {n / 37_000:.1f} kat")
+    print()
+    z = zones.run_three_zone()
+    q_h = zones.union.quantile_of_income(zones.union.MEMUR_FLAT)
+    n_st = N_STALLED * FEASIBLE_BASE * q_h
+    eligible = politics.HOUSEHOLDS * politics.TENANT_SHARE * q_h
+    print(f"BAZ: duran konut {tl(N_STALLED)} (sektor iddiasi {tl(N_CLAIM)} degil), tamamlanabilir {FEASIBLE_BASE:.0%}, HEKIS bandi {q_h:.0%} -> {tl(n_st)} daire.")
+    print(f"{'':<28}{'mevcut bos stok':>17}{'duran insaat':>14}{'toplam':>10}")
+    rows = (
+        ('yerlesen daire', z['N'], n_st, '{:,.0f}'),
+        ('yillik sub. (mr TL)', z['sub1'] / 1e9, n_st * ue['sub'] / 1e9, '{:.2f}'),
+        ('havuz sermayesi (mr TL)', z['entry'] / 1e9, n_st * c / 1e9, '{:.1f}'),
+    )
+    for name, a, b, f in rows:
+        print(f"{name:<28}{f.format(a).replace(',', '.'):>17}{f.format(b).replace(',', '.'):>14}{f.format(a + b).replace(',', '.'):>10}")
+    print(f"{'kapsam (uygun kiraciya)':<28}{z['N'] / eligible:>17.1%}{n_st / eligible:>14.1%}{(z['N'] + n_st) / eligible:>10.1%}")
     print()
     print("Daire basina havuz sermayesi: mevcut bos stok (anapara = deger) " + f"{tl(ue['value'])} TL, duran insaat (anapara = tamamlama) {tl(c)} TL: {ue['value'] / c:.1f} kat daha az.")
     return 0
