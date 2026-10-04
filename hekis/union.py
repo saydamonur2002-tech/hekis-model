@@ -33,12 +33,23 @@ def breakeven_scale(params: dict | None = None) -> float | None:
     return hi
 
 
+IBB_POVERTY_LINE_2024 = 88_185.0  # IPA / TUIK, bolgesel esdeger medyanin %60'i, 2024 anketi (gelir yili 2023)
+UPLIFT_CPI = 2.57   # 2023 ortalama -> 2026 ortasi, TUFE yaklasik
+UPLIFT_WAGE = 2.82  # 2023 ortalama net asgari ucret 9.954 -> 28.075,5 (hafizadan)
+
+
+def ibbs_median(uplift: float) -> float:
+    return IBB_POVERTY_LINE_2024 / 0.6 * uplift * politics.EQ_FACTOR / 12
+
+
 def main() -> int:
     tl = lambda v: f"{v:,.0f}".replace(",", ".")
     anchors = (
         ("A sendika, yalniz ucret (alt sinir)", MIN_WAGE_NET * EARNERS),
         ("B TUIK ulusal, 2026'ya yukseltilmis", BASE_MEDIAN),
         ("C TUIK Istanbul (TR10) olcekli", BASE_MEDIAN * politics.ISTANBUL_TR10_RATIO),
+        ("D IPA/TUIK TR10 yoksulluk siniri, TUFE", ibbs_median(UPLIFT_CPI)),
+        ("D IPA/TUIK TR10 yoksulluk siniri, ucret", ibbs_median(UPLIFT_WAGE)),
     )
     likely = dict(g_e=reality.G_ISTANBUL, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=reality.INFL_YEAREND_EXP)
     print(f"Hane geliri medyani, en olasi senaryo (Istanbul). Sendika: ucretlilerin %46,7'si asgari ucret ve altinda, medyan isci ~ {tl(MIN_WAGE_NET)} TL net.")
