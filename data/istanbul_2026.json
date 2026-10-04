@@ -1,0 +1,54 @@
+{
+  "as_of": "2026-08",
+  "note": "Gozlem ile varsayim ayridir. Fiziki uretim endeksi bu dosyada yok. Aidat gozlem degil.",
+  "sale": {
+    "istanbul_ortalama_tl": 7359550,
+    "istanbul_m2_tl": 66905,
+    "istanbul_nominal_yillik": 0.272,
+    "istanbul_reel_yillik": -0.034,
+    "turkiye_ortalama_tl": 5311000,
+    "turkiye_m2_tl": 42488,
+    "kaynak": "Emlakjet-Endeksa Agustos 2026 Konut Deger Raporu"
+  },
+  "rent": {
+    "istanbul_ortalama_tl": 45510,
+    "istanbul_m2_tl": 479,
+    "istanbul_betam_m2_tl": 463.9,
+    "istanbul_yeni_kira_yillik": 0.345,
+    "esenyurt_medyan_tl": 20000,
+    "esenyurt_m2_tl": 231,
+    "esenyurt_2_1_tl": 20000,
+    "esenyurt_1_1_tl": 17000,
+    "esenyurt_1_0_tl": 14250,
+    "kaynak": "Emlakjet-Endeksa Agustos 2026; BETAM sahibindex Eylul 2026; TCMB yeni kiraci endeksi Agustos 2026; KiraMetre Esenyurt 2026"
+  },
+  "social_rent": {
+    "1+1": 10000,
+    "2+1": 12000,
+    "3+1": 15000,
+    "4+1": 18000,
+    "kaynak": "Cevre Sehircilik, kiralik sosyal konut, 10 Eylul 2026"
+  },
+  "policy_rent": {
+    "2+1": 20000,
+    "1+1": 15000,
+    "1+0": 10000,
+    "aidat": 3000,
+    "kaynak": "model varsayimi, gozlem degil"
+  },
+  "sizes_m2": {"1+0": 40, "1+1": 60, "2+1": 95},
+  "vacancy": {
+    "elektrik_abonelik_avrupa_yakasi": 0.037,
+    "ulusal_bos_stok_iddiasi": 0.27,
+    "kaynak": "CK Enerji Avrupa yakasi Mart 2026; ulusal bos stok iddiasi 8.5/31 milyon, ayni kavram degil"
+  },
+  "inflation_annual": {
+    "2021": 0.3608,
+    "2022": 0.6427,
+    "2023": 0.6477,
+    "2024": 0.4438,
+    "2025": 0.3089,
+    "2026_agustos_yoy": 0.3151,
+    "kaynak": "TUIK TUFE, Aralik/Aralik; Agustos 2026 yillik"
+  }
+}
