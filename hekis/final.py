@@ -89,6 +89,55 @@ def compare_lux(obs: dict) -> None:
         print(f"{cut:<14.0%}" + "".join(f"{x:>26}" for x in cells))
 
 
+LUX_CAP = 0.65      # varsayim: bedel ne olursa olsun bosluk bitirebilecek en yuksek pay
+LUX_FS = 1.69       # Vancouver ankoru: %3 bedelde bosluk %54 azaldi -> 1 - exp(-3/fs) = 0,54/0,65
+
+
+def lux_response(fee: float, cap: float = LUX_CAP, fs_pct: float = LUX_FS) -> float:
+    """Luks bos daire sahibinin bosluguna son verme orani (satis, kiralama, kendi oturmasi). Havuza girmezler."""
+    import math
+    return cap * (1 - math.exp(-fee * 100 / fs_pct))
+
+
+def lux_economics(obs: dict, sigma: float, cut: float, fee_lux: float, collection: float, cap: float = LUX_CAP):
+    """Ayrilan luks dilim: adet, ortalama deger, bedel geliri (TL/yil), bosluk bitirme orani."""
+    from hekis import politics  # noqa: F401
+    f_low, f_top = lux_factors(sigma, cut)
+    stok_all = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
+    orta = activation.tier_units(obs, "orta", 1000)
+    mean_orta = sum(u.price * u.count for u in orta) / sum(u.count for u in orta)
+    count = stok_all * 0.5 * cut
+    value = mean_orta * f_top
+    r = lux_response(fee_lux, cap)
+    return count, value, count * (1 - r) * value * fee_lux * collection, r
+
+
+def compare_lux_fee(obs: dict) -> None:
+    sigma, cut = 0.6, 0.2
+    print("Luks ust dilim havuz disi, ayri bedel tarifesi. Tepki: Vancouver ankorlu (bedel %3'te bosluk %54 azalir), tavan %65.")
+    count, value, _, _ = lux_economics(obs, sigma, cut, 0.03, 0.6)
+    print(f"Ayrilan luks bos daire {count:,.0f}, ortalama deger {value / 1e6:.1f} mn TL (orta tip ortalamasinin {lux_factors(sigma, cut)[1]:.1f} kati)".replace(",", "."))
+    print()
+    for name, cap, fee in SCENARIOS[1:]:
+        p, n, r, first, rev_ord = run_scenario(obs, cap, fee, 0.6, cut, sigma, False)
+        print(f"{name}: genel bedel {fee:.0%}, yil-1 sub. {first / 1e9:.1f} mr, genel bedel geliri {rev_ord / 1e9:.1f} mr ({rev_ord / first:.2f})")
+        print(f"{'luks bedel':>11}{'bosluk biter':>14}{'luks gelir mr':>15}{'toplam gelir/sub':>18}{'(tahsilat luks %40 / %80)':>28}")
+        for fl in (0.01, 0.02, 0.03, 0.05, 0.08, 0.12):
+            _, _, rev_l, resp = lux_economics(obs, sigma, cut, fl, 0.6)
+            lo = lux_economics(obs, sigma, cut, fl, 0.4)[2]
+            hi = lux_economics(obs, sigma, cut, fl, 0.8)[2]
+            print(f"{fl:>11.0%}{resp:>14.0%}{rev_l / 1e9:>15.1f}{(rev_ord + rev_l) / first:>18.2f}{(rev_ord + lo) / first:>14.2f} /{(rev_ord + hi) / first:>5.2f}")
+        # basabas luks bedeli
+        need = first - rev_ord
+        be = None
+        for i in range(1, 400):
+            fl = i / 1000
+            if lux_economics(obs, sigma, cut, fl, 0.6)[2] >= need:
+                be = fl
+                break
+        print(f"  Luks dilimden kendini finanse etmek icin gereken bedel (tahsilat %60): " + (f"%{be:.1%}" if be else "%40 bile yetmez") + "\n")
+
+
 def main() -> int:
     obs = load_obs()
     g = activation.expected_real_growth(obs)
@@ -111,6 +160,8 @@ def main() -> int:
         print(f"{name:<42}" + "".join(row))
     print()
     compare_lux(obs)
+    print()
+    compare_lux_fee(obs)
     return 0
 
 

@@ -127,6 +127,10 @@ Karma sistem: tum stok 161 bin daire, giris 572 mr, yil 1 sub. 15,8 mr, 20 yil y
 
 Luksu havuzdan ayirmak giris degerini cok dusurur (daire sayisini az), cunku deger ust dilimde yogun. Luksu bedel tabanindan da ayirmak gelir/sub. oranini dusurur: luks bos daire en verimli bedel odeyicidir.
 
+### Luks dilim: havuz disi, ayri bedel tarifesi
+
+Luks ust dilim (orta tip bos stogun en pahali %20'si, 45 bin daire, ortalama 9,5 mn TL) havuza girmez, bedele tabidir, bedel orani genelden ayri. Tepki: bosluga son verme (satis, kiralama, kendi oturmasi) Vancouver ankorlu: %3 bedelde %54, tavan %65 (varsayim). Yil 1 subvansiyona gore toplam bedel geliri (genel bedel dahil, tahsilat %60): karma sistemde luks bedel %1 / %3 / %5 / %8 / %12 icin 0,44 / 0,56 / 0,65 / 0,82 / 1,06. Vancouver benzerinde 0,58 / 0,66 / 0,73 / 0,85 / 1,01. Luks dilimden tek basina kendini finanse etmek icin bedel yaklasik %11-12 gerekir, bu Vancouver'in en yuksek %5'inin iki katindan fazla ve denenmemis. %5 bedelde luks bos dairenin %62'si bosluktan cikar (yaklasik 28 bin daire), havuz disi.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
