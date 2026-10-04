@@ -61,11 +61,15 @@ Bu blokta olmayanlar: tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olu
 
 ### Katilim simulasyonu
 
-Sahip, bos tutmaktan beklenen reel getiri (son iki gozlemin reel KFE ortalamasi) ile senedin reel getirisini (0) karsilastirir. Katilim = tavan x lojistik(egim x (tutma maliyeti + bos tutma bedeli - beklenen reel artis)). Egim (25) ve tavan (%40) kalibre degil, varsayimdir. Tutma maliyeti degerin yilda %1,05'i.
+Sahip, bos tutmaktan beklenen reel getiri ile senedin reel getirisini (0) karsilastirir. Katilim = tavan x lojistik(egim x (tutma maliyeti + bos tutma bedeli - beklenen reel artis)).
 
-Geriye donuk, bu kural o yillarda islemis olsaydi: 2021 %7,8, 2022 %0,6, 2023 ve 2024 %0, 2025 %21,7, 2026 %34,1. Bugun %31,2.
+Testler: `python -m unittest discover -s tests` (15 test, model degismezleri ve katilim kurali). Kalibrasyon ve bant: `python -m hekis.calibrate`.
 
-Bugunku rejimde 450 bin bos stoktan yaklasik 140 bin daire girer, 498 mr TL giris degeri, 20 yilda 227 mr TL yuk (bugunku TL, yaklasik yilda 11 mr TL). Patlama rejiminde katilim sifira yakin. Bos tutma bedeli %0-2 araliginda katilimi sadece %31'den %34'e cikarir: tavan sinirlayici, insentif degil.
+Kalibrasyon sonucu. Beklenti kurali (onceki yillarin reel KFE artisi) bir yil ilerisini tahmin etmede sifir tahmininden iyi degil: RMSE 20-24 puan, pencere farklari anlamsiz. n=9. Pencere 1 secildi, ama secim gurultuye yakin. Davranis modeli olarak tutulur, tahmin modeli olarak degil. Tavan (%40) ve egim (25) icin gozlem yok, kalibre edilemez.
+
+Bugun beklenen reel artis -%6,5. 450 bin bos stok, bedel %1, orta nokta (tavan %40, egim 25): yaklasik 161 bin daire, 571 mr TL giris degeri, 20 yilda 261 mr TL yuk. Tavan ve egim bandinda (tavan %10-60, egim 10-50) giren daire 32 bin ile 266 bin arasinda, yuk 51-432 mr TL. Sekiz kat fark.
+
+Geriye donuk (pencere 1): 2021 %1, 2022 %0,3, 2023 %0, 2024 %3, 2025 %38, 2026 %26, bugun %35. Patlama rejiminde katilim sifir. Bos tutma bedeli %0-2 araliginda katilimi sadece birkac puan oynatir: tavan sinirlayici, insentif degil.
 
 ## Sinir
 

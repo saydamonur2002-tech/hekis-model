@@ -60,13 +60,19 @@ def owner_vacant_cost(obs: dict, tier: str) -> float:
     return cost / sum(u.count for u in units)
 
 
-def expected_real_growth(obs: dict, year: str | None = None) -> float:
-    """Sahibin reel fiyat beklentisi: son iki gozlemin ortalamasi. Kural varsayimdir."""
+WINDOW = 1  # hekis.calibrate secti, ama farklar anlamsiz kucuk
+
+
+def expected_real_growth(obs: dict, year: str | None = None, window: int | None = None) -> float:
+    """Sahibin reel fiyat beklentisi: son `window` gozlemin ortalamasi.
+    year verilirse o yildan onceki yillar, yoksa 2025 ve 2026 Agustos yillik dahil son gozlemler."""
+    w = window or WINDOW
     k = obs["kfe_reel_yillik"]
     if year is None:
-        return (k["2025"] + k["2026_agustos_yillik"]) / 2
-    y = int(year)
-    return (k[str(y - 2)] + k[str(y - 1)]) / 2
+        series = [k[str(y)] for y in range(2013, 2026)] + [k["2026_agustos_yillik"]]
+    else:
+        series = [k[str(y)] for y in range(2013, int(year))]
+    return sum(series[-w:]) / w
 
 
 def participation(g_e: float, hold_cost: float, fee: float = 0.0, slope: float = 25.0, cap: float = 0.40) -> float:
