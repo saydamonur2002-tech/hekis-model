@@ -21,7 +21,7 @@ python -m hekis.bind_cli
 
 Istanbul satis m2 66.905 TL. Kira m2 479 TL. Bosluk %3,7, Avrupa yakasi elektrik aboneligi.
 
-Gider: emlak vergisi binde 2 (ust sinir), DASK 2.022 TL/daire, bos dairenin aidati sahibe yazilir. Aidat Turkiye ortalamasi 600 TL/ay, ama bu rakam tek basliktan, kapsami teyitsiz ve Istanbul stoku icin dusuk. Bakim yilda giris degerinin %1'i, yabanci rehber araligi %1-3'un alt ucu, Turkiye verisi degil.
+Gider: emlak vergisi binde 2 (ust sinir), DASK 2.022 TL/daire, bos dairenin aidati sahibe yazilir. Aidat Istanbul ortalamasi 3.330 TL/ay (2026 site aidati haberi aktarimi). Turkiye ortalamasi 600 TL tek basliktan, kapsami teyitsiz, Istanbul stoku icin dusuk, baz alinmadi. Bakim yilda giris degerinin %1'i, yabanci rehber araligi %1-3'un alt ucu, Turkiye verisi degil.
 
 Enflasyon: Agustos 2026 yillik %31,51 (TUIK). Ileri yol Hazine ve Maliye OVP 2027-2029: %28,4 / %21 / %13,5 / %9, sonrasi %9 sabit (varsayim).
 
@@ -32,15 +32,15 @@ A eski model: enflasyon %31,5 donuk, kira aninda TUFE, gider yok. B kira 12 ayli
 | Kosu | A odenen / yuk | B odenen / yuk | C odenen / yuk |
 | --- | --- | --- | --- |
 | Piyasa kira, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
-| Piyasa kira, sabit | %25 / 0 | %13 / 1,5 mr | %30 / 0 |
-| HEKIS kirasi, TUFE | %74 / 3,2 mr | %50 / 3,2 mr | %56 / 3,5 mr |
-| HEKIS kirasi, sabit | %12 / 0,5 mr | %3 / 2,4 mr | %6 / 1,7 mr |
-| Resmi sosyal kira, TUFE | %47 / 0 | %22 / 0 | %27 / 0 |
+| Piyasa kira, sabit | %23 / 0 | %11 / 1,6 mr | %25 / 0,1 mr |
+| HEKIS kirasi, TUFE | %61 / 3,2 mr | %36 / 3,2 mr | %41 / 3,5 mr |
+| HEKIS kirasi, sabit | %10 / 0,5 mr | %2 / 2,6 mr | %3 / 2,0 mr |
+| Resmi sosyal kira, TUFE | %34 / 0 | %9 / 0 | %12 / 0 |
 | Esenyurt, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
 | Esenyurt, %20 alti kira | %100 / 2,0 mr | %100 / 2,0 mr | %100 / 2,2 mr |
-| HEKIS, ulusal bos stok %27 | %56 / 2,5 mr | %31 / 2,5 mr | %36 / 2,7 mr |
+| HEKIS, ulusal bos stok %27 | %46 / 2,5 mr | %17 / 2,5 mr | %21 / 2,7 mr |
 
-Duyarlilik (HEKIS kirasi, TUFE, C kosusu, geri odenen): aidat 600 TL ve bakim %1 icin %56. Istanbul ortalamasi 3.330 TL aidatta %41. Besiktas 8.400 TL'de %14. Bakim %2'de bu degerler %36, %21, %0. `python -m hekis.bind_cli` tum tabloyu basar.
+Duyarlilik (HEKIS kirasi, TUFE, C kosusu, geri odenen): bazda (Istanbul ortalamasi 3.330 TL, bakim %1) %41. Turkiye ortalamasi 600 TL ile %56. Besiktas 8.400 TL'de %14. Bakim %2'de bu degerler %36, %21, %0. `python -m hekis.bind_cli` tum tabloyu basar.
 
 ## Sinir
 

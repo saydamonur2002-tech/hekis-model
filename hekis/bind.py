@@ -67,7 +67,7 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik", aidat:
         tenant = rent
     else:
         raise ValueError(rent_mode)
-    aidat = obs["aidat"]["turkiye_ortalama_tl_ay"] if aidat is None else aidat
+    aidat = obs["aidat"]["istanbul_ortalama_tl_ay"] if aidat is None else aidat
     vacancy = obs["vacancy"]["elektrik_abonelik_avrupa_yakasi" if vacancy_key == "elektrik" else "ulusal_bos_stok_iddiasi"]
     units = []
     for name in ("2+1", "1+1", "1+0"):
