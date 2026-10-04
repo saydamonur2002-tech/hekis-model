@@ -113,6 +113,12 @@ Karar: oturan kirayi oder (dereceli), aidati havuz oder, abonelik (elektrik, dog
 
 Bedel geliri / yil 1 subvansiyon, etkin tahsilat %15 / %30 / %60 / %90: karma 0,10 / 0,19 / 0,39 / 0,58. Vancouver benzeri 0,15 / 0,31 / 0,62 / 0,92. Abonelik subvansiyonu eklenince onceki sonuc (bedel %3'te tahsilat %60'ta kendini finanse eder) gecerliligini yitirdi: kendini finanse etmek icin etkin tahsilat %90'a yakin olmali.
 
+### Kendi kendini finanse etme kosulu (modelden bagimsiz)
+
+`python -m hekis.selffinance`. Yerlesen daire basina yillik subvansiyon s, bos kalan daire basina bedel x deger V x tahsilat c, yerlesen oran p (bos stoktan). Kosul: bedel x tahsilat >= (12 s / V) x p / (1 - p). Katilim arttikca bedel odeyen taban erir.
+
+V = 3,55 mn TL icin gerekli etkin bedel (bedel x tahsilat, degerin yilda yuzdesi), s = 4 bin / 8 bin / 14 bin TL/ay: p %10'da 0,2 / 0,3 / 0,5; p %36'da 0,8 / 1,5 / 2,7; p %50'de 1,4 / 2,7 / 4,7; p %60'ta 2,0 / 4,1 / 7,1. Deger duyarliligi (p %36, s 8,4 bin): V 1,5 mn 3,8%, 2,4 mn 2,4%, 3,55 mn 1,6%, 4,7 mn 1,2%, 6 mn 0,9%. Bedel %5 ve tahsilat %90 (etkin %4,5) ile kendini finanse eden en yuksek yerlesen oran: s 8,4 bin, V 3,55 mn icin %61, s 14 bin ve V 2,4 mn icin %39.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
