@@ -26,9 +26,9 @@ SIGMA = math.sqrt(2 * math.log(MEAN / MEDIAN))
 MU = math.log(MEDIAN)
 
 
-def hh_monthly(q: float) -> float:
+def hh_monthly(q: float, uplift: float | None = None, eq: float | None = None) -> float:
     """q. yuzdelik dilimdeki hanenin 2026 aylik geliri."""
-    return math.exp(MU + SIGMA * ND.inv_cdf(q)) * EQ_FACTOR / 12 * UPLIFT
+    return math.exp(MU + SIGMA * ND.inv_cdf(q)) * (EQ_FACTOR if eq is None else eq) / 12 * (UPLIFT if uplift is None else uplift)
 
 
 def share_check() -> tuple[float, float]:
@@ -37,13 +37,14 @@ def share_check() -> tuple[float, float]:
     return top, bottom
 
 
-def graduated(rent: float, alpha: float, qcut: float, steps: int = 400) -> tuple[float, float]:
+def graduated(rent: float, alpha: float, qcut: float, steps: int = 400,
+              uplift: float | None = None, eq: float | None = None) -> tuple[float, float]:
     """Uygun hane [0, qcut] araligindan kura ile secilir. Oturan min(kira, alpha x gelir) oder.
     Ortalama aylik odeme ve ortalama aylik subvansiyon."""
     pay_sum = 0.0
     for i in range(steps):
         q = qcut * (i + 0.5) / steps
-        pay_sum += min(rent, alpha * hh_monthly(q))
+        pay_sum += min(rent, alpha * hh_monthly(q, uplift, eq))
     pay = pay_sum / steps
     return pay, rent - pay
 
@@ -55,6 +56,43 @@ def blend_units(obs: dict, n: float):
     flat = sum((u.rent - u.tenant_pay) * u.count for u in units) / count
     value = sum(u.price * u.count for u in units) / count
     return rent, flat, value
+
+
+def fee_economics(obs: dict, fee: float, sub: float, value: float, collection: float) -> tuple[float, float, float]:
+    """Katilim, yillik subvansiyon, yillik bedel geliri (TL)."""
+    g = activation.expected_real_growth(obs)
+    c = activation.hold_cost_ratio(obs)
+    stok = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
+    p = activation.participation(g, c, fee, 25.0, 0.40)
+    return p, stok * p * sub * 12, stok * (1 - p) * value * fee * collection
+
+
+def break_even_fee(obs: dict, sub: float, value: float, collection: float) -> float | None:
+    lo, hi = 0.0, 0.30
+    f = lambda fee: (lambda r: r[2] - r[1])(fee_economics(obs, fee, sub, value, collection))
+    if f(hi) < 0:
+        return None
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if f(mid) < 0 else (lo, mid)
+    return hi
+
+
+def sensitivity(obs: dict) -> None:
+    """a=%30, kesim %40. Tahsilat x gelir artisi x esdeger-hane katsayisi."""
+    rent, _, value = blend_units(obs, 161_000)
+    print("Bedel geliri subvansiyonu karsilayan en dusuk bedel (basabas), alt %40, a=%30")
+    print(f"{'tahsilat':>9}{'gelir artisi':>14}{'esdeger k.':>12}{'ort. sub. TL/ay':>17}{'sub. mr/yil':>13}{'basabas bedel':>15}{'gelir/sub. @%3':>16}")
+    for coll in (0.3, 0.6, 0.9):
+        for uplift in (1.3, UPLIFT, 2.0):
+            for eq in (1.8, 2.0, 2.2):
+                if (uplift != UPLIFT and eq != 2.0):
+                    continue
+                _, sub = graduated(rent, 0.30, 0.4, uplift=uplift, eq=eq)
+                be = break_even_fee(obs, sub, value, coll)
+                p, s_year, rev = fee_economics(obs, 0.03, sub, value, coll)
+                be_txt = "yok (>%30)" if be is None else f"%{be:.1%}"
+                print(f"{coll:>9.0%}{uplift:>14.2f}{eq:>12.1f}{sub:>17,.0f}{s_year / 1e9:>13.1f}{be_txt:>15}{rev / s_year:>16.2f}".replace(",", "."))
 
 
 def main() -> int:
@@ -100,6 +138,8 @@ def main() -> int:
     print(f"  Uygun ama yerlesemeyen kiraci hane: {tl(tenants * 0.4 - k)} ({(tenants * 0.4 - k) / (tenants * 0.4):.0%}). Kuraya dayali, esitsiz.")
     print(f"  Bos tutmaya devam eden sahip: {tl(own_stay)}, her biri yilda {tl(fee_per_owner)} TL bedel (beyan/tahsilat %60: ~{tl(fee_per_owner * COLLECTION)})")
     print(f"  Genel hane: bedel geliri subvansiyonu karsilarsa ek yuk 0, karsilamazsa kisi basi yukarida")
+    print()
+    sensitivity(obs)
     return 0
 
 

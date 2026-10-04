@@ -91,6 +91,8 @@ Oturan min(kira, a x gelir) oder, kura ile secilir. a %30, uygun kitle gelirin a
 
 Bos tutma bedeli gelir olarak subvansiyonu karsilar mi: tahsilat %60 varsayimiyla bedel %2'de gelir/subvansiyon 0,9, %3'te 1,3. Yani Vancouver'in etkili bulunan %3 duzeyi ayni zamanda kendini finanse eden duzey. Bedel %1'de genel hane basina yilda yaklasik 250 TL yuk kalir.
 
+Duyarlilik (alt %40, a %30): bedel gelirinin subvansiyonu karsilamasi icin gereken en dusuk bedel (basabas) tahsilat %30'da %3,4-6,4, %60'ta %1,6-3,0, %90'da %1,0-1,9. Tahsilat %60 ve gelir artisi 1,65 iken %2,2. Sonuc en cok tahsilata, sonra gelir artisina bagli. Esdeger-hane katsayisinin etkisi daha kucuk.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
