@@ -84,6 +84,16 @@ Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut art
 
 `hekis.checks`: 15 kontrol, 4 uyumlu, 9 uyari, 2 dogrulanamaz. Uyarilar: model bosluk orani (%3,7) bos stok tahminlerinin altinda; Esenyurt getirisi %7,3 vs Endeksa %10,04 (kaynaklar farkli); politika kirasi getirisi %3,8 vs piyasa %8,6; gelir dagilimi alt ucu fazla yoksul; ilk yil enflasyon yolu gozlenenin 2-3 puan altinda; beklenti kurali tahmin gucu yok; KFE Turkiye geneli Istanbul'dan 3 puan farkli; etkin tahsilat varsayimi iyimser; orta tip kirasi yapisal secim. Dogrulanamayan: katilim fonksiyonu, kisi basi subvansiyon.
 
+## 7b. En olasi senaryo, guncel veriyle
+
+`python -m hekis.reality`, `data/GUNCEL.md`. Eylul 2026 TUFE aciklanmadan once: Agustos yillik %31,51, Eylul beklentisi %30,16, yil sonu %29,66, politika faizi %37 (reel +%4,2), kira artis ust siniri (12 aylik TUFE ort.) %31,79 (kural dogrulandi), yeni kiraci %34,5, Gini 0,410.
+
+Faiz kanali (2019-2025, n=7, R2 0,81, nedensellik degil): reel konut artisi = 0,005 - 1,35 x reel faiz. Bugunku reel faizde tahmin -%5,1, gozlenen -%6,5. Katilim penceresi reel faiz yaklasik -%0,4'un altina inmedikce acik; tampon 4,6 puan. Reel faiz 0'da yerlesen %30 duser, -%5'te dortte birine iner.
+
+Senaryolar (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30, luks bedel %5) 91 bin daire, yil 1 sub. 7,1, bedel 6,0, oran 0,84, acik 1,1, 20 yil yuk 152. Iyimser 208 bin daire, yuk 347, oran 0,93. Kotumser 29 bin daire, yuk 48.
+
+Etki (en olasi, 91 bin hane, hane basina ayda 6.524 TL): Gini 0,4296 -> 0,4294 (-0,0002), goreli yoksulluk -0,05 puan, piyasa kirasi -%1 ile -%4 (esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %81'den %30'a, alt %40'ta %36'dan %30'a duser, aylik kazanc 12.100 ile 3.000 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
+
 ## Sonuc
 
 Model, bos stoku kullandirmanin maliyetini kira farkindan ve abonelikten ibaret gosteriyor, stoku kullandirmanin kendisi bedava. Kendini finanse etme olcek meselesi: kucuk programlar finanse eder, buyukler etmez. Yon sonuclari sagdir (ters dongululuk, olcek erozyonu, bedelin katilimi artirmada zayifligi), buyukluk sonuclari degildir (katilim, tahsilat ve beklenti kalibre edilemez).

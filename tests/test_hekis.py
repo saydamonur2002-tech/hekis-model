@@ -203,5 +203,32 @@ class PropertyTests(unittest.TestCase):
         self.assertLess(rho, -0.5)
 
 
+class RealityTests(unittest.TestCase):
+    def test_gini_unchanged_without_benefit(self):
+        from hekis import reality
+        g0, g1, p0, p1 = reality.gini_with_benefit(0, 50000)
+        self.assertAlmostEqual(g0, g1, places=9)
+        self.assertAlmostEqual(p0, p1, places=9)
+
+    def test_benefit_to_poor_reduces_gini_and_poverty(self):
+        from hekis import reality
+        g0, g1, p0, p1 = reality.gini_with_benefit(500_000, 80000)
+        self.assertLess(g1, g0)
+        self.assertLessEqual(p1, p0)
+
+    def test_ols_recovers_line(self):
+        from hekis import reality
+        a, b, r2 = reality.ols([0, 1, 2, 3], [1, 3, 5, 7])
+        self.assertAlmostEqual(a, 1.0)
+        self.assertAlmostEqual(b, 2.0)
+        self.assertAlmostEqual(r2, 1.0)
+
+    def test_interest_channel_slope_negative(self):
+        from hekis import reality
+        xs = [reality.RR_HIST[y] for y in sorted(reality.RR_HIST)]
+        ys = [reality.G_HIST[y] for y in sorted(reality.RR_HIST)]
+        self.assertLess(reality.ols(xs, ys)[1], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

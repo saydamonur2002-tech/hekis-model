@@ -48,6 +48,8 @@ def make_obs(P: dict) -> dict:
     for y in ("2026", "2027", "2028", "2029"):
         obs["ovp_2027_2029"][y] = max(0.0, obs["ovp_2027_2029"][y] + P["infl_shift"])
     obs["bos_stok"]["ibb_elektrik_su_tabanli"] = P["stok"]
+    if "infl_first" in P:
+        obs["ovp_2027_2029"]["2026"] = P["infl_first"]
     return obs
 
 
