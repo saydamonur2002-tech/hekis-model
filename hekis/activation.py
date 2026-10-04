@@ -104,7 +104,7 @@ def simulate_outcome(obs: dict) -> None:
     print()
     stok = obs["bos_stok"]
     print("Bos tutma bedeli etkisi (yilda degerin yuzdesi), 225 bin / 450 bin bos stok, yari orta yari ucuz semt")
-    print(f"{"rejim":<26}{'bedel':>7}{'katilim':>9}{'daire (225b)':>14}{'daire (450b)':>14}{'giris mr (450b)':>17}{'20y odenen':>12}{'yuk mr (450b)':>15}")
+    print(f"{'rejim':<26}{'bedel':>7}{'katilim':>9}{'daire (225b)':>14}{'daire (450b)':>14}{'giris mr (450b)':>17}{'20y odenen':>12}{'yuk mr (450b)':>15}")
     regimes = (("bugun (durgun)", g), ("patlama (2023 beklentisi)", expected_real_growth(obs, "2023")))
     for name, ge in regimes:
         for fee in (0.0, 0.002, 0.01, 0.02):
