@@ -101,6 +101,18 @@ Gider kimde: modelde oturan yalniz kira oder. Emlak vergisi, DASK, bakim ve dolu
 
 Karar: oturan kirayi oder (dereceli), aidati havuz oder, abonelik (elektrik, dogalgaz, su) subvanse edilir. Abonelik yaklasik 1.583 TL/ay (elektrik 648 EPDK tarifesi, dogalgaz 469 BOTAS toptan fiyati ve 1000 m3/yil varsayimi, su 466 eski ISKI tarifesi ve 10 m3/ay varsayimi, dogalgaz ve su alt sinir). Yil 1 subvansiyon 12,9'dan 15,8 mr TL'ye, 20 yil yuk 278'den 336 mr TL'ye cikar. Geri odeme degismez (%75), abonelik havuza girmez. Oturanin konut gideri (kira %30 + abonelik) abonelik sub. olmadan alt %10'da %37, olunca %30'da kalir.
 
+### Revize model, tek kosu
+
+`python -m hekis.final`. Aidat havuzda, oturan dereceli kira (a %30, alt %40), abonelik tam subvanse, OVP enflasyonu, 450 bin bos stok, beklenen reel konut artisi -%6,5. Bugunku TL.
+
+| Senaryo | Katilim | Daire | Giris | 20 yil odenen | Yil 1 sub. | 20 yil yuk |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gonullu tek basina | %4 | 20 bin | 69 mr | %75 | 1,9 mr | 41 mr |
+| Karma (bedel %1, tavan %40) | %36 | 161 bin | 571 mr | %75 | 15,8 mr | 336 mr |
+| Vancouver benzeri (bedel %3, tavan %55) | %51 | 231 bin | 820 mr | %75 | 22,7 mr | 483 mr |
+
+Bedel geliri / yil 1 subvansiyon, etkin tahsilat %15 / %30 / %60 / %90: karma 0,10 / 0,19 / 0,39 / 0,58. Vancouver benzeri 0,15 / 0,31 / 0,62 / 0,92. Abonelik subvansiyonu eklenince onceki sonuc (bedel %3'te tahsilat %60'ta kendini finanse eder) gecerliligini yitirdi: kendini finanse etmek icin etkin tahsilat %90'a yakin olmali.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
