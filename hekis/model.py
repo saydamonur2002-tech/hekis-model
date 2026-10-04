@@ -38,6 +38,9 @@ class Params:
     horizon: int = 20
     rent_index: str = "none"
     opex_rate: float = 0.0
+    tax_rate: float = 0.0
+    unit_fixed: float = 0.0
+    vacant_aidat: bool = False
     prev_inflation: float = 0.0
 
     def validate(self) -> None:
@@ -117,13 +120,24 @@ def _load_units(raw: Iterable[dict]) -> list[UnitType]:
     return [UnitType(**item) for item in raw]
 
 
+def holding_cost(units: list[UnitType], params: Params) -> float:
+    """Yillik elde tutma gideri, bugunku TL. Bakim ve vergi degerle, sigorta daire basina,
+    bos dairenin aidati sahibe yazilir. Dolu dairenin aidati kiradan dusuldugu icin ikinci kez girmez."""
+    value = sum(u.count * u.price for u in units)
+    cost = (params.opex_rate + params.tax_rate) * value
+    cost += params.unit_fixed * sum(u.count for u in units)
+    if params.vacant_aidat:
+        cost += sum(u.aidat * 12 * u.count * params.vacancy for u in units)
+    return cost
+
+
 def static_payback(units: list[UnitType], params: Params) -> float:
     """Fiyat / yillik net havuz. Aidat borc servisine girmez."""
     value = sum(u.count * u.price for u in units)
     net = 0.0
     for u in units:
         net += (u.rent - u.aidat) * 12 * u.count * (1 - params.vacancy) * params.collection
-    net -= params.opex_rate * value
+    net -= holding_cost(units, params)
     if net <= 0:
         return float("inf")
     return value / net
@@ -165,7 +179,7 @@ def simulate(
     quota = 1.0
     rows: list[YearRow] = []
     pool0, subsidy0 = pool_and_subsidy(units, params)
-    opex0 = params.opex_rate * entry
+    opex0 = holding_cost(units, params)
     rent_scale = 1.0
     prev_pi = params.prev_inflation
 

@@ -109,7 +109,10 @@ def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool):
         rent_index=rent_index,
         settle_in_hekis=True,
         horizon=20,
-        opex_rate=obs["opex"]["yillik_oran_giris_degeri"] if realistic else 0.0,
+        opex_rate=obs["opex"]["bakim_orani_giris_degeri"] if realistic else 0.0,
+        tax_rate=obs["opex"]["emlak_vergisi_orani"] if realistic else 0.0,
+        unit_fixed=obs["opex"]["dask_tl_daire_yil"] if realistic else 0.0,
+        vacant_aidat=realistic,
         prev_inflation=obs["inflation_annual"]["2026_agustos_yoy"],
     )
     return simulate(units, paths[path_name], index, params, name=name)

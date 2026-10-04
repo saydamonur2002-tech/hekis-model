@@ -19,7 +19,7 @@ python -m hekis.bind_cli
 
 ## 2026 bagi, 1000+1000+500 olcek
 
-Istanbul satis m2 66.905 TL. Kira m2 479 TL. Aidat 3 bin ve bakim gideri yilda giris degerinin %1'i varsayimdir. Bosluk %3,7, Avrupa yakasi elektrik aboneligi.
+Istanbul satis m2 66.905 TL. Kira m2 479 TL. Aidat 3 bin varsayimdir. Gider: emlak vergisi binde 2, DASK 2.022 TL/daire, bos dairenin aidati sahibe yazilir (kaynakli). Bakim yilda giris degerinin %0,5'i (varsayim). Bosluk %3,7, Avrupa yakasi elektrik aboneligi.
 
 "Odenen", havuzun 20 yilda sahibe reel olarak geri odedigi anapara payidir. Yuksek olmasi iyidir. "Yuk", kira farki ile havuzun kapatamadigi aciktir, bugunku TL ile. Nominal toplam enflasyonun toplamini da icerir, o yuzden kullanilmaz.
 
@@ -28,16 +28,16 @@ Uc kosu yan yana. A eski model: enflasyon %31,5'te donuk, kira aninda TUFE kadar
 | Kosu | A odenen / yuk | B odenen / yuk | C odenen / yuk |
 | --- | --- | --- | --- |
 | Piyasa kira, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
-| Piyasa kira, sabit | %23 / 0 | %13 / 1,1 mr | %14 / 0,9 mr |
-| HEKIS kirasi, TUFE | %63 / 3,2 mr | %43 / 3,2 mr | %45 / 3,3 mr |
-| HEKIS kirasi, sabit | %10 / 0,5 mr | %3 / 2,0 mr | %3 / 1,9 mr |
-| Resmi sosyal kira, TUFE | %36 / 0 | %16 / 0 | %17 / 0 |
+| Piyasa kira, sabit | %23 / 0 | %15 / 0,8 mr | %15 / 0,6 mr |
+| HEKIS kirasi, TUFE | %63 / 3,2 mr | %47 / 3,2 mr | %50 / 3,3 mr |
+| HEKIS kirasi, sabit | %10 / 0,5 mr | %4 / 1,6 mr | %4 / 1,5 mr |
+| Resmi sosyal kira, TUFE | %36 / 0 | %20 / 0 | %22 / 0 |
 | Esenyurt, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
 | Esenyurt, %20 alti kira | %100 / 2,0 mr | %100 / 2,0 mr | %100 / 2,1 mr |
-| HEKIS, ulusal bos stok %27 | %48 / 2,5 mr | %28 / 2,5 mr | %29 / 2,5 mr |
+| HEKIS, ulusal bos stok %27 | %48 / 2,5 mr | %29 / 2,5 mr | %30 / 2,5 mr |
 
 Gider eklenince geri odeme belirgin duser. Sabit kirada gider TUFE ile artar, havuz bir noktadan sonra negatife doner. Dusen enflasyon sonucu pek degistirmez, cunku kira ve gider ayni endekste.
 
 ## Sinir
 
-Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Gider orani ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamis varsayimdir. Dusen enflasyon yolu tahmin degil, varsayimdir. Model yeni konut istahini kapatmaz.
+Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamis varsayimdir. Dusen enflasyon yolu tahmin degil, varsayimdir. Model yeni konut istahini kapatmaz.
