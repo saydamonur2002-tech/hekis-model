@@ -1,7 +1,7 @@
 """Dereceli kira, dereceli bos tutma bedeli ve kimin ne odedigi hesabi.
 
 Gelir dagilimi: medyan ve ortalamaya uydurulmus lognormal. Sinavi: ust ve alt %20 payi.
-Siyasi agirlik uretilmez. Kazanan ve kaybeden sayilari ve kisi basi tutarlar verilir.
+Kim ne oder, kisi basi tutarlar. Siyasi degerlendirme yok.
 
     python -m hekis.politics
 """
@@ -91,7 +91,7 @@ def main() -> int:
         gap = max(0.0, subsidy - revenue)
         print(f"{fee:>7.1%}{p:>9.1%}{tl(k):>10}{subsidy / 1e9:>13.1f}{revenue / 1e9:>21.1f}{revenue / subsidy:>12.1f}{gap / HOUSEHOLDS:>29,.0f}".replace(",", "."))
     print()
-    print("Kim kazanir, kim kaybeder (bedel %1, a=%30, kesim %40)")
+    print("Kim ne oder (bedel %1, a=%30, kesim %40)")
     p = activation.participation(g, c, 0.01, 25.0, 0.40)
     k = stok * p
     own_stay = stok * (1 - p)

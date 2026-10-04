@@ -83,7 +83,7 @@ Havuz her durumda tam kirayi aldigi icin oturanin odedigi pay sahibe geri odemey
 
 Kalan %25 anapara 20. yilda reel olarak odenmemis durur. Senedi devlet garanti ederse bu gizli yukumluluktur, modelde yuk olarak sayilmiyor.
 
-### Dereceli kira, bedel ve siyasi hesap
+### Dereceli kira ve bedel geliri
 
 `python -m hekis.politics`. Gelir dagilimi: TUIK 2025 medyan 241 bin, ortalama 333 bin TL (`data/GELIR.md`), lognormal uydurma. Sinavi: ust %20 payi model %48,5 (TUIK %48), alt %20 model %5,0 (TUIK %6,4). Esdeger-hane katsayisi 2,0, gelir artisi (asgari ucret 2024-2026) ve hane sayisi varsayimdir.
 
