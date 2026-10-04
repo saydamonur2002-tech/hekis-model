@@ -29,7 +29,7 @@ def band_factor(a: float, b: float, sigma: float) -> float:
 
 
 def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float = 0.20, sigma: float = 0.6,
-                   fee_buffer: float | None = None, lux_vac: float | None = None) -> dict:
+                   fee_buffer: float | None = None, lux_vac: float | None = None, premium: float = 0.0) -> dict:
     """fee_buffer: tampon bedeli (varsayilan genel bedel). lux_vac: luks bandinin bos stoktaki payi (varsayilan cut: bosluk
     deger sirasina esit dagilmis). Daha buyukse bosluk luks bandina kaymistir, kalan havuz ve tampon arasinda
     q_h : (1 - q_h - cut) oraninda bolunur."""
@@ -49,7 +49,7 @@ def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float =
     val = sum(u.price * u.count for u in units_probe)
     p0 = activation.params(obs)
     hold = (p0.tax_rate * val + p0.unit_fixed * cnt + sum(u.aidat * 12 * u.count for u in units_probe)) / val
-    p = activation.participation(P["g_e"], hold, P["fee"], P["slope"], P["cap"])
+    p = activation.participation(P["g_e"], hold + premium, P["fee"], P["slope"], P["cap"])  # premium: katilan sahibe yillik odenen, degerin yuzdesi
     n = S_h * p
     rent = sum(u.rent * u.count for u in units_probe) / cnt
     pay, _ = politics.graduated(rent, P["alpha"], q_h, uplift=P["uplift"], eq=P["eq"], scale=P["inc_scale"])
@@ -71,9 +71,30 @@ def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float =
     rev_lux = S_l * (1 - resp_l) * V_l * P["lux_fee"] * final.effective_collection(P["lux_fee"], P["lux_coll"])
     rev = rev_pool + rev_buf + rev_lux
     eligible = politics.HOUSEHOLDS * politics.TENANT_SHARE * q_h
-    return {"q_h": q_h, "S": (S_h, S_b, S_l), "V": (V_h, V_b, V_l), "p": p, "N": n, "sub1": first, "yuk": r.total_fiscal_real,
+    prem_cost = n * V_h * premium
+    return {"q_h": q_h, "prem_cost": prem_cost, "balance": rev - first - prem_cost, "S": (S_h, S_b, S_l), "V": (V_h, V_b, V_l), "p": p, "N": n, "sub1": first, "yuk": r.total_fiscal_real,
             "rev": rev, "rev_parts": (rev_pool, rev_buf, rev_lux), "ratio": rev / first if first > 0 else 0.0,
             "coverage": n / eligible, "freed_buf": S_b * resp_b, "freed_lux": S_l * resp_l, "entry": r.entry_value}
+
+
+def solve_premium(**kw) -> dict:
+    """Bedel gelirinin sub. ustunde kalan fazlasi katilim primine gider. Butce dengeli en buyuk prim, ama tavana
+    ulasilinca durur (bundan sonraki prim bosa gider)."""
+    base = run_three_zone(**kw)
+    if base["balance"] <= 0:
+        return {**base, "premium": 0.0, "base_N": base["N"]}
+    cap_n = base["S"][0] * ({**E.BASE, **LIKELY, **kw.get("P", {})}["cap"])
+    lo_p, hi_p = 0.0, 0.20
+    best = 0.0
+    for _ in range(50):
+        mid = (lo_p + hi_p) / 2
+        z = run_three_zone(premium=mid, **kw)
+        if z["balance"] >= 0 and z["N"] < 0.99 * cap_n:
+            best, lo_p = mid, mid
+        else:
+            hi_p = mid
+    z = run_three_zone(premium=best, **kw)
+    return {**z, "premium": best, "base_N": base["N"]}
 
 
 def main() -> int:
@@ -122,6 +143,20 @@ def main() -> int:
         zz = run_three_zone(**kw)
         freed = zz["freed_buf"] + zz["freed_lux"]
         print(f"{name:<44}{zz['N'] / 1000:>6.0f}b{bn(zz['sub1']):>6.1f}{bn(zz['rev']):>7.1f}{zz['ratio']:>6.2f}{bn(zz['yuk']):>6.0f}{tl(zz['S'][0]):>9}{tl(zz['S'][2]):>9}{tl(freed):>9}")
+    print()
+    print("Fazla gelir katilim primine gider: butce dengeli en buyuk prim (katilim tavanina ulasinca durur).")
+    print(f"{'varyant':<36}{'daire once':>11}{'sonra':>8}{'prim %deger/yil':>17}{'prim mr':>9}{'kalan fazla':>13}{'kapsam':>8}{'20y yuk':>9}")
+    for name, kw in (("temel", dict()), ("tampon bedelsiz", dict(fee_buffer=0.0)), ("luks %40", dict(lux_vac=0.40)), ("luks %60", dict(lux_vac=0.60))):
+        z = solve_premium(**kw)
+        print(f"{name:<36}{z['base_N'] / 1000:>10.0f}b{z['N'] / 1000:>7.0f}b{z['premium']:>17.2%}{bn(z['prem_cost']):>9.1f}{bn(z['balance']):>13.1f}{z['coverage']:>8.1%}{bn(z['yuk']):>9.0f}")
+    print()
+    print("Prim tavani asinca bosa gider: katilim tavani (kullanima uygun stok payi) bagli. Kalan fazla tavani %25'ten %40'a")
+    print("cikaracak tadilat icin kullanilsa, daire basina yillik butce (tadilat maliyeti verisi yok, esik olarak):")
+    for name, kw in (("temel", dict()), ("tampon bedelsiz", dict(fee_buffer=0.0)), ("luks %40", dict(lux_vac=0.40)), ("luks %60", dict(lux_vac=0.60))):
+        z = solve_premium(**kw)
+        extra = z["S"][0] * 0.15
+        per = z["balance"] / extra if extra else 0.0
+        print(f"  {name:<20}ek daire {extra / 1000:>5.1f} bin, kalan fazla {bn(z['balance']):>5.1f} mr/yil -> daire basina yillik {per:>10,.0f} TL".replace(",", "."))
     return 0
 
 
