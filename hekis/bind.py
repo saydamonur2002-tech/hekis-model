@@ -51,6 +51,10 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik") -> tup
         rent = esenyurt_rents(obs)
         tenant = rent
         price = {name: rent[name] * 12 * 18 for name in SIZES}
+    elif rent_mode == "esenyurt_sub20":
+        rent = esenyurt_rents(obs)
+        tenant = {name: rent[name] * 0.80 for name in SIZES}
+        price = {name: rent[name] * 12 * 18 for name in SIZES}
     elif rent_mode == "hekis":
         rent = obs["policy_rent"]
         social = obs["social_rent"]
@@ -91,6 +95,7 @@ def run_bound(obs: dict | None = None) -> list[str]:
         ("hekis_sabit_kira", "hekis", "none", "hold_last", "elektrik"),
         ("sosyal_tufe", "sosyal", "tufe", "hold_last", "elektrik"),
         ("esenyurt_tufe", "esenyurt", "tufe", "hold_last", "elektrik"),
+        ("esenyurt_sub20_tufe", "esenyurt_sub20", "tufe", "hold_last", "elektrik"),
         ("hekis_bos_stok", "hekis", "tufe", "hold_last", "bos_stok"),
     ]
     for name, mode, rent_index, path_name, vacancy_key in specs:
