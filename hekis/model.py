@@ -36,6 +36,7 @@ class Params:
     settle_in_hekis: bool = True
     leakage_rate: float = 0.70
     horizon: int = 20
+    rent_index: str = "none"
 
     def validate(self) -> None:
         if not 0 <= self.vacancy < 1:
@@ -50,6 +51,8 @@ class Params:
             raise ValueError("leakage_rate 0 ile 1 arasinda olmali")
         if self.horizon < 1:
             raise ValueError("horizon en az 1")
+        if self.rent_index not in ("none", "tufe"):
+            raise ValueError("rent_index none veya tufe olmali")
 
 
 @dataclass
@@ -151,12 +154,15 @@ def simulate(
     cpi = 1.0
     quota = 1.0
     rows: list[YearRow] = []
-    pool, subsidy = pool_and_subsidy(units, params)
+    pool0, subsidy0 = pool_and_subsidy(units, params)
 
     for year in range(1, n + 1):
         pi = inflation[year - 1]
         cpi *= 1 + pi
         x = physical_index[year - 1]
+        scale = cpi if params.rent_index == "tufe" else 1.0
+        pool = pool0 * scale
+        subsidy = subsidy0 * scale
 
         production = quota * params.production_share * pool
         service_cash = pool - production
