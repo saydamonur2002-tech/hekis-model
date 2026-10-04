@@ -46,6 +46,10 @@
     "aidat": 3000,
     "kaynak": "model varsayimi, gozlem degil"
   },
+  "opex": {
+    "yillik_oran_giris_degeri": 0.01,
+    "kaynak": "model varsayimi, gozlem degil. Bakim, onarim, emlak vergisi, yonetim. Sifir degil, ama 1% de olculmus sayi degil"
+  },
   "sizes_m2": {"1+0": 40, "1+1": 60, "2+1": 95},
   "vacancy": {
     "elektrik_abonelik_avrupa_yakasi": 0.037,

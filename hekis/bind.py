@@ -82,31 +82,54 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik") -> tup
     return units, vacancy
 
 
-def run_bound(obs: dict | None = None) -> list[str]:
-    obs = obs or load_obs()
+SPECS = [
+    ("piyasa_tufe", "piyasa", "tufe", "elektrik"),
+    ("piyasa_sabit_kira", "piyasa", "none", "elektrik"),
+    ("hekis_tufe", "hekis", "tufe", "elektrik"),
+    ("hekis_sabit_kira", "hekis", "none", "elektrik"),
+    ("sosyal_tufe", "sosyal", "tufe", "elektrik"),
+    ("esenyurt_tufe", "esenyurt", "tufe", "elektrik"),
+    ("esenyurt_sub20_tufe", "esenyurt_sub20", "tufe", "elektrik"),
+    ("hekis_bos_stok", "hekis", "tufe", "bos_stok"),
+]
+
+
+def run_one(obs: dict, spec: tuple, path_name: str, realistic: bool):
+    """realistic: kira 12 aylik TUFE ortalamasiyla, bakim gideri ile. Degilse eski saf TUFE, gidersiz."""
+    name, mode, rent_index, vacancy_key = spec
     paths = inflation_paths(obs)
     index = [1.0] * 20
     index[2] = 0.9
-    reports = []
-    specs = [
-        ("piyasa_tufe", "piyasa", "tufe", "hold_last", "elektrik"),
-        ("piyasa_sabit_kira", "piyasa", "none", "hold_last", "elektrik"),
-        ("hekis_tufe", "hekis", "tufe", "hold_last", "elektrik"),
-        ("hekis_sabit_kira", "hekis", "none", "hold_last", "elektrik"),
-        ("sosyal_tufe", "sosyal", "tufe", "hold_last", "elektrik"),
-        ("esenyurt_tufe", "esenyurt", "tufe", "hold_last", "elektrik"),
-        ("esenyurt_sub20_tufe", "esenyurt_sub20", "tufe", "hold_last", "elektrik"),
-        ("hekis_bos_stok", "hekis", "tufe", "hold_last", "bos_stok"),
-    ]
-    for name, mode, rent_index, path_name, vacancy_key in specs:
-        units, vacancy = build_units(obs, mode, vacancy_key)
-        params = Params(
-            vacancy=vacancy,
-            collection=0.98,
-            rent_index=rent_index,
-            settle_in_hekis=True,
-            horizon=20,
-        )
-        result = simulate(units, paths[path_name], index, params, name=name)
-        reports.append(format_report(result))
-    return reports
+    if realistic and rent_index == "tufe":
+        rent_index = "tufe_ort12"
+    units, vacancy = build_units(obs, mode, vacancy_key)
+    params = Params(
+        vacancy=vacancy,
+        collection=0.98,
+        rent_index=rent_index,
+        settle_in_hekis=True,
+        horizon=20,
+        opex_rate=obs["opex"]["yillik_oran_giris_degeri"] if realistic else 0.0,
+        prev_inflation=obs["inflation_annual"]["2026_agustos_yoy"],
+    )
+    return simulate(units, paths[path_name], index, params, name=name)
+
+
+def run_bound(obs: dict | None = None, path_name: str = "disinflation_varsayim", realistic: bool = True) -> list[str]:
+    obs = obs or load_obs()
+    return [format_report(run_one(obs, spec, path_name, realistic)) for spec in SPECS]
+
+
+def matrix(obs: dict | None = None) -> str:
+    """Eski donuk-TUFE kosusu ile gerceklige uyarlanmis kosunun yan yana karsilastirmasi."""
+    obs = obs or load_obs()
+    tl = lambda v: f"{v / 1e9:,.1f}".replace(",", ".")
+    cols = ("A) eski: donuk %31,5", "B) A + kira gecikmesi + gider", "C) B + dusen enflasyon")
+    lines = [f"{'kosu':<22}" + "".join(f"{c:>31}" for c in cols), f"{'':<22}" + f"{'odenen  yuk(mr TL, bugunku)':>31}" * 3]
+    for spec in SPECS:
+        cells = []
+        for path_name, realistic in (("hold_last", False), ("hold_last", True), ("disinflation_varsayim", True)):
+            r = run_one(obs, spec, path_name, realistic)
+            cells.append(f"{r.real_eroded:5.0%}  {tl(r.total_fiscal_real):>8}")
+        lines.append(f"{spec[0]:<22}" + "".join(f"{c:>31}" for c in cells))
+    return "\n".join(lines)

@@ -19,19 +19,25 @@ python -m hekis.bind_cli
 
 ## 2026 bagi, 1000+1000+500 olcek
 
-Istanbul satis m2 66.905 TL. Kira m2 479 TL. Enflasyon ileri patikada son gozlenen yillik oran, %31,5, donduruldu. Bu dondurma veri degil. Bosluk %3,7, Avrupa yakasi elektrik aboneligi. Aidat 3 bin varsayim.
+Istanbul satis m2 66.905 TL. Kira m2 479 TL. Aidat 3 bin ve bakim gideri yilda giris degerinin %1'i varsayimdir. Bosluk %3,7, Avrupa yakasi elektrik aboneligi.
 
-| Kosu | Statik geri donus | 20 yilda reel erime |
-| --- | --- | --- |
-| Piyasa kira, TUFE'ye bagli | 13,5 yil | tamamlanir |
-| Piyasa kira, nominal sabit | 13,5 yil | %23 |
-| HEKIS kirasi 20/15/10, oturan sosyal kira, TUFE | 31,8 yil | %63 |
-| Resmi sosyal kira, TUFE | 55,9 yil | %36 |
-| Esenyurt gozlenen kira, 18 yil turev fiyat | 23,0 yil | %87 |
-| HEKIS, ulusal bos stok %27 | 42,0 yil | %48 |
+"Odenen", havuzun 20 yilda sahibe reel olarak geri odedigi anapara payidir. Yuksek olmasi iyidir. "Yuk", kira farki ile havuzun kapatamadigi aciktir, bugunku TL ile. Nominal toplam enflasyonun toplamini da icerir, o yuzden kullanilmaz.
 
-Piyasa kirasi endekslenirse havuz anaparayi reel olarak 15 yilda bitirir. Endekslenmezse enflasyon havuzu yer, 20 yilda anaparanin ancak dortte biri erir. HEKIS kirasi piyasanin altindadir. Oturan resmi sosyal kirayi oderse fark butcedir. Bu fark da endekslenirse reel yillik transfer yaklasik 162 milyon TL'dir. Nominal toplam 161 milyar yaziyorsa bu enflasyonun toplamidir, bugunku yuk degil.
+Uc kosu yan yana. A eski model: enflasyon %31,5'te donuk, kira aninda TUFE kadar artar, gider yok. B kira yenilemede 12 aylik TUFE ortalamasi ile artar, gider eklendi. C ayrica enflasyon %31,5'ten %15'e dogrusal iner (varsayim).
+
+| Kosu | A odenen / yuk | B odenen / yuk | C odenen / yuk |
+| --- | --- | --- | --- |
+| Piyasa kira, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
+| Piyasa kira, sabit | %23 / 0 | %13 / 1,1 mr | %14 / 0,9 mr |
+| HEKIS kirasi, TUFE | %63 / 3,2 mr | %43 / 3,2 mr | %45 / 3,3 mr |
+| HEKIS kirasi, sabit | %10 / 0,5 mr | %3 / 2,0 mr | %3 / 1,9 mr |
+| Resmi sosyal kira, TUFE | %36 / 0 | %16 / 0 | %17 / 0 |
+| Esenyurt, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
+| Esenyurt, %20 alti kira | %100 / 2,0 mr | %100 / 2,0 mr | %100 / 2,1 mr |
+| HEKIS, ulusal bos stok %27 | %48 / 2,5 mr | %28 / 2,5 mr | %29 / 2,5 mr |
+
+Gider eklenince geri odeme belirgin duser. Sabit kirada gider TUFE ile artar, havuz bir noktadan sonra negatife doner. Dusen enflasyon sonucu pek degistirmez, cunku kira ve gider ayni endekste.
 
 ## Sinir
 
-Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Model yeni konut istahini kapatmaz.
+Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Gider orani ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamis varsayimdir. Dusen enflasyon yolu tahmin degil, varsayimdir. Model yeni konut istahini kapatmaz.

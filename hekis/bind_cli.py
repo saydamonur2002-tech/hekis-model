@@ -3,10 +3,12 @@
     python -m hekis.bind_cli
 """
 
-from hekis.bind import run_bound
+from hekis.bind import matrix, run_bound
 
 
 def main() -> int:
+    print(matrix())
+    print()
     for report in run_bound():
         print(report)
         print()
