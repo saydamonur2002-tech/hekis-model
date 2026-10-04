@@ -1,4 +1,4 @@
-"""Gozlem dosyasindan senaryo uret. Fiyat m2 gozlem, tip fiyati olcek varsayimi."""
+"""Gozlem dosyasindan senaryo uret."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ def load_obs(path: str | Path | None = None) -> dict:
     return json.loads(target.read_text(encoding="utf-8"))
 
 
-def prices_from_m2(obs: dict) -> dict[str, float]:
-    m2 = obs["sale"]["istanbul_m2_tl"]
+def prices_from_m2(obs: dict, key: str = "istanbul_m2_tl") -> dict[str, float]:
+    m2 = obs["sale"][key]
     return {name: m2 * size for name, size in SIZES.items()}
 
 
@@ -50,11 +50,11 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik") -> tup
     elif rent_mode == "esenyurt":
         rent = esenyurt_rents(obs)
         tenant = rent
-        price = {name: rent[name] * 12 * 18 for name in SIZES}
+        price = prices_from_m2(obs, "esenyurt_m2_tl")
     elif rent_mode == "esenyurt_sub20":
         rent = esenyurt_rents(obs)
         tenant = {name: rent[name] * 0.80 for name in SIZES}
-        price = {name: rent[name] * 12 * 18 for name in SIZES}
+        price = prices_from_m2(obs, "esenyurt_m2_tl")
     elif rent_mode == "hekis":
         rent = obs["policy_rent"]
         social = obs["social_rent"]
