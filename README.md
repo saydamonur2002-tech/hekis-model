@@ -71,6 +71,10 @@ Bugun beklenen reel artis -%6,5. 450 bin bos stok, bedel %1, orta nokta (tavan %
 
 Geriye donuk (pencere 1): 2021 %1, 2022 %0,3, 2023 %0, 2024 %3, 2025 %38, 2026 %26, bugun %35. Patlama rejiminde katilim sifir. Bos tutma bedeli %0-2 araliginda katilimi sadece birkac puan oynatir: tavan sinirlayici, insentif degil.
 
+Yurt disi benzerleri (`data/ANALOG.md`). Bos stoktaki tepkiyi olcen tek net ornek Vancouver: bos konut vergisi degerin %1'inden %3-5'ine cikarken bos konut sayisi 2017-2022'de %54 azaldi (bir kismi sahibinin oturmasiyla, kiraya verilenler %25). Fransa'da vergi onemli olcude etkili olmadi, Irlanda'da kendi beyanli vergi sinirli kaldi. Yaptirimsiz gonullu programlar cok dusuk: Portekiz'de kira sozlesmelerinin %0,12-0,4'u, Irlanda Repair and Leasing'de basvuranlarin %3,8'i anlasma imzaladi. Bunlar secilmis kitle uzerinden, bos stoga orani degil.
+
+Bu uc ucla sinirlanmis senaryolar (450 bin bos stok): gonullu tek basina %4 katilim, 20 bin daire, 32 mr TL yuk. Mevcut karma varsayim (bedel %1, tavan %40) 161 bin daire, 261 mr TL. Vancouver benzeri (bedel %3, tavan %55) 231 bin daire, 374 mr TL. Mevcut kanun taslagindaki bedel (%0,2-2) Vancouver'in altinda, Fransa'nin basarisiz kaldigi duzeye yakin. Merkezi %40 varsayimina ancak guclu yaptirimla ulasilir, gonullu program tek basina ulasmaz.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
