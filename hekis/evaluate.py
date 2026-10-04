@@ -24,7 +24,7 @@ SPACE = {
     "alpha": (0.20, 0.30, 0.40),           # oturanin gelirden kira payi
     "qcut": (0.20, 0.40, 0.60),            # uygun gelir dilimi
     "uplift": (1.3, politics.UPLIFT, 2.0),
-    "inc_scale": (1.0, politics.INCOME_SCALE, 1.5),   # Istanbul gelirinin ulusala orani (alt dilimler icin belirsiz)
+    "inc_scale": (0.6, politics.INCOME_SCALE, 1.5),   # hane gelir olcegi: sendika alt anchor 0,63, ulusal 1,0, Istanbul TR10 1,31
     "util_scale": (0.7, 1.0, 1.5),         # abonelik gider carpani
     "infl_shift": (-0.05, 0.0, 0.10),      # OVP yoluna eklenen enflasyon
     "cut": (0.10, 0.20, 0.50),             # ayrilan luks pay

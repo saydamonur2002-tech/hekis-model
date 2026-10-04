@@ -4,7 +4,7 @@ Hedef Endeksli Kapali Ic Senet. Bos konut stokunu kullandirmanin stok-akim hesab
 
 Bu bir politika vaadi degil, hesap makinesidir. Repo ozel, kisisel modelleme. Dogrulanmis bir kamu maliyesi modeli degildir. Gozlem ile varsayim ayri tutulur, ayri dosyalarda: `data/VARSAYIM.md`.
 
-**Kapsam: simdilik yalniz Istanbul.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu 3,09 ADNKS; kiraci payi %27 ulusal varsayim, Istanbul'a ozgu veri bulunamadi; Istanbul geliri ulusalin 1,307 kati, TUIK TR10 434.929 / 332.882 TL). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
+**Kapsam: simdilik yalniz Istanbul.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu 3,09 ADNKS; kiraci payi %27 ulusal varsayim, Istanbul'a ozgu veri bulunamadi; hane geliri baz ulusal TUIK dagilimi, bant sendika 0,63 ile Istanbul TR10 1,31 arasi, `hekis.union`). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
 
 ## Calistirma
 
@@ -78,9 +78,7 @@ Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yukse
 
 Kosul: bedel x tahsilat >= (12 s / V) x p / (1 - p). s yerlesen daire basina aylik subvansiyon, V deger, p yerlesen oran. Katilim arttikca bedel odeyen taban erir. V 3,55 mn, s 8 bin TL/ay icin gerekli etkin bedel p %10'da %0,3, %36'da %1,5, %50'de %2,7, %60'ta %4,1 (`hekis.selffinance`).
 
-Monte Carlo (1500 cekilis, 19 parametre, ucgen dagilim, `hekis.analysis`, Istanbul): yerlesen daire %5/%50/%95 yuzdeliginde 18/103/216 bin, 20 yil yuk 23/124/309 mr TL. Kendini finanse eden cekilis %92, ama bu olcege bagli: yerlesen daire 75 bin altinda %100, 75-150 binde %93, 150 binin ustunde %78 (medyan oran 1,38). Spearman(daire, oran) = -0,74. Baz durumda (132 bin daire) oran 1,32, sub. 7,3 mr, bedel 9,6 mr.
-
-Dikkat: bu sonuc Istanbul gelir olcegine cok duyarli. Olcek 1,0 (ulusal dagilim) iken oran 0,93, 1,15'te 1,12, 1,307'de (baz) 1,32, 1,5'te 1,58; yani sistem Istanbul geliri ulusalin yaklasik %6 ustundeyse kendini finanse eder. Tum dagilimi ortalama orani kadar olceklemek varsayimdir: Istanbul'un alt dilimleri ulusalin %31 ustunde olmayabilir.
+Monte Carlo (1500 cekilis, 19 parametre, ucgen dagilim, `hekis.analysis`, Istanbul): yerlesen daire %5/%50/%95 yuzdeliginde 18/103/216 bin, 20 yil yuk 29/158/412 mr TL. Kendini finanse eden cekilis %83, ama bu olcege bagli: yerlesen daire 25 bin altinda %100, 25-75 binde %98, 75-150 binde %85, 150 binin ustunde %57 (medyan oran 1,09). Spearman(daire, oran) = -0,72. Baz durumda (132 bin daire) oran 0,93, sub. 10,4 mr, bedel 9,6 mr.
 
 Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut artisi (0,58), katilim tavani (-0,51), genel bedel, ayrilan luks pay, kira/gelir kurali, uygun kitle, etkin tahsilat. Bakim orani, aidat, stok buyuklugu (oranda), enflasyon yolu neredeyse hic.
 
@@ -94,11 +92,17 @@ Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut art
 
 Faiz kanali (2019-2025, n=7, R2 0,81, nedensellik degil): reel konut artisi = 0,005 - 1,35 x reel faiz. Bugunku reel faizde tahmin -%5,1, gozlenen -%6,5. Katilim penceresi reel faiz yaklasik -%0,4'un altina inmedikce acik; tampon 4,6 puan. Reel faiz 0'da yerlesen %30 duser, -%5'te dortte birine iner.
 
-Senaryolar, Istanbul, beklenen reel artis -%3,7, Istanbul gelir olcegi 1,307 (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30, luks bedel %5) 82 bin daire, yil 1 sub. 4,6, bedel 6,1, oran 1,33, fazla 1,5, 20 yil yuk 96. Iyimser 196 bin daire, sub. 10,8, oran 1,46, yuk 228. Kotumser 26 bin daire, yuk 30. Gelir olcegi 1,0 olsa en olasi sub. 6,5, oran 0,94, yuk 137.
+Senaryolar, Istanbul, beklenen reel artis -%3,7, ulusal TUIK gelir dagilimi (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30, luks bedel %5) 82 bin daire, yil 1 sub. 6,5, bedel 6,1, oran 0,94, acik 0,4, 20 yil yuk 137. Iyimser 196 bin daire, sub. 15,3, oran 1,03, yuk 326. Kotumser 26 bin daire, yuk 43.
 
-Etki (en olasi, 82 bin hane, hane basina ayda 4.600 TL): Istanbul'da uygun (alt %40) 551 bin kiraci hanenin %15,0'ina ulasir. Gini 0,4296 -> 0,4290 (-0,0006), goreli yoksulluk -0,15 puan, piyasa kirasi dogrusal yaklasimla -%6 ile -%20 (ust sinir, esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %62'den %30'a, alt %20'de %44'ten %30'a, alt %40'ta %27'den %25'e duser, aylik kazanc 9.900 ile 1.600 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
+Etki (en olasi, 82 bin hane, hane basina ayda 6.524 TL): Istanbul'da uygun (alt %40) 551 bin kiraci hanenin %15,0'ina ulasir. Gini 0,4296 -> 0,4285 (-0,0011), goreli yoksulluk -0,27 puan, piyasa kirasi dogrusal yaklasimla -%6 ile -%20 (ust sinir, esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %81'den %30'a, alt %40'ta %36'dan %30'a duser, aylik kazanc 12.100 ile 3.000 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
 
 Duzeltme: bu bolumun onceki surumunde bos stok Istanbul'un (450 bin) ama kapsam ve etki 28 mn ulusal hane uzerindendi. Tutarsizlik giderildi.
+
+### 7b-2. Sendika verisiyle hane geliri medyani
+
+`python -m hekis.union`, `data/SENDIKA.md`. DISK-AR: ucretlilerin %46,7'si (8,36 mn) asgari ucret ve altinda, ozel sektor %49,6'si asgari ucretin %5 fazlasi ve alti. Medyan isci ucreti net asgari ucrete yakin: 28.076 TL (2026). Bu SGK kayitli bireysel ucrettir, hane geliri degil. Istanbul'a ozgu sendika verisi bulunamadi.
+
+Uc anchor, en olasi senaryo: A sendika (28.076 x 1,5 calisan varsayimi = 42.113 TL hane medyani, yalniz ucret, alt sinir): 82 bin daire, sub. 9,9 mr, oran 0,61, 20 yil yuk 212, Gini -0,0025. B TUIK ulusal (66.369 TL, baz): sub. 6,5, oran 0,94, yuk 137, Gini -0,0011. C TUIK Istanbul (86.715 TL): sub. 4,6, oran 1,33, yuk 96, Gini -0,0006. Basabas hane medyani 69.638 TL/ay, net asgari ucretin 2,48 kati. Hane basina calisan sayisi 1,2'den 2,4'e giderse oran 0,55'ten 0,96'ya cikar. Sonuc: sistem basabas civarinda, gelir kaynagina gore 0,6 ile 1,3 arasi. Baz B, A ve C bant.
 
 ## 7c. Istanbul ve 7 buyuksehir (simdilik kapsam disi, ayri calisma)
 

@@ -15,7 +15,7 @@ Siniflar: TEYITLI (kaynakta gorulen), TURETILMIS (veriden hesap, yontem varsayim
 | Abonelik (elektrik, gaz, su) | 1.583 TL/ay | elektrik TEYITLI, gaz ve su TURETILMIS/eski | dusuk (0,03) |
 | Gelir dagilimi | lognormal, medyan 241 bin, ort. 333 bin | TURETILMIS (ust/alt %20 payi sinandi: %48,5/%5,0) | orta |
 | Hane katsayisi, gelir artisi | 2,0; 1,65 | VARSAYIM | orta (uplift 0,12) |
-| Istanbul gelir olcegi | 1,307 (TUIK TR10 434.929 / Turkiye 332.882) | TEYITLI ortalama, TUM dagilima uygulanmasi VARSAYIM | yuksek: oran 0,93 (olcek 1,0) ile 1,58 (1,5) arasi |
+| Hane gelir olcegi | baz 1,0; sendika 0,63; Istanbul TR10 1,31 | Sendika medyani TEYITLI (aktarim), hane medyanina cevirme VARSAYIM (1,5 calisan); TR10 ortalama TEYITLI, tum dagilima uygulama VARSAYIM | yuksek: oran 0,61 / 0,94 / 1,33 |
 | Istanbul hane sayisi | 15,75 mn / 3,09 = 5,10 mn | TEYITLI (ADNKS 2025) | orta |
 | Istanbul kiraci hane payi | %27 | VARSAYIM (ulusal, Istanbul verisi bulunamadi) | orta |
 | Sosyal kira | 12/10 bin | TEYITLI (Bakan aciklamasi) | orta |

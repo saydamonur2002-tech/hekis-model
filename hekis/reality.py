@@ -32,14 +32,15 @@ def ols(xs: list[float], ys: list[float]) -> tuple[float, float, float]:
     return a, b, 1 - ss_res / ss_tot
 
 
-def gini_with_benefit(n_housed: float, benefit_year: float, households: float = politics.HOUSEHOLDS, grid: int = 4000):
+def gini_with_benefit(n_housed: float, benefit_year: float, households: float = politics.HOUSEHOLDS, grid: int = 4000,
+                      scale: float | None = None):
     """Hane geliri dagilimi (lognormal). Alt %40'tan n_housed hane yillik benefit_year TL alir (kura).
     Doner: gini once, gini sonra, goreli yoksulluk once/sonra (medyanin %50'si, gelir ilavesi sonrasi sabit cizgi)."""
     phi = min(1.0, n_housed / (0.4 * households))
     base, after = [], []
     for i in range(grid):
         q = (i + 0.5) / grid
-        inc = politics.hh_monthly(q) * 12
+        inc = politics.hh_monthly(q, scale=scale) * 12
         w = 1 / grid
         base.append((inc, w))
         if q < 0.4:
@@ -47,7 +48,7 @@ def gini_with_benefit(n_housed: float, benefit_year: float, households: float = 
             after.append((inc, w * (1 - phi)))
         else:
             after.append((inc, w))
-    line = 0.5 * politics.hh_monthly(0.5) * 12
+    line = 0.5 * politics.hh_monthly(0.5, scale=scale) * 12
 
     def gini(cells: list[tuple[float, float]]) -> float:
         cells = sorted(cells)

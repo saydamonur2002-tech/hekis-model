@@ -14,7 +14,8 @@ from statistics import NormalDist
 from hekis import activation
 from hekis.bind import load_obs
 
-INCOME_SCALE = 434_929.0 / 332_882.0  # Istanbul (TR10) ortalama esdeger gelir / Turkiye, TUIK GYKA 2025. Ayni dagilim genisligi varsayimi
+ISTANBUL_TR10_RATIO = 434_929.0 / 332_882.0  # Istanbul (TR10) ortalama esdeger gelir / Turkiye, TUIK GYKA 2025. Ust anchor
+INCOME_SCALE = 1.0  # baz: ulusal TUIK dagilimi. Sendika alt anchor 0,63, Istanbul TR10 ust anchor 1,31 (hekis.union)
 MEDIAN = 241_151.0
 MEAN = 332_882.0
 EQ_FACTOR = 2.0          # varsayim
