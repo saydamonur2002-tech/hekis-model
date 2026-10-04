@@ -57,6 +57,11 @@ def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik", aidat:
         rent = esenyurt_rents(obs)
         tenant = {name: rent[name] * 0.80 for name in SIZES}
         price = prices_from_m2(obs, "esenyurt_m2_tl")
+    elif rent_mode == "esenyurt_sosyal":
+        rent = esenyurt_rents(obs)
+        social = obs["social_rent"]
+        tenant = {"2+1": social["2+1"], "1+1": social["1+1"], "1+0": social["1+1"] * 0.8}
+        price = prices_from_m2(obs, "esenyurt_m2_tl")
     elif rent_mode == "hekis":
         rent = obs["policy_rent"]
         social = obs["social_rent"]

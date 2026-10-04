@@ -42,6 +42,23 @@ A eski model: enflasyon %31,5 donuk, kira aninda TUFE, gider yok. B kira 12 ayli
 
 Duyarlilik (HEKIS kirasi, TUFE, C kosusu, geri odenen): bazda (Istanbul ortalamasi 3.330 TL, bakim %1) %41. Turkiye ortalamasi 600 TL ile %56. Besiktas 8.400 TL'de %14. Bakim %2'de bu degerler %36, %21, %0. `python -m hekis.bind_cli` tum tabloyu basar.
 
+## Bos stoku kullandirma
+
+`python -m hekis.activation`. Bos duran daire sisteme girerse ne olur. Orta semt Istanbul ortalamasi, ucuz semt Esenyurt. Havuz kirayi oder, oturan sosyal kira oder, fark butcedir.
+
+Istanbul'da bos konut 225 bin (elektrik aboneligi, Buyukduman) ile 450-750 bin (IBB) arasinda tahmin ediliyor. Stok 4,5 milyon. Yontem farki, tek sayi degil. Orta/ucuz semt payi bilinmiyor, yari yariya senaryodur. Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir.
+
+| Daire basina | Fiyat | Sahibin bos maliyeti / yil | Sosyal sub. / yil | 20 yil odenen | 20 yil yuk |
+| --- | --- | --- | --- | --- | --- |
+| Orta semt | 4,68 mn TL | 51 bin TL | 65 bin TL | %41 | 1,4 mn TL |
+| Ucuz semt (Esenyurt) | 2,41 mn TL | 24 bin TL | 85 bin TL | %100 | 1,8 mn TL |
+
+Ornek: 225 bin bos stokun %10'u girerse 22.500 daire, 80 mr TL giris degeri, 20 yilda yaklasik 36 mr TL (bugunku TL) yuk. Katilim %25 olursa 91 mr TL.
+
+Ucuz semtte geri odeme %100 cikmasi Esenyurt fiyatinin turetilmis olmasina dayanir. Esenyurt aidati kaynaksiz varsayim.
+
+Bu blokta olmayanlar: tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, katilim karari, kademeli giris.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
