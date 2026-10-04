@@ -1,0 +1,23 @@
+{
+  "name": "nakit_kacis",
+  "units": [
+    {"name": "2+1", "count": 1000, "price": 7500000, "rent": 20000, "aidat": 3000, "tenant_pay": 10000},
+    {"name": "1+1", "count": 1000, "price": 5500000, "rent": 15000, "aidat": 3000, "tenant_pay": 8000},
+    {"name": "1+0", "count": 500, "price": 3500000, "rent": 10000, "aidat": 3000, "tenant_pay": 6000}
+  ],
+  "params": {
+    "vacancy": 0.05,
+    "collection": 0.98,
+    "real_coupon": 0.0,
+    "premium_alpha": 0.04,
+    "premium_cap": 0.10,
+    "index_threshold": 1.0,
+    "quota_cut": 0.5,
+    "production_share": 0.0,
+    "settle_in_hekis": false,
+    "leakage_rate": 0.70,
+    "horizon": 20
+  },
+  "inflation": [0.30, 0.28, 0.26, 0.24, 0.22, 0.20, 0.18, 0.18, 0.16, 0.16, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15],
+  "physical_index": [0.85, 0.90, 0.95, 1.02, 1.05, 1.08, 1.10, 1.04, 0.92, 1.06, 1.05, 1.05, 1.04, 1.03, 1.02, 1.02, 1.01, 1.01, 1.00, 1.00]
+}
