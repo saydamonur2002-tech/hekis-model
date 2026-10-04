@@ -119,6 +119,14 @@ Bedel geliri / yil 1 subvansiyon, etkin tahsilat %15 / %30 / %60 / %90: karma 0,
 
 V = 3,55 mn TL icin gerekli etkin bedel (bedel x tahsilat, degerin yilda yuzdesi), s = 4 bin / 8 bin / 14 bin TL/ay: p %10'da 0,2 / 0,3 / 0,5; p %36'da 0,8 / 1,5 / 2,7; p %50'de 1,4 / 2,7 / 4,7; p %60'ta 2,0 / 4,1 / 7,1. Deger duyarliligi (p %36, s 8,4 bin): V 1,5 mn 3,8%, 2,4 mn 2,4%, 3,55 mn 1,6%, 4,7 mn 1,2%, 6 mn 0,9%. Bedel %5 ve tahsilat %90 (etkin %4,5) ile kendini finanse eden en yuksek yerlesen oran: s 8,4 bin, V 3,55 mn icin %61, s 14 bin ve V 2,4 mn icin %39.
 
+### Luks ust dilim ayrimi
+
+`python -m hekis.final`. Orta tipteki (Istanbul ortalamasi) bos stoktan en pahali %20 havuz disi birakilir, bos olsa bile. Deger dagilimi lognormal, ortalama sabit, sigma 0,6 (varsayim, ilce ortalamalarindan: Beşiktaş/Kadıköy/Sarıyer 155-177 bin TL/m2, Esenyurt 34 bin). Ucuz (Esenyurt) tipte luks yok varsayilir. Orta tipteki kira politika kirasi, degere bagli degil.
+
+Karma sistem: tum stok 161 bin daire, giris 572 mr, yil 1 sub. 15,8 mr, 20 yil yuk 337 mr, gelir/sub. 0,39. Luks ayrilinca 146 bin daire, giris 421 mr (-%26), yil 1 sub. 14,5 mr, yuk 307 mr, gelir/sub. 0,31. Luks daireler bedel odemeye devam ederse 0,49. Vancouver benzeri: 0,62 / 0,49 / 0,86. Gonullu: 20 bin / 18 bin daire. Luks pay %35-50'ye ve sigma 0,4-0,8'e cikarsa karma sistem 121-146 bin daire, 262-308 mr yuk, gelir/sub. 0,24-0,33.
+
+Luksu havuzdan ayirmak giris degerini cok dusurur (daire sayisini az), cunku deger ust dilimde yogun. Luksu bedel tabanindan da ayirmak gelir/sub. oranini dusurur: luks bos daire en verimli bedel odeyicidir.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.

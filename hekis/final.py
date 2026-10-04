@@ -20,23 +20,73 @@ SCENARIOS = (
 )
 
 
-def run_scenario(obs: dict, cap: float, fee: float, collection: float):
+def lux_factors(sigma: float, cut: float) -> tuple[float, float]:
+    """Lognormal deger dagilimi, ortalama sabit. Ust `cut` payi disarida birakilinca:
+    kalan ortalama deger carpani, ayrilan ust dilimin ortalama deger carpani."""
+    if cut <= 0:
+        return 1.0, 0.0
+    from statistics import NormalDist
+    nd = NormalDist()
+    z = nd.inv_cdf(1 - cut)
+    low_share = nd.cdf(z - sigma)
+    return low_share / (1 - cut), (1 - low_share) / cut
+
+
+def run_scenario(obs: dict, cap: float, fee: float, collection: float, cut: float = 0.0, sigma: float = 0.6,
+                 fee_on_lux: bool = False):
+    """cut: orta (Istanbul ortalamasi) tipteki bos stoktan ayrilan luks ust dilim payi. Ucuz (Esenyurt) tipte luks yok varsayilir.
+    Luks daireler havuzdan cikar. fee_on_lux: yine de bos tutma bedeli odesinler mi."""
+    f_low, f_top = lux_factors(sigma, cut)
     g = activation.expected_real_growth(obs)
-    c = activation.hold_cost_ratio(obs)
-    stok = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
-    p = activation.participation(g, c, fee, 25.0, cap)
+    stok_all = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
+    stok = stok_all * (1 - 0.5 * cut)
+    s_orta = 0.5 * (1 - cut) / (1 - 0.5 * cut)
+    # tutma maliyeti orani, kalan karisim
+    orta = [replace(u, price=u.price * f_low) for u in activation.tier_units(obs, "orta", 1000 * s_orta)]
+    ucuz = activation.tier_units(obs, "ucuz", 1000 * (1 - s_orta))
+    mix = orta + ucuz
+    cnt = sum(u.count for u in mix)
+    val = sum(u.price * u.count for u in mix)
+    p0 = activation.params(obs)
+    hold = (p0.tax_rate * val + p0.unit_fixed * cnt + sum(u.aidat * 12 * u.count for u in mix)) / val
+    p = activation.participation(g, hold, fee, 25.0, cap)
     n = stok * p
-    rent, _, value = politics.blend_units(obs, max(n, 1000))
+    avg_value = val / cnt
+    rent = sum(u.rent * u.count for u in mix) / cnt
     pay, _ = politics.graduated(rent, 0.30, 0.4)
     share = pay / rent
     units = []
-    for tier in ("orta", "ucuz"):
-        units += [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, tier, n * 0.5)]
+    units += [replace(u, price=u.price * f_low, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "orta", n * s_orta)]
+    units += [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "ucuz", n * (1 - s_orta))]
     params = replace(activation.params(obs), utility_sub=politics.monthly_utilities(obs))
     r = simulate(units, inflation_paths(obs)["ovp"], [1.0] * 20, params)
     first = r.rows[0].subsidy / (1 + r.rows[0].inflation)
-    revenue = stok * (1 - p) * value * fee * collection
+    revenue = stok * (1 - p) * avg_value * fee * collection
+    if fee_on_lux and cut > 0:
+        orta_value = [u for u in activation.tier_units(obs, "orta", 1000)]
+        mean_orta = sum(u.price * u.count for u in orta_value) / sum(u.count for u in orta_value)
+        lux_count = stok_all * 0.5 * cut
+        revenue += lux_count * mean_orta * f_top * fee * collection
     return p, n, r, first, revenue
+
+
+def compare_lux(obs: dict) -> None:
+    bn = lambda v: f"{v / 1e9:,.0f}".replace(",", ".")
+    print("Luks ust dilim ayrimi: orta tipteki bos stoktan en pahali %20 havuz disi, bos olsa bile. Deger dagilimi lognormal sigma 0,6 (varsayim).")
+    print(f"{'sistem':<40}{'durum':<20}{'daire':>8}{'giris mr':>10}{'yil-1 sub':>10}{'20y yuk':>9}{'gelir/sub':>11}")
+    for name, cap, fee in SCENARIOS:
+        for label, cut, lux_fee in (("tum stok", 0.0, False), ("luks ayrildi", 0.2, False), ("luks ayrildi+bedel", 0.2, True)):
+            p, n, r, first, rev = run_scenario(obs, cap, fee, 0.6, cut, 0.6, lux_fee)
+            print(f"{name:<40}{label:<20}{n / 1000:>7.0f}b{bn(r.entry_value):>10}{first / 1e9:>10.1f}{bn(r.total_fiscal_real):>9}{rev / first if first else 0:>11.2f}")
+        print()
+    print("Duyarlilik, karma sistem: luks dilim payi x deger dagilimi sigma (daire bin / 20y yuk mr / gelir-sub., luks bedel disi)")
+    print(f"{'ayrilan pay':<14}" + "".join(f"{f'sigma {sg}':>26}" for sg in (0.4, 0.6, 0.8)))
+    for cut in (0.2, 0.35, 0.5):
+        cells = []
+        for sg in (0.4, 0.6, 0.8):
+            p, n, r, first, rev = run_scenario(obs, 0.40, 0.01, 0.6, cut, sg)
+            cells.append(f"{n / 1000:>6.0f}b /{bn(r.total_fiscal_real):>5} /{rev / first:>5.2f}")
+        print(f"{cut:<14.0%}" + "".join(f"{x:>26}" for x in cells))
 
 
 def main() -> int:
@@ -59,6 +109,8 @@ def main() -> int:
             _, _, _, first, rev = run_scenario(obs, cap, fee, coll)
             row.append(f"{rev / first:>14.2f}")
         print(f"{name:<42}" + "".join(row))
+    print()
+    compare_lux(obs)
     return 0
 
 
