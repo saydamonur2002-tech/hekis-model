@@ -75,6 +75,14 @@ Yurt disi benzerleri (`data/ANALOG.md`). Bos stoktaki tepkiyi olcen tek net orne
 
 Bu uc ucla sinirlanmis senaryolar (450 bin bos stok): gonullu tek basina %4 katilim, 20 bin daire, 32 mr TL yuk. Mevcut karma varsayim (bedel %1, tavan %40) 161 bin daire, 261 mr TL. Vancouver benzeri (bedel %3, tavan %55) 231 bin daire, 374 mr TL. Mevcut kanun taslagindaki bedel (%0,2-2) Vancouver'in altinda, Fransa'nin basarisiz kaldigi duzeye yakin. Merkezi %40 varsayimina ancak guclu yaptirimla ulasilir, gonullu program tek basina ulasmaz.
 
+### Subvansiyon
+
+`python -m hekis.subsidy`. Havuz sahibe piyasa kirasini oder, oturan sosyal kira oder, fark butcedir. 161 bin dairede (mevcut karma senaryo) yil 1 subvansiyonu yaklasik 12 mr TL, 20 yilda 261 mr TL (bugunku TL), daire basina ayda yaklasik 6.750 TL. Prim ve havuz acigi sifir: yukun tamami kira farkidir.
+
+Havuz her durumda tam kirayi aldigi icin oturanin odedigi pay sahibe geri odemeyi degistirmez: ayni 20 yilda %75. Oturan kiranin tamamini odese subvansiyon sifir olur, geri odeme degismez. Subvansiyon bos stoku kullandirmanin maliyeti degil, sosyal kira kararinin maliyetidir. Ayri karar, ayri tartisilmali.
+
+Kalan %25 anapara 20. yilda reel olarak odenmemis durur. Senedi devlet garanti ederse bu gizli yukumluluktur, modelde yuk olarak sayilmiyor.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
