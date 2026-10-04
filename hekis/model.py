@@ -41,6 +41,7 @@ class Params:
     tax_rate: float = 0.0
     unit_fixed: float = 0.0
     vacant_aidat: bool = False
+    tenant_aidat: bool = False
     prev_inflation: float = 0.0
 
     def validate(self) -> None:
@@ -136,7 +137,7 @@ def static_payback(units: list[UnitType], params: Params) -> float:
     value = sum(u.count * u.price for u in units)
     net = 0.0
     for u in units:
-        net += (u.rent - u.aidat) * 12 * u.count * (1 - params.vacancy) * params.collection
+        net += (u.rent - (0.0 if params.tenant_aidat else u.aidat)) * 12 * u.count * (1 - params.vacancy) * params.collection
     net -= holding_cost(units, params)
     if net <= 0:
         return float("inf")
@@ -148,7 +149,7 @@ def pool_and_subsidy(units: list[UnitType], params: Params) -> tuple[float, floa
     subsidy = 0.0
     occupied = 1 - params.vacancy
     for u in units:
-        pool += (u.rent - u.aidat) * 12 * u.count * occupied * params.collection
+        pool += (u.rent - (0.0 if params.tenant_aidat else u.aidat)) * 12 * u.count * occupied * params.collection
         gap = max(0.0, u.rent - u.tenant_pay)
         subsidy += gap * 12 * u.count * occupied
     return pool, subsidy

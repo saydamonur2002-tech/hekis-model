@@ -97,6 +97,8 @@ Duzeltme: tahsilat %60 varsayimini Irlanda'dan turetmistim, yanlisti. Irlanda'da
 
 Bedelin gelire orani (deger 3,55 mn TL): %3 bedelde alt %10 hane gelirinin %37'si, medyan %13, ust %20 siniri %7. Odeme gucu sorunu alt gelirli sahipte gercek ama bos konut sahipleri genelde ust gelirde.
 
+Gider kimde: modelde oturan yalniz kira oder. Emlak vergisi, DASK, bakim ve dolu dairenin aidati havuzdan duser. `Params.tenant_aidat=True` ile aidat oturana gecer: ortalama aidat 2.390 TL/ay, 20 yil geri odeme %75'ten %91'e, statik geri donus 30,1'den 24,5 yila, subvansiyon yuku ayni (261 mr). Oturanin gelire oranla konut gideri (kira %30 + aidat) alt %10'da %40'a, alt %40'ta %34'e cikar. Aidat oturana gecince yuk bitmez, oturanla havuz arasinda kayar.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
