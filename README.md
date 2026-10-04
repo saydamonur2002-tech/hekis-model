@@ -24,6 +24,31 @@ python -m hekis.selffinance            # kendini finanse etme cebiri
 
 `data/`: istanbul_2026.json (girdiler), OKUMA.md, TEYIT.md, KFE.md (TCMB konut fiyat endeksi), KREDI.md (ipotekli pay), FAIZ_KUR.md, GELIR.md (TUIK), ANALOG.md (Vancouver, Irlanda, Fransa, Portekiz, Ispanya), VARSAYIM.md (varsayim envanteri ve etki sirasi).
 
+## 0. Hangi komut hangi kurali kosar
+
+Bu repoda iki ayri hat var, birbirine karistirilmamali.
+
+| Hat | Komutlar | Kira ve oturan odemesi | Enflasyon |
+| --- | --- | --- | --- |
+| Eski sekiz mod | `hekis.bind_cli` | Sabit: `hekis` modunda sosyal kira, `esenyurt` modunda oturan havuz kirasinin tamamini oder (sub. 0), `sub20` %80. Gelir degiskeni ve %30 kurali YOK. `hekis` modunun havuz kirasi `policy_rent` 20/15/10 bin (kaynak: model varsayimi) | A, B sutunu: son gozlem %31,51 donuk; C: OVP |
+| Gelirli hat | `final`, `zones`, `analysis`, `reality`, `union`, `stalled`, `cities` | Esenyurt gozlem kirasi 20/17/14,25 bin (KiraMetre ilan medyani), oturan min(kira, gelirin %30'u) (kural varsayim) | OVP yolu, donuk degil |
+
+`bind_cli` tek baz degil, sekiz modu birden kosar. Guncel baz sonuclar gelirli hattadir. Eski `data/ESENYURT_SUB20.md` olu nottur (fiyat kira x 12 x 18), kosan kod teyitli Endeksa m2'sini kullanir. Kira artisi: model 12 aylik TUFE ortalamasini yillik adimda onceki ve cari yil enflasyonunun ortalamasi olarak yaklasik hesaplar; ilan edilen %31,79 yasal tavani her yenilemede yeniden ilan edilir, modelde dogrudan girdi degil. `main` dali eski surumdur, bu dal guncel.
+
+### Sahibin senede karsilik kabul ettigi kira (havuz kirasi carpani)
+
+`zones.run_three_zone(pool_rent_mult=m)`, `bind.build_units(rent_mult=m)` (esenyurt ailesi). m havuzun aldigi kirayi carpar, oturan payi ayri kalir (dereceli %30). Baglanti (varsayim): sahibin senet getirisi -lambda x (1-m), lambda havuz brut kira girisi / deger (%8,3). Esenyurt tipi havuz, en olasi senaryo:
+
+| m | Katilim baglantisi | Daire | Yil 1 sub. | Oran | Geri odenen | 20 yil yuk |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1,0 | - | 37 bin | 3,9 | 2,39 | %100 | 84 |
+| 0,9 | acik | 35 bin | 3,0 | 3,09 | %100 | 65 |
+| 0,8 | acik | 34 bin | 2,3 | 4,14 | %100 | 48 |
+| 0,7 | acik | 32 bin | 1,6 | 5,71 | %85 | 35 |
+| 0,6 | acik | 30 bin | 1,2 | 8,04 | %67 | 24 |
+
+m dusurmek subvansiyonu keser (m=0,8'de -%41), katilimi az keser (-%9), cunku beklenen reel artis -%3,7 iken sahipler doygun bolgede. Beklenen reel artis yukselince isirir: g_e %0'da m=0,8 / m=1,0 katilim orani 0,84, %4'te 0,76. Baglanti kapali olsa katilim ayni kalir. Geri odeme m=0,7'de %85'e, 0,6'da %67'ye duser: yani 20 yilda anaparanin bir kismi odenmemis kalir.
+
 ## 1. Stok-akim cekirdegi
 
 Istanbul satis m2 66.905 TL, kira m2 479 TL. Havuz sahibe kirayi oder, bakim/vergi/DASK/bos dairenin aidati havuzdan duser, oturan sosyal/dereceli kira oder, fark subvansiyondur. "Odenen" havuzun 20 yilda sahibe reel geri odedigi anapara payidir, yuksek iyidir.

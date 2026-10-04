@@ -44,21 +44,24 @@ def inflation_paths(obs: dict, horizon: int = 20) -> dict[str, list[float]]:
     return {"hold_last": hold, "disinflation_varsayim": disinflation, "ovp": ovp_path, "realized_2021_2025": realized}
 
 
-def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik", aidat: float | None = None) -> tuple[list[UnitType], float]:
+def build_units(obs: dict, rent_mode: str, vacancy_key: str = "elektrik", aidat: float | None = None,
+                rent_mult: float = 1.0) -> tuple[list[UnitType], float]:
+    """rent_mult: yalniz esenyurt ailesinde havuzun aldigi kirayi carpar (sahibin senede karsilik kabul ettigi kira).
+    Oturan payi ayri: esenyurt modunda oturan havuz kirasini oder, sub20 %80'ini, sosyal modda sosyal kirayi."""
     price = prices_from_m2(obs)
     if rent_mode == "piyasa":
         rent = market_rents(obs)
         tenant = rent
     elif rent_mode == "esenyurt":
-        rent = esenyurt_rents(obs)
+        rent = {k: v * rent_mult for k, v in esenyurt_rents(obs).items()}
         tenant = rent
         price = prices_from_m2(obs, "esenyurt_m2_tl")
     elif rent_mode == "esenyurt_sub20":
-        rent = esenyurt_rents(obs)
+        rent = {k: v * rent_mult for k, v in esenyurt_rents(obs).items()}
         tenant = {name: rent[name] * 0.80 for name in SIZES}
         price = prices_from_m2(obs, "esenyurt_m2_tl")
     elif rent_mode == "esenyurt_sosyal":
-        rent = esenyurt_rents(obs)
+        rent = {k: v * rent_mult for k, v in esenyurt_rents(obs).items()}
         social = obs["social_rent"]
         tenant = {"2+1": social["2+1"], "1+1": social["1+1"], "1+0": social["1+1"] * 0.8}
         price = prices_from_m2(obs, "esenyurt_m2_tl")

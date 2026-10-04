@@ -29,7 +29,8 @@ def band_factor(a: float, b: float, sigma: float) -> float:
 
 
 def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float = 0.20, sigma: float = 0.6,
-                   fee_buffer: float | None = None, lux_vac: float | None = None, premium: float = 0.0) -> dict:
+                   fee_buffer: float | None = None, lux_vac: float | None = None, premium: float = 0.0,
+                   pool_rent_mult: float = 1.0, senet_coupling: bool = True) -> dict:
     """fee_buffer: tampon bedeli (varsayilan genel bedel). lux_vac: luks bandinin bos stoktaki payi (varsayilan cut: bosluk
     deger sirasina esit dagilmis). Daha buyukse bosluk luks bandina kaymistir, kalan havuz ve tampon arasinda
     q_h : (1 - q_h - cut) oraninda bolunur."""
@@ -49,12 +50,17 @@ def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float =
     val = sum(u.price * u.count for u in units_probe)
     p0 = activation.params(obs)
     hold = (p0.tax_rate * val + p0.unit_fixed * cnt + sum(u.aidat * 12 * u.count for u in units_probe)) / val
-    p = activation.participation(P["g_e"], hold + premium, P["fee"], P["slope"], P["cap"])  # premium: katilan sahibe yillik odenen, degerin yuzdesi
+    # Sahibin senede karsilik kabul ettigi kira carpani: havuz m x piyasa kirasi alir, oturan payi ayri (dereceli).
+    # Baglanti (varsayim): geri odeme (1-m) x brut kira kadar yavaslar, sahibin senet getirisi -lambda x (1-m).
+    rent_full = sum(u.rent * u.count for u in units_probe) / cnt
+    lam = rent_full * 12 * (1 - p0.vacancy) * p0.collection / (val / cnt)
+    s_ret = -lam * (1 - pool_rent_mult) if senet_coupling else 0.0
+    p = activation.participation(P["g_e"], hold + s_ret + premium, P["fee"], P["slope"], P["cap"])  # premium: katilan sahibe yillik odenen, degerin yuzdesi
     n = S_h * p
-    rent = sum(u.rent * u.count for u in units_probe) / cnt
+    rent = rent_full * pool_rent_mult
     pay, _ = politics.graduated(rent, P["alpha"], q_h, uplift=P["uplift"], eq=P["eq"], scale=P["inc_scale"])
     share = pay / rent
-    housed = [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "ucuz", n)]
+    housed = [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "ucuz", n, rent_mult=pool_rent_mult)]
     params = replace(activation.params(obs), utility_sub=politics.monthly_utilities(obs))
     r = simulate(housed, inflation_paths(obs)["ovp"], [1.0] * 20, params)
     first = r.rows[0].subsidy / (1 + r.rows[0].inflation)
@@ -74,7 +80,7 @@ def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float =
     prem_cost = n * V_h * premium
     return {"q_h": q_h, "prem_cost": prem_cost, "balance": rev - first - prem_cost, "S": (S_h, S_b, S_l), "V": (V_h, V_b, V_l), "p": p, "N": n, "sub1": first, "yuk": r.total_fiscal_real,
             "rev": rev, "rev_parts": (rev_pool, rev_buf, rev_lux), "ratio": rev / first if first > 0 else 0.0,
-            "coverage": n / eligible, "freed_buf": S_b * resp_b, "freed_lux": S_l * resp_l, "entry": r.entry_value}
+            "coverage": n / eligible, "paid": r.real_eroded, "s_ret": s_ret, "freed_buf": S_b * resp_b, "freed_lux": S_l * resp_l, "entry": r.entry_value}
 
 
 def solve_premium(**kw) -> dict:
@@ -157,6 +163,22 @@ def main() -> int:
         extra = z["S"][0] * 0.15
         per = z["balance"] / extra if extra else 0.0
         print(f"  {name:<20}ek daire {extra / 1000:>5.1f} bin, kalan fazla {bn(z['balance']):>5.1f} mr/yil -> daire basina yillik {per:>10,.0f} TL".replace(",", "."))
+    print()
+    print("Sahibin senede karsilik kabul ettigi kira: havuz kirasi carpani m (piyasa kirasinin payi). Oturan payi ayri (dereceli, %30).")
+    print("Baglanti kapali: yalniz sub. ve geri odeme degisir. Baglanti acik: sahibin senet getirisi -lambda x (1-m), katilim duser.")
+    print(f"{'m':>5}{'baglanti':>10}{'senet getirisi':>16}{'daire':>8}{'yil-1 sub':>10}{'bedel':>7}{'oran':>6}{'odenen':>8}{'20y yuk':>9}")
+    for m in (1.0, 0.9, 0.8, 0.7, 0.6):
+        for coup in (False, True):
+            if m == 1.0 and coup:
+                continue
+            zz = run_three_zone(pool_rent_mult=m, senet_coupling=coup)
+            print(f"{m:>5.1f}{'acik' if coup else 'kapali':>10}{zz['s_ret']:>16.2%}{zz['N'] / 1000:>7.0f}b{bn(zz['sub1']):>10.1f}{bn(zz['rev']):>7.1f}{zz['ratio']:>6.2f}{zz['paid']:>8.0%}{bn(zz['yuk']):>9.0f}")
+    print()
+    print("Baglanti acik, beklenen reel artisa gore: m = 1,0 / 0,8 icin yerlesen daire (bin). Doygun bolgede (g_e cok negatif) m etkisiz, g_e yukselince isirir.")
+    print(f"{'g_e':>7}{'m=1,0':>9}{'m=0,9':>9}{'m=0,8':>9}{'m=0,7':>9}{'0,8 / 1,0':>11}")
+    for g in (-0.065, -0.037, -0.01, 0.0, 0.02, 0.04):
+        ns = [run_three_zone(P={"g_e": g}, pool_rent_mult=m)["N"] for m in (1.0, 0.9, 0.8, 0.7)]
+        print(f"{g:>7.1%}" + "".join(f"{x / 1000:>8.1f}b" for x in ns) + f"{ns[2] / ns[0] if ns[0] else 0:>11.2f}")
     return 0
 
 

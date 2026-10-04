@@ -20,10 +20,10 @@ TIERS = {
 }
 
 
-def tier_units(obs: dict, tier: str, n_units: float) -> list[UnitType]:
+def tier_units(obs: dict, tier: str, n_units: float, rent_mult: float = 1.0) -> list[UnitType]:
     mode, key = TIERS[tier]
     aidat = obs["bos_stok"][key] if key in obs["bos_stok"] else obs["aidat"][key]
-    units, _ = build_units(obs, mode, "elektrik", aidat)
+    units, _ = build_units(obs, mode, "elektrik", aidat, rent_mult)
     total = sum(COUNTS.values())
     return [replace(u, count=round(n_units * COUNTS[u.name] / total)) for u in units]
 

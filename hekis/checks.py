@@ -25,9 +25,11 @@ def main() -> int:
     add("Havuzdaki bosluk (devir) orani", f"{v:.1%}", f"Istanbul bos stok payi {share_low:.1%} - {share_mid:.1%}", "UYARI: model bosluk orani bos stok tahminlerinin altinda")
     # 2 getiri
     m2 = obs["rent"]["istanbul_m2_tl"] * 12 / obs["sale"]["istanbul_m2_tl"]
-    es = obs["rent"]["esenyurt_2_1_tl"] * 12 / (obs["sale"]["esenyurt_m2_tl"] * 95)
+    units_es = activation.tier_units(obs, "ucuz", 1000)
+    es_blend = sum(u.rent * 12 * u.count for u in units_es) / sum(u.price * u.count for u in units_es)
+    es_21 = obs["rent"]["esenyurt_2_1_tl"] * 12 / (obs["sale"]["esenyurt_m2_tl"] * 95)
     add("Istanbul brut kira getirisi", f"{m2:.1%}", "Endeksa Esenyurt getirisi %10,04 (10 yil amortisman)", "UYUMLU: ayni buyukluk")
-    add("Esenyurt 2+1 brut getiri (model fiyat/kira)", f"{es:.1%}", "Endeksa %10,04", "UYUMLU" if abs(es - 0.1004) < 0.02 else "UYARI")
+    add("Esenyurt brut getiri (model, 40/40/20 karisim)", f"{es_blend:.1%} (yalniz 2+1: {es_21:.1%})", "Endeksa %10,04: 105 m2 ortalama stok, ~26-30 bin kira", "UYARI: bilesim ve kaynak farkli, ayni daire degil")
     pol = 20_000 * 12 / (obs["sale"]["istanbul_m2_tl"] * 95)
     add("Politika kirasi getirisi (orta, 2+1)", f"{pol:.1%}", f"piyasa {m2:.1%}", "UYARI: politika kirasi piyasanin cok altinda, geri odeme bundan yavas")
     # 3 tutma maliyeti

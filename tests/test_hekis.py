@@ -301,5 +301,35 @@ class StalledTests(unittest.TestCase):
         self.assertLess(c / ue["net"], 10)  # geri odeme 10 yildan kisa
 
 
+class PoolRentTests(unittest.TestCase):
+    def test_mult_one_is_identity(self):
+        from hekis import zones
+        a = zones.run_three_zone()
+        b = zones.run_three_zone(pool_rent_mult=1.0, senet_coupling=True)
+        self.assertAlmostEqual(a["N"], b["N"], places=6)
+        self.assertAlmostEqual(a["sub1"], b["sub1"], places=6)
+
+    def test_lower_pool_rent_lowers_subsidy_and_repayment(self):
+        from hekis import zones
+        a = zones.run_three_zone(pool_rent_mult=1.0)
+        b = zones.run_three_zone(pool_rent_mult=0.7, senet_coupling=False)
+        self.assertLess(b["sub1"], a["sub1"])
+        self.assertLess(b["paid"], a["paid"] + 1e-9)
+        self.assertAlmostEqual(a["N"], b["N"], places=6)  # baglanti kapaliyken katilim ayni
+
+    def test_coupling_lowers_participation(self):
+        from hekis import zones
+        off = zones.run_three_zone(pool_rent_mult=0.7, senet_coupling=False)
+        on = zones.run_three_zone(pool_rent_mult=0.7, senet_coupling=True)
+        self.assertLess(on["N"], off["N"])
+
+    def test_bind_esenyurt_modes_scale_pool_rent_not_social(self):
+        from hekis.bind import build_units
+        base, _ = build_units(OBS, "esenyurt_sosyal")
+        scaled, _ = build_units(OBS, "esenyurt_sosyal", rent_mult=0.8)
+        self.assertAlmostEqual(scaled[0].rent, base[0].rent * 0.8)
+        self.assertAlmostEqual(scaled[0].tenant_pay, base[0].tenant_pay)  # oturan payi ayri
+
+
 if __name__ == "__main__":
     unittest.main()
