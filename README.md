@@ -99,6 +99,8 @@ Bedelin gelire orani (deger 3,55 mn TL): %3 bedelde alt %10 hane gelirinin %37's
 
 Gider kimde: modelde oturan yalniz kira oder. Emlak vergisi, DASK, bakim ve dolu dairenin aidati havuzdan duser. `Params.tenant_aidat=True` ile aidat oturana gecer: ortalama aidat 2.390 TL/ay, 20 yil geri odeme %75'ten %91'e, statik geri donus 30,1'den 24,5 yila, subvansiyon yuku ayni (261 mr). Oturanin gelire oranla konut gideri (kira %30 + aidat) alt %10'da %40'a, alt %40'ta %34'e cikar. Aidat oturana gecince yuk bitmez, oturanla havuz arasinda kayar.
 
+Karar: oturan kirayi oder (dereceli), aidati havuz oder, abonelik (elektrik, dogalgaz, su) subvanse edilir. Abonelik yaklasik 1.583 TL/ay (elektrik 648 EPDK tarifesi, dogalgaz 469 BOTAS toptan fiyati ve 1000 m3/yil varsayimi, su 466 eski ISKI tarifesi ve 10 m3/ay varsayimi, dogalgaz ve su alt sinir). Yil 1 subvansiyon 12,9'dan 15,8 mr TL'ye, 20 yil yuk 278'den 336 mr TL'ye cikar. Geri odeme degismez (%75), abonelik havuza girmez. Oturanin konut gideri (kira %30 + abonelik) abonelik sub. olmadan alt %10'da %37, olunca %30'da kalir.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.

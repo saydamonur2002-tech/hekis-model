@@ -66,6 +66,15 @@
     "2023": 0.111, "2024": -0.104, "2025": -0.015, "2026_agustos_yillik": -0.065,
     "kaynak": "TCMB KFE (EVDS) Aralik/Aralik, TUFE ile reel. Turkiye geneli, Istanbul degil. Detay data/KFE.md"
   },
+  "abonelik": {
+    "elektrik_kwh_ay": 200,
+    "elektrik_tl_kwh": 3.24,
+    "dogalgaz_m3_yil": 1000,
+    "dogalgaz_tl_m3": 5.631,
+    "su_m3_ay": 10,
+    "su_tl_m3": 46.62,
+    "kaynak": "Elektrik: EPDK mesken tarifesi Nisan 2026, 100 kWh = 323,8 TL (vergiler dahil), konut ortalamasi yaklasik 200 kWh/ay. Dogalgaz: BOTAS konut tarifesi Eylul 2026 1000 m3 = 5.631 TL, dagitim bedeli ve vergi dahil degil, tuketim 1000 m3/yil varsayim. Su: ISKI konut 46,62 TL/m3 Haziran 2025, 2026'da aylik zamlarla eskimis, tuketim 10 m3/ay varsayim"
+  },
   "ovp_2027_2029": {
     "2026": 0.284, "2027": 0.21, "2028": 0.135, "2029": 0.09,
     "kaynak": "Hazine ve Maliye Bakanligi OVP 2027-2029, 6 Eylul 2026, haber aktarimi. 2029 sonrasi %9 sabit: model varsayimi"

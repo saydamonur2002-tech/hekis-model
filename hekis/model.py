@@ -42,6 +42,7 @@ class Params:
     unit_fixed: float = 0.0
     vacant_aidat: bool = False
     tenant_aidat: bool = False
+    utility_sub: float = 0.0
     prev_inflation: float = 0.0
 
     def validate(self) -> None:
@@ -195,7 +196,7 @@ def simulate(
             rent_scale *= 1 + (prev_pi + pi) / 2
         prev_pi = pi
         pool = pool0 * rent_scale - opex0 * cpi
-        subsidy = subsidy0 * rent_scale
+        subsidy = subsidy0 * rent_scale + params.utility_sub * 12 * sum(u.count for u in units) * (1 - params.vacancy) * cpi
 
         production = quota * params.production_share * pool
         service_cash = pool - production

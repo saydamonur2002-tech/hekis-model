@@ -140,8 +140,46 @@ def main() -> int:
     print(f"  Genel hane: bedel geliri subvansiyonu karsilarsa ek yuk 0, karsilamazsa kisi basi yukarida")
     print()
     sensitivity(obs)
+    print()
+    utility_subsidy_report()
     return 0
 
+
+
+def monthly_utilities(obs: dict) -> float:
+    """Daire basina aylik abonelik gideri, bugunku TL. Dogalgaz ve su kalemi eksik veya eski, alt sinir."""
+    a = obs["abonelik"]
+    return (a["elektrik_kwh_ay"] * a["elektrik_tl_kwh"] + a["dogalgaz_m3_yil"] * a["dogalgaz_tl_m3"] / 12
+            + a["su_m3_ay"] * a["su_tl_m3"])
+
+
+def utility_subsidy_report() -> None:
+    from dataclasses import replace
+
+    from hekis.bind import inflation_paths
+    from hekis.model import simulate
+
+    obs = load_obs()
+    util = monthly_utilities(obs)
+    n = 161_000
+    rent, _, _ = blend_units(obs, n)
+    pay, _ = graduated(rent, 0.30, 0.4)
+    share = pay / rent
+    units = []
+    for tier in ("orta", "ucuz"):
+        units += [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, tier, n * 0.5)]
+    print(f"Abonelik: elektrik {obs['abonelik']['elektrik_kwh_ay'] * obs['abonelik']['elektrik_tl_kwh']:,.0f} + dogalgaz {obs['abonelik']['dogalgaz_m3_yil'] * obs['abonelik']['dogalgaz_tl_m3'] / 12:,.0f} + su {obs['abonelik']['su_m3_ay'] * obs['abonelik']['su_tl_m3']:,.0f} = {util:,.0f} TL/ay".replace(",", "."))
+    print(f"{'':<34}{'yil-1 sub. mr':>14}{'20y yuk mr':>12}{'20y odenen':>12}")
+    for label, u in (("sadece dereceli kira", 0.0), ("+ abonelik sübvansiyonu", util)):
+        p = replace(activation.params(obs), utility_sub=u)
+        r = simulate(units, inflation_paths(obs)["ovp"], [1.0] * 20, p)
+        first = r.rows[0].subsidy / (1 + r.rows[0].inflation)
+        print(f"{label:<34}{first / 1e9:>14.1f}{r.total_fiscal_real / 1e9:>12.0f}{r.real_eroded:>12.0%}")
+    print("Oturanin gelire oranla konut gideri (kira a=%30 + abonelik):")
+    for q in (0.1, 0.2, 0.3, 0.4):
+        inc = hh_monthly(q)
+        rpay = min(rent * share, 0.30 * inc)
+        print(f"  q{int(q * 100)}: abonelik sub. yokken %{(rpay + util) / inc:.0%}, sub. varken %{rpay / inc:.0%}")
 
 if __name__ == "__main__":
     raise SystemExit(main())
