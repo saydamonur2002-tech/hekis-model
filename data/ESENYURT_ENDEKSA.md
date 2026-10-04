@@ -1,35 +1,37 @@
-# Esenyurt satis gozlemi, Agustos 2026
+# Esenyurt satis gozlemi, teyit 2026-10-04
 
-Kaynak: Endeksa, Istanbul Esenyurt satilik konut. Emlakjet ayni m2 fiyati ve 10 yil geri donusu tekrarliyor.
+## Teyit edilen
 
-| Gozlem | Deger |
-| --- | --- |
-| Ortalama m2 satis | 34.475 TL |
-| Birim fiyat araligi | 20.455 - 53.333 TL |
-| Ortalama brut alan | 105 m2 |
-| Ortalama konut fiyati | 3.619.875 TL |
-| Endeksa geri donus | 10 yil |
-| Endeksa getiri | %10,04 |
-| Son 1 yil nominal artis | %32,18 |
-| Emlakjet ortalama kira | 25.955 TL |
-| Emlakjet kira m2 | 288 TL |
+Endeksa Istanbul Esenyurt satilik konut sayfasi, Agustos 2026 sonu. Duz sayfa okumasi betik yuzunden bos dondu. Arama dokumu ayni URL'den su satirlari verdi. Emlakjet ilce kutusu ayni ortalamayi bagimsiz tekrarliyor.
 
-34.475 x 105 = 3.619.875. Sayi kendi icinde tutarli.
+| Alan | Deger | Teyit |
+| --- | --- | --- |
+| Ortalama m2 satis | 34.475 TL | Endeksa + Emlakjet |
+| Ortalama brut alan | 105 m2 | Endeksa |
+| Ortalama konut fiyati | 3.619.875 TL | Endeksa + Emlakjet |
+| Geri donus | 10 yil | Endeksa + Emlakjet |
+| Getiri | %10,04 | Endeksa + Emlakjet |
+| Son 1 yil nominal artis | %32,18 | Endeksa |
+| Ortalama kira | 25.955 TL | Emlakjet ilce kutusu |
+| Kira m2 | 288 TL | Emlakjet ilce kutusu |
+| Birim fiyat araligi 20.455-53.333 | kullanici aktarimi | bu turda sayfada gorulmedi, teyitsiz |
 
-10 yil geri donus, aylik kirayi yaklasik 30.166 TL varsayar. Emlakjet 288 TL/m2 x 105 m2 = 30.240 TL. Endeksa'nin 10 yili bu kira ornegine bagli. KiraMetre oda tipi medyani 2+1 icin 20.000 TL. Bu daha kucuk veya daha eski stok. Ikisi ayni daire degil.
+34.475 x 105 = 3.619.875. Aritmetik tutuyor.
 
-Eski model fiyati kira x 12 x 18 ile turetmisti. O turev dusuruldu. Satis artik m2 gozlemi.
+Kaynaklar:
+- https://www.endeksa.com/tr/analiz/turkiye/istanbul/esenyurt/index/satilik/konut
+- Emlakjet Esenyurt ilce kutusu, ayni 34.475 / 3.619.875 / 10 yil / %10,04 / 288 TL m2 kira
 
-Tip olcegi hâlâ varsayim: 1+0 40, 1+1 60, 2+1 95 m2. Ortalama stok 105 m2. 2+1 bu ortalamanin altinda.
+## Modele eklenen
 
-Sub20 kosu, tip medyan kira + Endeksa m2 satis + TUFE + yuzde 20 butce subvansiyonu:
+`data/istanbul_2026.json` icinde `esenyurt_m2_tl` 34475, ortalama fiyat 3619875, ortalama alan 105, amortisman 10, getiri 0.1004. Kod satis fiyatini bu m2 ile carpiyor. 18 yil turevi dusuruldu.
 
-| Tip | Fiyat | Muhasebe kira | Oturan | Butce/ay |
-| --- | --- | --- | --- | --- |
-| 2+1 | 3.275.125 | 20.000 | 16.000 | 4.000 |
-| 1+1 | 2.068.500 | 17.000 | 13.600 | 3.400 |
-| 1+0 | 1.379.000 | 14.250 | 11.400 | 2.850 |
+Min-maks json'da duruyor ama teyitsiz isaretli. Kosuya girmiyor.
 
-Olcek 1000+1000+500. Giris 6,03 milyar TL. Statik geri donus 14,5 yil. Kira TUFE ile yururse anapara 15. yilda reel olarak biter. Reel yillik subvansiyon 102 milyon TL. Suvbansiyon havuzu buyutmez.
+## Carpisma
 
-Endeksa cifti ayri: 3,62 milyonluk ortalama daire, 10 yil, getiri %10. Bu cift kullanilirsa geri donus 10 yila iner. 20 binlik medyanla 10 yil yazmak cifte yazimdir.
+10 yil, aylik kirayi yaklasik 30.166 TL varsayar. 288 TL/m2 x 105 m2 = 30.240 TL. Endeksa-Emlakjet cifti kendi icinde kapaniyor.
+
+KiraMetre 2+1 medyani 20.000 TL, m2 kira 231 TL, 2.212 kayit. i24Haber'in aktardigi Endeksa Mart 2026 kira m2 degeri 228 TL. Bu, Agustos satis ciftinin kirasi degil. 20 binlik medyanla 10 yil yazmak cifte yazimdir.
+
+Sub20 kosu tip medyan kira + teyitli m2 satis + TUFE + yuzde 20 butce subvansiyonu olarak duruyor. Endeksa cifti ayri okunur: 3,62 milyon, 10 yil, getiri %10,04.
