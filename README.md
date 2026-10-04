@@ -4,7 +4,7 @@ Hedef Endeksli Kapali Ic Senet. Bos konut stokunu kullandirmanin stok-akim hesab
 
 Bu bir politika vaadi degil, hesap makinesidir. Repo ozel, kisisel modelleme. Dogrulanmis bir kamu maliyesi modeli degildir. Gozlem ile varsayim ayri tutulur, ayri dosyalarda: `data/VARSAYIM.md`.
 
-**Kapsam: simdilik yalniz Istanbul.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu ve kiraci payi ulusal varsayim). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
+**Kapsam: simdilik yalniz Istanbul.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu 3,09 ADNKS; kiraci payi %27 ulusal varsayim, Istanbul'a ozgu veri bulunamadi; Istanbul geliri ulusalin 1,307 kati, TUIK TR10 434.929 / 332.882 TL). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
 
 ## Calistirma
 
@@ -78,7 +78,9 @@ Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yukse
 
 Kosul: bedel x tahsilat >= (12 s / V) x p / (1 - p). s yerlesen daire basina aylik subvansiyon, V deger, p yerlesen oran. Katilim arttikca bedel odeyen taban erir. V 3,55 mn, s 8 bin TL/ay icin gerekli etkin bedel p %10'da %0,3, %36'da %1,5, %50'de %2,7, %60'ta %4,1 (`hekis.selffinance`).
 
-Monte Carlo (1500 cekilis, 18 parametre, ucgen dagilim, `hekis.analysis`, Istanbul): yerlesen daire %5/%50/%95 yuzdeliginde 17/100/205 bin, 20 yil yuk 29/160/396 mr TL. Kendini finanse eden cekilis %83, ama bu olcege bagli: yerlesen daire 25 bin altinda %100, 25-75 binde %99, 75-150 binde %85, 150 binin ustunde %56 (medyan oran 1,09). Spearman(daire, oran) = -0,77. Kucuk programlar kendini finanse eder, buyukler etmez. Baz durumda (132 bin daire) oran 0,93, yillik acik yaklasik 0,8 mr TL.
+Monte Carlo (1500 cekilis, 19 parametre, ucgen dagilim, `hekis.analysis`, Istanbul): yerlesen daire %5/%50/%95 yuzdeliginde 18/103/216 bin, 20 yil yuk 23/124/309 mr TL. Kendini finanse eden cekilis %92, ama bu olcege bagli: yerlesen daire 75 bin altinda %100, 75-150 binde %93, 150 binin ustunde %78 (medyan oran 1,38). Spearman(daire, oran) = -0,74. Baz durumda (132 bin daire) oran 1,32, sub. 7,3 mr, bedel 9,6 mr.
+
+Dikkat: bu sonuc Istanbul gelir olcegine cok duyarli. Olcek 1,0 (ulusal dagilim) iken oran 0,93, 1,15'te 1,12, 1,307'de (baz) 1,32, 1,5'te 1,58; yani sistem Istanbul geliri ulusalin yaklasik %6 ustundeyse kendini finanse eder. Tum dagilimi ortalama orani kadar olceklemek varsayimdir: Istanbul'un alt dilimleri ulusalin %31 ustunde olmayabilir.
 
 Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut artisi (0,58), katilim tavani (-0,51), genel bedel, ayrilan luks pay, kira/gelir kurali, uygun kitle, etkin tahsilat. Bakim orani, aidat, stok buyuklugu (oranda), enflasyon yolu neredeyse hic.
 
@@ -92,9 +94,9 @@ Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut art
 
 Faiz kanali (2019-2025, n=7, R2 0,81, nedensellik degil): reel konut artisi = 0,005 - 1,35 x reel faiz. Bugunku reel faizde tahmin -%5,1, gozlenen -%6,5. Katilim penceresi reel faiz yaklasik -%0,4'un altina inmedikce acik; tampon 4,6 puan. Reel faiz 0'da yerlesen %30 duser, -%5'te dortte birine iner.
 
-Senaryolar, Istanbul, beklenen reel artis -%3,7 (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30, luks bedel %5) 82 bin daire, yil 1 sub. 6,5, bedel 6,1, oran 0,94, acik 0,4, 20 yil yuk 137. Iyimser 196 bin daire, yuk 326, oran 1,03. Kotumser 26 bin daire, yuk 43. Faiz kanali g_e ile en olasi 87 bin daire.
+Senaryolar, Istanbul, beklenen reel artis -%3,7, Istanbul gelir olcegi 1,307 (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30, luks bedel %5) 82 bin daire, yil 1 sub. 4,6, bedel 6,1, oran 1,33, fazla 1,5, 20 yil yuk 96. Iyimser 196 bin daire, sub. 10,8, oran 1,46, yuk 228. Kotumser 26 bin daire, yuk 30. Gelir olcegi 1,0 olsa en olasi sub. 6,5, oran 0,94, yuk 137.
 
-Etki (en olasi, 82 bin hane, hane basina ayda 6.524 TL): Istanbul'da uygun (alt %40) 552 bin kiraci hanenin %14,9'una ulasir. Gini 0,4296 -> 0,4285 (-0,0011), goreli yoksulluk -0,27 puan, piyasa kirasi dogrusal yaklasimla -%6 ile -%20 (ust sinir, esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %81'den %30'a, alt %40'ta %36'dan %30'a duser, aylik kazanc 12.100 ile 3.000 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
+Etki (en olasi, 82 bin hane, hane basina ayda 4.600 TL): Istanbul'da uygun (alt %40) 551 bin kiraci hanenin %15,0'ina ulasir. Gini 0,4296 -> 0,4290 (-0,0006), goreli yoksulluk -0,15 puan, piyasa kirasi dogrusal yaklasimla -%6 ile -%20 (ust sinir, esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %62'den %30'a, alt %20'de %44'ten %30'a, alt %40'ta %27'den %25'e duser, aylik kazanc 9.900 ile 1.600 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
 
 Duzeltme: bu bolumun onceki surumunde bos stok Istanbul'un (450 bin) ama kapsam ve etki 28 mn ulusal hane uzerindendi. Tutarsizlik giderildi.
 

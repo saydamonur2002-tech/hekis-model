@@ -14,12 +14,14 @@ from statistics import NormalDist
 from hekis import activation
 from hekis.bind import load_obs
 
+INCOME_SCALE = 434_929.0 / 332_882.0  # Istanbul (TR10) ortalama esdeger gelir / Turkiye, TUIK GYKA 2025. Ayni dagilim genisligi varsayimi
 MEDIAN = 241_151.0
 MEAN = 332_882.0
 EQ_FACTOR = 2.0          # varsayim
 UPLIFT = 28_075.5 / 17_002.0   # asgari ucret artisi 2024->2026, 2024 degeri hafizadan
 ISTANBUL_POP = 15_754_053  # TUIK ADNKS 2025
-HOUSEHOLDS = round(ISTANBUL_POP / 3.08)  # KAPSAM: yalniz Istanbul. Hane buyuklugu ulusal ortalama (varsayim)
+ISTANBUL_HH_SIZE = 3.09  # ADNKS 2025
+HOUSEHOLDS = round(ISTANBUL_POP / ISTANBUL_HH_SIZE)  # KAPSAM: yalniz Istanbul
 TENANT_SHARE = 0.27
 COLLECTION = 0.60        # VARSAYIM. Irlanda'dan turetilmedi: orada 50 bin isaretli konuttan yaklasik 3 bini vergiye tabi (~%6), %59 baska bir oran
 ND = NormalDist()
@@ -27,9 +29,9 @@ SIGMA = math.sqrt(2 * math.log(MEAN / MEDIAN))
 MU = math.log(MEDIAN)
 
 
-def hh_monthly(q: float, uplift: float | None = None, eq: float | None = None) -> float:
+def hh_monthly(q: float, uplift: float | None = None, eq: float | None = None, scale: float | None = None) -> float:
     """q. yuzdelik dilimdeki hanenin 2026 aylik geliri."""
-    return math.exp(MU + SIGMA * ND.inv_cdf(q)) * (EQ_FACTOR if eq is None else eq) / 12 * (UPLIFT if uplift is None else uplift)
+    return math.exp(MU + SIGMA * ND.inv_cdf(q)) * (INCOME_SCALE if scale is None else scale) * (EQ_FACTOR if eq is None else eq) / 12 * (UPLIFT if uplift is None else uplift)
 
 
 def share_check() -> tuple[float, float]:
@@ -39,13 +41,13 @@ def share_check() -> tuple[float, float]:
 
 
 def graduated(rent: float, alpha: float, qcut: float, steps: int = 400,
-              uplift: float | None = None, eq: float | None = None) -> tuple[float, float]:
+              uplift: float | None = None, eq: float | None = None, scale: float | None = None) -> tuple[float, float]:
     """Uygun hane [0, qcut] araligindan kura ile secilir. Oturan min(kira, alpha x gelir) oder.
     Ortalama aylik odeme ve ortalama aylik subvansiyon."""
     pay_sum = 0.0
     for i in range(steps):
         q = qcut * (i + 0.5) / steps
-        pay_sum += min(rent, alpha * hh_monthly(q, uplift, eq))
+        pay_sum += min(rent, alpha * hh_monthly(q, uplift, eq, scale))
     pay = pay_sum / steps
     return pay, rent - pay
 

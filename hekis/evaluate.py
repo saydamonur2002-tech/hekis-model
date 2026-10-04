@@ -24,6 +24,7 @@ SPACE = {
     "alpha": (0.20, 0.30, 0.40),           # oturanin gelirden kira payi
     "qcut": (0.20, 0.40, 0.60),            # uygun gelir dilimi
     "uplift": (1.3, politics.UPLIFT, 2.0),
+    "inc_scale": (1.0, politics.INCOME_SCALE, 1.5),   # Istanbul gelirinin ulusala orani (alt dilimler icin belirsiz)
     "util_scale": (0.7, 1.0, 1.5),         # abonelik gider carpani
     "infl_shift": (-0.05, 0.0, 0.10),      # OVP yoluna eklenen enflasyon
     "cut": (0.10, 0.20, 0.50),             # ayrilan luks pay
@@ -60,7 +61,7 @@ def evaluate(P: dict | None = None, obs_mut=None) -> dict:
         obs_mut(obs)
     p, n, r, first, rev_ord = final.run_scenario(
         obs, P["cap"], P["fee"], P["coll"], P["cut"], P["sigma"], False,
-        g=P["g_e"], slope=P["slope"], alpha=P["alpha"], qcut=P["qcut"], uplift=P["uplift"], eq=P["eq"], rent_prop=P["rent_prop"])
+        g=P["g_e"], slope=P["slope"], alpha=P["alpha"], qcut=P["qcut"], uplift=P["uplift"], eq=P["eq"], rent_prop=P["rent_prop"], scale=P["inc_scale"])
     _, _, rev_lux, resp = final.lux_economics(obs, P["sigma"], P["cut"], P["lux_fee"], P["lux_coll"], P["lux_cap"])
     revenue = rev_ord + rev_lux
     return {

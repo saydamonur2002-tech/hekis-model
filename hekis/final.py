@@ -34,7 +34,7 @@ def lux_factors(sigma: float, cut: float) -> tuple[float, float]:
 
 def run_scenario(obs: dict, cap: float, fee: float, collection: float, cut: float = 0.0, sigma: float = 0.6,
                  fee_on_lux: bool = False, g: float | None = None, slope: float = 25.0, alpha: float = 0.30,
-                 qcut: float = 0.4, uplift: float | None = None, eq: float | None = None, rent_prop: bool = True):
+                 qcut: float = 0.4, uplift: float | None = None, eq: float | None = None, rent_prop: bool = True, scale: float | None = None):
     """cut: orta (Istanbul ortalamasi) tipteki bos stoktan ayrilan luks ust dilim payi. Ucuz (Esenyurt) tipte luks yok varsayilir.
     Luks daireler havuzdan cikar. fee_on_lux: yine de bos tutma bedeli odesinler mi."""
     f_low, f_top = lux_factors(sigma, cut)
@@ -55,7 +55,7 @@ def run_scenario(obs: dict, cap: float, fee: float, collection: float, cut: floa
     n = stok * p
     avg_value = val / cnt
     rent = sum(u.rent * u.count for u in mix) / cnt
-    pay, _ = politics.graduated(rent, alpha, qcut, uplift=uplift, eq=eq)
+    pay, _ = politics.graduated(rent, alpha, qcut, uplift=uplift, eq=eq, scale=scale)
     share = pay / rent
     units = []
     units += [replace(u, price=u.price * f_low, rent=u.rent * f_rent, tenant_pay=u.rent * f_rent * share) for u in activation.tier_units(obs, "orta", n * s_orta)]
