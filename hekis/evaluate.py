@@ -53,9 +53,11 @@ def make_obs(P: dict) -> dict:
     return obs
 
 
-def evaluate(P: dict | None = None) -> dict:
+def evaluate(P: dict | None = None, obs_mut=None) -> dict:
     P = {**BASE, **(P or {})}
     obs = make_obs(P)
+    if obs_mut is not None:
+        obs_mut(obs)
     p, n, r, first, rev_ord = final.run_scenario(
         obs, P["cap"], P["fee"], P["coll"], P["cut"], P["sigma"], False,
         g=P["g_e"], slope=P["slope"], alpha=P["alpha"], qcut=P["qcut"], uplift=P["uplift"], eq=P["eq"], rent_prop=P["rent_prop"])

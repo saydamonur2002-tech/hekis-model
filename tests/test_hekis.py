@@ -230,5 +230,40 @@ class RealityTests(unittest.TestCase):
         self.assertLess(reality.ols(xs, ys)[1], 0)
 
 
+class CityTests(unittest.TestCase):
+    def test_istanbul_factors_are_identity(self):
+        from hekis import cities
+        ci = cities.city_inputs(OBS, "istanbul")
+        self.assertAlmostEqual(ci["fp"], 1.0)
+        self.assertAlmostEqual(ci["fr"], 1.0)
+
+    def test_istanbul_run_matches_plain_evaluate(self):
+        from hekis import cities, evaluate as E
+        ci = cities.city_inputs(OBS, "istanbul")
+        a = cities.run_city(OBS, "istanbul")
+        P = {**cities.LIKELY, "stok": ci["stok"], "g_e": ci["g_e"]}
+        b = E.evaluate(P)
+        self.assertAlmostEqual(a["N"], b["N"], places=6)
+        self.assertAlmostEqual(a["ratio"], b["ratio"], places=9)
+
+    def test_all_cities_finite_and_population_shares(self):
+        from hekis import cities
+        tot_pop = 0
+        for c in cities.CITIES:
+            o = cities.run_city(OBS, c)
+            for k in ("N", "sub1", "rev", "yuk", "ratio"):
+                self.assertTrue(math.isfinite(o[k]), (c, k))
+            tot_pop += o["pop"]
+        self.assertGreater(tot_pop / 86_092_168, 0.40)
+        self.assertLess(tot_pop / 86_092_168, 0.50)
+
+    def test_vacant_stock_scales_with_population(self):
+        from hekis import cities
+        a = cities.city_inputs(OBS, "ankara")
+        i = cities.city_inputs(OBS, "istanbul")
+        self.assertAlmostEqual(a["stok"] / i["stok"], a["pop"] / i["pop"], places=9)
+        self.assertAlmostEqual(i["stok"], 450_000, delta=500)
+
+
 if __name__ == "__main__":
     unittest.main()

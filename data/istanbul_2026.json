@@ -75,6 +75,20 @@
     "su_tl_m3": 46.62,
     "kaynak": "Elektrik: EPDK mesken tarifesi Nisan 2026, 100 kWh = 323,8 TL (vergiler dahil), konut ortalamasi yaklasik 200 kWh/ay. Dogalgaz: BOTAS konut tarifesi Eylul 2026 1000 m3 = 5.631 TL, dagitim bedeli ve vergi dahil degil, tuketim 1000 m3/yil varsayim. Su: ISKI konut 46,62 TL/m3 Haziran 2025, 2026'da aylik zamlarla eskimis, tuketim 10 m3/ay varsayim"
   },
+  "sehirler": {
+    "hane_buyuklugu": 3.08,
+    "kiraci_payi": 0.27,
+    "bos_stok_kisi_basi": 0.02856,
+    "istanbul": {"nufus": 15754053, "satis": 7359550, "kira": 45510, "reel_gelir_artis_farki": 0.028, "veri": "teyitli"},
+    "ankara": {"nufus": 5910320, "satis": 5132140, "kira": 34440, "reel_gelir_artis_farki": 0.037, "veri": "teyitli"},
+    "izmir": {"nufus": 4504185, "satis": 6574320, "kira": 33369, "reel_gelir_artis_farki": 0.0, "veri": "teyitli"},
+    "bursa": {"nufus": 3263011, "satis": 4737460, "kira": 24207, "reel_gelir_artis_farki": 0.0, "veri": "teyitli"},
+    "antalya": {"nufus": 2777677, "satis": 6132170, "kira": 29306, "reel_gelir_artis_farki": 0.012, "veri": "teyitli"},
+    "konya": {"nufus": 2343409, "satis": 4737460, "kira": 24207, "reel_gelir_artis_farki": 0.0, "veri": "yer tutucu: Bursa degerleri"},
+    "adana": {"nufus": 2283609, "satis": 4737460, "kira": 24207, "reel_gelir_artis_farki": 0.0, "veri": "yer tutucu: Bursa degerleri"},
+    "kocaeli": {"nufus": 2161171, "satis": 4737460, "kira": 24207, "reel_gelir_artis_farki": 0.033, "veri": "yer tutucu: Bursa degerleri, fiyat artisi teyitli (reel %-2,9)"},
+    "kaynak": "Nufus: TUIK ADNKS 2025. Satis ve kira: Emlakjet-Endeksa Agustos 2026 (Kocaeli, Konya, Adana icin yok). Fiyat artisi farki: sehir reel artisi eksi Turkiye (%-6,2) KFE'ye eklenir, yalniz Istanbul, Ankara, Kocaeli, Antalya icin var. Secim olcutu TUIK 2025 konut satisi sirasi (Istanbul 280 bin, Ankara 152 bin, Izmir 97 bin, Antalya 45 bin, Bursa 28 bin, Kocaeli 20 bin, Konya 20 bin, Adana 19 bin); Gaziantep, Mersin, Sanliurfa bu aramada gorulmedi. Bos stok kisi basi Istanbul 450 bin / 15,75 mn, tum sehirlere ayni uygulanir: varsayim. Gelir dagilimi ulusal, sehre ozgu degil: varsayim"
+  },
   "ovp_2027_2029": {
     "2026": 0.284, "2027": 0.21, "2028": 0.135, "2029": 0.09,
     "kaynak": "Hazine ve Maliye Bakanligi OVP 2027-2029, 6 Eylul 2026, haber aktarimi. 2029 sonrasi %9 sabit: model varsayimi"

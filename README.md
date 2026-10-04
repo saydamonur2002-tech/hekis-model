@@ -94,6 +94,14 @@ Senaryolar (mr TL/yil, bugunku TL): en olasi (tavan %25, bedel %1, tahsilat %30,
 
 Etki (en olasi, 91 bin hane, hane basina ayda 6.524 TL): Gini 0,4296 -> 0,4294 (-0,0002), goreli yoksulluk -0,05 puan, piyasa kirasi -%1 ile -%4 (esneklik varsayimi). Yerlesen hanenin konut yuku gelire oranla alt %10'da %81'den %30'a, alt %40'ta %36'dan %30'a duser, aylik kazanc 12.100 ile 3.000 TL. Programsiz referans Esenyurt piyasa kirasi + abonelik, bu dusuk gelirli hanenin gercek karsi olgusunu abartabilir.
 
+## 7c. Istanbul ve 7 buyuksehir (gerisi hesap disi)
+
+`python -m hekis.cities`. Sehirler: Istanbul, Ankara, Izmir, Bursa, Antalya, Konya, Adana, Kocaeli (TUIK 2025 konut satisi siralamasi; Gaziantep, Mersin, Sanliurfa bu aramada gorulmedi, siralama tam dogrulanmadi). Nufus TUIK ADNKS 2025: 39,0 mn, Turkiye'nin %45'i. Fiyat ve kira carpani Istanbul'a gore ortalama satis ve kira orani (Emlakjet-Endeksa Agustos 2026): Ankara 0,70 / 0,76, Izmir 0,89 / 0,73, Antalya 0,83 / 0,64, Bursa 0,64 / 0,53. Kocaeli, Konya, Adana icin veri yok, Bursa degerleri yer tutucu. Bos stok kisi basi Istanbul ile ayni (450 bin / 15,75 mn), hane buyuklugu 3,08, kiraci payi %27, gelir dagilimi ulusal: hepsi varsayim. Beklenen reel artis sehir bazinda KFE'ye Endeksa'nin sehir-Turkiye reel farki eklenir (Istanbul -%3,7, Ankara -%2,8, Kocaeli -%3,2, Antalya -%5,3, digerleri -%6,5).
+
+En olasi senaryo (tavan %25, bedel %1, tahsilat %30, luks bedel %5): 8 sehirde 210 bin daire (Istanbul 82 bin, %39), yil 1 sub. 11,0 mr TL (Istanbul %59), bedel 12,6 mr, oran 1,14, 20 yil yuk 232 mr. Istanbul tek basina oran 0,94, acik 0,39 mr: diger sehirlerde kira farki kucuk (ulusal sosyal kira 10-12 bin yerel piyasa kirasina yakin), abonelik sub. baskin ve bedel tabani genis, o yuzden oran 1,18-1,80.
+
+Etki (8 sehir nufusu, 12,7 mn hane, 3,4 mn kiraci hane): 210 bin hane (uygun alt %40 kiracinin %15'i), hane basina ayda 4.368 TL. Gini 0,4296 -> 0,4289, goreli yoksulluk -0,18 puan. Kira piyasasi etkisi dogrusal yaklasimla %-6 ile %-20, ust sinirdir: yerlesenlerin piyasa kiracisi olduklari ve esnekligin dusuk oldugu varsayilir.
+
 ## Sonuc
 
 Model, bos stoku kullandirmanin maliyetini kira farkindan ve abonelikten ibaret gosteriyor, stoku kullandirmanin kendisi bedava. Kendini finanse etme olcek meselesi: kucuk programlar finanse eder, buyukler etmez. Yon sonuclari sagdir (ters dongululuk, olcek erozyonu, bedelin katilimi artirmada zayifligi), buyukluk sonuclari degildir (katilim, tahsilat ve beklenti kalibre edilemez).
