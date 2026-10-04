@@ -8,7 +8,15 @@
     "istanbul_reel_yillik": -0.034,
     "turkiye_ortalama_tl": 5311000,
     "turkiye_m2_tl": 42488,
-    "kaynak": "Emlakjet-Endeksa Agustos 2026 Konut Deger Raporu"
+    "esenyurt_m2_tl": 34475,
+    "esenyurt_m2_min_tl": 20455,
+    "esenyurt_m2_max_tl": 53333,
+    "esenyurt_ortalama_tl": 3619875,
+    "esenyurt_ortalama_m2": 105,
+    "esenyurt_amortisman_yil": 10,
+    "esenyurt_getiri": 0.1004,
+    "esenyurt_nominal_yillik": 0.3218,
+    "kaynak": "Emlakjet-Endeksa Agustos 2026; Esenyurt Endeksa satilik konut"
   },
   "rent": {
     "istanbul_ortalama_tl": 45510,
@@ -17,6 +25,8 @@
     "istanbul_yeni_kira_yillik": 0.345,
     "esenyurt_medyan_tl": 20000,
     "esenyurt_m2_tl": 231,
+    "esenyurt_emlakjet_ortalama_tl": 25955,
+    "esenyurt_emlakjet_m2_tl": 288,
     "esenyurt_2_1_tl": 20000,
     "esenyurt_1_1_tl": 17000,
     "esenyurt_1_0_tl": 14250,
