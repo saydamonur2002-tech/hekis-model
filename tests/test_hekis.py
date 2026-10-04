@@ -115,5 +115,93 @@ class PoliticsTests(unittest.TestCase):
         self.assertAlmostEqual(pay + sub, 16825.0)
 
 
+class PropertyTests(unittest.TestCase):
+    """Rastgele girdilerle degismez testleri. Tohum sabit, tekrarlanabilir."""
+
+    def test_random_units_conserve_principal(self):
+        import random
+        rng = random.Random(7)
+        for _ in range(200):
+            u = unit(rent=rng.uniform(0, 80000), aidat=rng.uniform(0, 8000), price=rng.uniform(1e6, 1e7),
+                     count=rng.randint(1, 500), tenant=rng.uniform(0, 80000))
+            r = simulate([u], [rng.uniform(0, 0.8)] * 20, [1.0] * 20,
+                         Params(rent_index=rng.choice(["none", "tufe", "tufe_ort12"]), opex_rate=rng.uniform(0, 0.03),
+                                vacancy=rng.uniform(0, 0.3), collection=rng.uniform(0.5, 1.0)))
+            paid = -sum(x.real_principal_change for x in r.rows)
+            self.assertAlmostEqual(paid + r.end_real_principal, r.entry_value, delta=1e-6 * r.entry_value)
+            self.assertTrue(all(x.principal_real >= -1e-6 for x in r.rows))
+
+    def test_rent_doubling_doubles_pool(self):
+        a = simulate([unit(rent=20000)], [0.3] * 20, [1.0] * 20, Params(rent_index="tufe"))
+        b = simulate([unit(rent=40000)], [0.3] * 20, [1.0] * 20, Params(rent_index="tufe"))
+        self.assertAlmostEqual(b.rows[0].pool_net / a.rows[0].pool_net, 2.0, places=6)
+
+    def test_luxury_response_monotone_and_bounded(self):
+        from hekis import final
+        fees = [i / 100 for i in range(0, 30)]
+        rs = [final.lux_response(f) for f in fees]
+        self.assertEqual(rs, sorted(rs))
+        self.assertLessEqual(max(rs), final.LUX_CAP + 1e-12)
+        self.assertEqual(rs[0], 0.0)
+
+    def test_effective_collection_nonincreasing_with_floor(self):
+        from hekis import final
+        cs = [final.effective_collection(i / 100, 0.6) for i in range(0, 40)]
+        self.assertEqual(cs, sorted(cs, reverse=True))
+        self.assertGreaterEqual(min(cs), final.AVOID_FLOOR)
+
+    def test_luxury_revenue_has_interior_peak(self):
+        from hekis import final
+        revs = [final.lux_economics(OBS, 0.6, 0.2, i / 1000, 0.6)[2] for i in range(1, 151)]
+        peak = revs.index(max(revs))
+        self.assertGreater(peak, 5)
+        self.assertLess(peak, 149)
+        self.assertTrue(all(r >= 0 for r in revs))
+
+    def test_evaluate_finite_on_random_draws(self):
+        import random
+        from hekis import evaluate as E
+        rng = random.Random(11)
+        for _ in range(150):
+            P = {k: rng.triangular(lo, hi, mode) for k, (lo, mode, hi) in E.SPACE.items()}
+            o = E.evaluate(P)
+            for k in ("p", "N", "sub1", "yuk", "odenen", "rev", "ratio"):
+                self.assertTrue(math.isfinite(o[k]), (k, o[k]))
+            self.assertGreaterEqual(o["p"], 0.0)
+            self.assertLessEqual(o["p"], 0.60 + 1e-9)
+            self.assertGreaterEqual(o["odenen"], -1e-9)
+            self.assertLessEqual(o["odenen"], 1.0 + 1e-9)
+
+    def test_ratio_invariant_to_stock_size(self):
+        # Hem yerlesen hem bedel tabani stokla dogrusal: oran stoktan bagimsiz olmali.
+        from hekis import evaluate as E
+        a = E.evaluate({"stok": 225_000})["ratio"]
+        b = E.evaluate({"stok": 750_000})["ratio"]
+        self.assertAlmostEqual(a, b, delta=0.02)
+
+    def test_more_fee_more_participation_less_or_equal_base(self):
+        from hekis import evaluate as E
+        lo = E.evaluate({"fee": 0.005})
+        hi = E.evaluate({"fee": 0.05})
+        self.assertGreaterEqual(hi["N"], lo["N"] - 1)
+
+    def test_zero_expected_growth_boom_kills_participation(self):
+        from hekis import evaluate as E
+        self.assertLess(E.evaluate({"g_e": 0.40})["N"], 1000)
+
+    def test_monte_carlo_reproducible(self):
+        from hekis import evaluate as E
+        _, a = E.monte_carlo(30, seed=5)
+        _, b = E.monte_carlo(30, seed=5)
+        self.assertEqual([x["ratio"] for x in a], [x["ratio"] for x in b])
+
+    def test_scale_bin_erosion_holds(self):
+        # Olcek buyudukce kendini finanse etme azalir: Spearman(daire, oran) belirgin negatif.
+        from hekis import evaluate as E
+        _, outs = E.monte_carlo(400, seed=3)
+        rho = E.spearman([o["N"] for o in outs], [o["ratio"] for o in outs])
+        self.assertLess(rho, -0.5)
+
+
 if __name__ == "__main__":
     unittest.main()

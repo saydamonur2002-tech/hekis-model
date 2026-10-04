@@ -33,30 +33,32 @@ def lux_factors(sigma: float, cut: float) -> tuple[float, float]:
 
 
 def run_scenario(obs: dict, cap: float, fee: float, collection: float, cut: float = 0.0, sigma: float = 0.6,
-                 fee_on_lux: bool = False):
+                 fee_on_lux: bool = False, g: float | None = None, slope: float = 25.0, alpha: float = 0.30,
+                 qcut: float = 0.4, uplift: float | None = None, eq: float | None = None, rent_prop: bool = True):
     """cut: orta (Istanbul ortalamasi) tipteki bos stoktan ayrilan luks ust dilim payi. Ucuz (Esenyurt) tipte luks yok varsayilir.
     Luks daireler havuzdan cikar. fee_on_lux: yine de bos tutma bedeli odesinler mi."""
     f_low, f_top = lux_factors(sigma, cut)
-    g = activation.expected_real_growth(obs)
+    f_rent = f_low if rent_prop else 1.0  # orta tip kirasi degerle orantili mi, sabit politika kirasi mi
+    g = activation.expected_real_growth(obs) if g is None else g
     stok_all = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
     stok = stok_all * (1 - 0.5 * cut)
     s_orta = 0.5 * (1 - cut) / (1 - 0.5 * cut)
     # tutma maliyeti orani, kalan karisim
-    orta = [replace(u, price=u.price * f_low) for u in activation.tier_units(obs, "orta", 1000 * s_orta)]
+    orta = [replace(u, price=u.price * f_low, rent=u.rent * f_rent) for u in activation.tier_units(obs, "orta", 1000 * s_orta)]
     ucuz = activation.tier_units(obs, "ucuz", 1000 * (1 - s_orta))
     mix = orta + ucuz
     cnt = sum(u.count for u in mix)
     val = sum(u.price * u.count for u in mix)
     p0 = activation.params(obs)
     hold = (p0.tax_rate * val + p0.unit_fixed * cnt + sum(u.aidat * 12 * u.count for u in mix)) / val
-    p = activation.participation(g, hold, fee, 25.0, cap)
+    p = activation.participation(g, hold, fee, slope, cap)
     n = stok * p
     avg_value = val / cnt
     rent = sum(u.rent * u.count for u in mix) / cnt
-    pay, _ = politics.graduated(rent, 0.30, 0.4)
+    pay, _ = politics.graduated(rent, alpha, qcut, uplift=uplift, eq=eq)
     share = pay / rent
     units = []
-    units += [replace(u, price=u.price * f_low, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "orta", n * s_orta)]
+    units += [replace(u, price=u.price * f_low, rent=u.rent * f_rent, tenant_pay=u.rent * f_rent * share) for u in activation.tier_units(obs, "orta", n * s_orta)]
     units += [replace(u, tenant_pay=u.rent * share) for u in activation.tier_units(obs, "ucuz", n * (1 - s_orta))]
     params = replace(activation.params(obs), utility_sub=politics.monthly_utilities(obs))
     r = simulate(units, inflation_paths(obs)["ovp"], [1.0] * 20, params)
@@ -99,7 +101,19 @@ def lux_response(fee: float, cap: float = LUX_CAP, fs_pct: float = LUX_FS) -> fl
     return cap * (1 - math.exp(-fee * 100 / fs_pct))
 
 
-def lux_economics(obs: dict, sigma: float, cut: float, fee_lux: float, collection: float, cap: float = LUX_CAP):
+AVOID_START = 0.05  # bu bedelin ustunde kacinma baslar
+AVOID_SLOPE = 0.05  # asan her yuzde puan icin tahsilat mutlak puan kaybi (varsayim)
+AVOID_FLOOR = 0.10
+
+
+def effective_collection(fee: float, collection: float, start: float = AVOID_START, slope: float = AVOID_SLOPE) -> float:
+    """Yuksek bedelde hisse bolme, sirket devri gibi kacinma: tahsilat bedel arttikca duser."""
+    over_pp = max(0.0, fee * 100 - start * 100)
+    return max(AVOID_FLOOR, collection - slope * over_pp)
+
+
+def lux_economics(obs: dict, sigma: float, cut: float, fee_lux: float, collection: float, cap: float = LUX_CAP,
+                  avoid_slope: float = AVOID_SLOPE, avoid_start: float = AVOID_START, fs_pct: float = LUX_FS):
     """Ayrilan luks dilim: adet, ortalama deger, bedel geliri (TL/yil), bosluk bitirme orani."""
     from hekis import politics  # noqa: F401
     f_low, f_top = lux_factors(sigma, cut)
@@ -108,8 +122,9 @@ def lux_economics(obs: dict, sigma: float, cut: float, fee_lux: float, collectio
     mean_orta = sum(u.price * u.count for u in orta) / sum(u.count for u in orta)
     count = stok_all * 0.5 * cut
     value = mean_orta * f_top
-    r = lux_response(fee_lux, cap)
-    return count, value, count * (1 - r) * value * fee_lux * collection, r
+    r = lux_response(fee_lux, cap, fs_pct)
+    c_eff = effective_collection(fee_lux, collection, avoid_start, avoid_slope)
+    return count, value, count * (1 - r) * value * fee_lux * c_eff, r
 
 
 def compare_lux_fee(obs: dict) -> None:
@@ -121,21 +136,23 @@ def compare_lux_fee(obs: dict) -> None:
     for name, cap, fee in SCENARIOS[1:]:
         p, n, r, first, rev_ord = run_scenario(obs, cap, fee, 0.6, cut, sigma, False)
         print(f"{name}: genel bedel {fee:.0%}, yil-1 sub. {first / 1e9:.1f} mr, genel bedel geliri {rev_ord / 1e9:.1f} mr ({rev_ord / first:.2f})")
-        print(f"{'luks bedel':>11}{'bosluk biter':>14}{'luks gelir mr':>15}{'toplam gelir/sub':>18}{'(tahsilat luks %40 / %80)':>28}")
+        print(f"{'luks bedel':>11}{'bosluk biter':>14}{'etkin tahsilat':>16}{'luks gelir mr':>15}{'toplam gelir/sub':>18}{'(tahsilat luks %40 / %80)':>28}")
         for fl in (0.01, 0.02, 0.03, 0.05, 0.08, 0.12):
             _, _, rev_l, resp = lux_economics(obs, sigma, cut, fl, 0.6)
             lo = lux_economics(obs, sigma, cut, fl, 0.4)[2]
             hi = lux_economics(obs, sigma, cut, fl, 0.8)[2]
-            print(f"{fl:>11.0%}{resp:>14.0%}{rev_l / 1e9:>15.1f}{(rev_ord + rev_l) / first:>18.2f}{(rev_ord + lo) / first:>14.2f} /{(rev_ord + hi) / first:>5.2f}")
-        # basabas luks bedeli
+            print(f"{fl:>11.0%}{resp:>14.0%}{effective_collection(fl, 0.6):>16.0%}{rev_l / 1e9:>15.1f}{(rev_ord + rev_l) / first:>18.2f}{(rev_ord + lo) / first:>14.2f} /{(rev_ord + hi) / first:>5.2f}")
         need = first - rev_ord
-        be = None
-        for i in range(1, 400):
+        be, peak_fee, peak = None, 0.0, 0.0
+        for i in range(1, 151):  # %15'e kadar: ustu anlamsiz ve kacinma tabani yapay
             fl = i / 1000
-            if lux_economics(obs, sigma, cut, fl, 0.6)[2] >= need:
+            rv = lux_economics(obs, sigma, cut, fl, 0.6)[2]
+            if rv > peak:
+                peak, peak_fee = rv, fl
+            if be is None and rv >= need:
                 be = fl
-                break
-        print(f"  Luks dilimden kendini finanse etmek icin gereken bedel (tahsilat %60): " + (f"%{be:.1%}" if be else "%40 bile yetmez") + "\n")
+        print(f"  Kacinma dahil luks gelirinin tepesi: bedel %{peak_fee:.1%}, gelir {peak / 1e9:.1f} mr; gerekli ek gelir {need / 1e9:.1f} mr. "
+              + (f"Basabas luks bedeli %{be:.1%}." if be else "Luks tek basina yetmez.") + "\n")
 
 
 def main() -> int:

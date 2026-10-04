@@ -1,136 +1,93 @@
 # HEKIS modeli
 
-Hedef Endeksli Kapali Ic Senet. Kapali kira-uretim devresinin stok-akim hesabi.
+Hedef Endeksli Kapali Ic Senet. Bos konut stokunu kullandirmanin stok-akim hesabi. Uc defter ayri tutulur: mulkiyet, oturan, senet. Esit gostermek cifte yazimdir.
 
-Bu bir politika vaadi degil, uc defteri ayiran bir hesap makinesidir. Mulkiyet, oturan ve senet ayni sayiyi tasimak zorunda degildir. Esit gostermek cifte yazimdir.
-
-Repo ozeldir. Calisma taslagidir, dogrulanmis bir kamu maliyesi modeli degildir. Not kopyasi: `saydamonur2002-tech/modeller` icinde `HEKIS_Kapali_Kira_Uretim_Devresi.md`.
+Bu bir politika vaadi degil, hesap makinesidir. Repo ozel, kisisel modelleme. Dogrulanmis bir kamu maliyesi modeli degildir. Gozlem ile varsayim ayri tutulur, ayri dosyalarda: `data/VARSAYIM.md`.
 
 ## Calistirma
 
-Python 3 yeter. Ek paket yok.
+Python 3, ek paket yok (sadece `data/` okuma icin degil, testler `unittest`).
 
 ```bash
-python -m hekis.simulate
-python -m hekis.bind_cli
+python -m unittest discover -s tests   # 29 test
+python -m hekis.checks                 # gerceklik kontrolleri
+python -m hekis.analysis               # tornado, Monte Carlo, rank korelasyonu, ters stres
+python -m hekis.final                  # uc sistem, luks ayrimi, luks bedel
+python -m hekis.bind_cli               # stok-akim, eski A/B/C karsilastirmasi
+python -m hekis.calibrate              # beklenti kurali kalibrasyonu, katilim bandi
+python -m hekis.selffinance            # kendini finanse etme cebiri
 ```
 
-`bind_cli` fiyati, kirayi ve enflasyonu `data/istanbul_2026.json` dosyasindan okur. Kaynaklar `data/OKUMA.md` icindedir. Eski `scenarios/` uydurma fiyatla duruyor. Gercek kosu o degil.
+## Veri
 
-## 2026 bagi, 1000+1000+500 olcek
+`data/`: istanbul_2026.json (girdiler), OKUMA.md, TEYIT.md, KFE.md (TCMB konut fiyat endeksi), KREDI.md (ipotekli pay), FAIZ_KUR.md, GELIR.md (TUIK), ANALOG.md (Vancouver, Irlanda, Fransa, Portekiz, Ispanya), VARSAYIM.md (varsayim envanteri ve etki sirasi).
 
-Istanbul satis m2 66.905 TL. Kira m2 479 TL. Bosluk %3,7, Avrupa yakasi elektrik aboneligi.
+## 1. Stok-akim cekirdegi
 
-Gider: emlak vergisi binde 2 (ust sinir), DASK 2.022 TL/daire, bos dairenin aidati sahibe yazilir. Aidat Istanbul ortalamasi 3.330 TL/ay (2026 site aidati haberi aktarimi). Turkiye ortalamasi 600 TL tek basliktan, kapsami teyitsiz, Istanbul stoku icin dusuk, baz alinmadi. Bakim yilda giris degerinin %1'i, yabanci rehber araligi %1-3'un alt ucu, Turkiye verisi degil.
+Istanbul satis m2 66.905 TL, kira m2 479 TL. Havuz sahibe kirayi oder, bakim/vergi/DASK/bos dairenin aidati havuzdan duser, oturan sosyal/dereceli kira oder, fark subvansiyondur. "Odenen" havuzun 20 yilda sahibe reel geri odedigi anapara payidir, yuksek iyidir.
 
-Enflasyon: Agustos 2026 yillik %31,51 (TUIK). Ileri yol Hazine ve Maliye OVP 2027-2029: %28,4 / %21 / %13,5 / %9, sonrasi %9 sabit (varsayim).
+A eski (donuk %31,5 enflasyon, kira aninda TUFE, gider yok), B kira 12 aylik TUFE ortalamasi ve gider dahil, C ayrica OVP yolu (%28,4/21/13,5/9). Odenen / yuk (mr TL, bugunku):
 
-"Odenen", havuzun 20 yilda sahibe reel olarak geri odedigi anapara payidir. Yuksek iyidir. "Yuk", kira farki ile havuzun kapatamadigi aciktir, bugunku TL ile.
-
-A eski model: enflasyon %31,5 donuk, kira aninda TUFE, gider yok. B kira 12 aylik TUFE ortalamasiyla, giderler dahil. C ayrica OVP yolu.
-
-| Kosu | A odenen / yuk | B odenen / yuk | C odenen / yuk |
+| Kosu | A | B | C |
 | --- | --- | --- | --- |
 | Piyasa kira, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
-| Piyasa kira, sabit | %23 / 0 | %11 / 1,6 mr | %25 / 0,1 mr |
-| HEKIS kirasi, TUFE | %61 / 3,2 mr | %36 / 3,2 mr | %41 / 3,5 mr |
-| HEKIS kirasi, sabit | %10 / 0,5 mr | %2 / 2,6 mr | %3 / 2,0 mr |
-| Resmi sosyal kira, TUFE | %34 / 0 | %9 / 0 | %12 / 0 |
-| Esenyurt, TUFE | %100 / 0 | %100 / 0 | %100 / 0 |
-| Esenyurt, %20 alti kira | %100 / 2,0 mr | %100 / 2,0 mr | %100 / 2,2 mr |
-| HEKIS, ulusal bos stok %27 | %46 / 2,5 mr | %17 / 2,5 mr | %21 / 2,7 mr |
+| Piyasa kira, sabit | %23 / 0 | %11 / 1,6 | %25 / 0,1 |
+| HEKIS kirasi, TUFE | %61 / 3,2 | %36 / 3,2 | %41 / 3,5 |
+| Resmi sosyal kira | %34 / 0 | %9 / 0 | %12 / 0 |
+| Esenyurt, %20 alti kira | %100 / 2,0 | %100 / 2,0 | %100 / 2,2 |
+| HEKIS, ulusal bos stok %27 | %46 / 2,5 | %17 / 2,5 | %21 / 2,7 |
 
-Duyarlilik (HEKIS kirasi, TUFE, C kosusu, geri odenen): bazda (Istanbul ortalamasi 3.330 TL, bakim %1) %41. Turkiye ortalamasi 600 TL ile %56. Besiktas 8.400 TL'de %14. Bakim %2'de bu degerler %36, %21, %0. `python -m hekis.bind_cli` tum tabloyu basar.
+Gider kalemleri: emlak vergisi binde 2 (ust sinir), DASK 2.022 TL, bos dairenin aidati sahibe yazilir (Istanbul ort. 3.330 TL/ay), bakim yilda degerin %1'i (varsayim). Bos dairenin sahibe maliyeti yilda yaklasik degerin %1,05'i.
 
-## Bos stoku kullandirma
+## 2. Bos stoku kullandirma
 
-`python -m hekis.activation`. Bos duran daire sisteme girerse ne olur. Orta semt Istanbul ortalamasi, ucuz semt Esenyurt. Havuz kirayi oder, oturan sosyal kira oder, fark butcedir.
+Istanbul'da bos konut 225 bin (elektrik aboneligi) ile 450-750 bin (IBB) arasinda tahmin ediliyor, stok 4,5 milyon, yontem farki var. Orta semt Istanbul ortalamasi, ucuz semt Esenyurt.
 
-Istanbul'da bos konut 225 bin (elektrik aboneligi, Buyukduman) ile 450-750 bin (IBB) arasinda tahmin ediliyor. Stok 4,5 milyon. Yontem farki, tek sayi degil. Orta/ucuz semt payi bilinmiyor, yari yariya senaryodur. Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir.
+| Daire basina | Fiyat | Sahibin bos maliyeti / yil | Subvansiyon / yil | 20 yil odenen |
+| --- | --- | --- | --- | --- |
+| Orta | 4,68 mn TL | 51 bin | 65 bin | %41 |
+| Ucuz (Esenyurt) | 2,41 mn TL | 24 bin | 85 bin | %100 |
 
-| Daire basina | Fiyat | Sahibin bos maliyeti / yil | Sosyal sub. / yil | 20 yil odenen | 20 yil yuk |
-| --- | --- | --- | --- | --- | --- |
-| Orta semt | 4,68 mn TL | 51 bin TL | 65 bin TL | %41 | 1,4 mn TL |
-| Ucuz semt (Esenyurt) | 2,41 mn TL | 24 bin TL | 85 bin TL | %100 | 1,8 mn TL |
+Katilim: sahip, bos tutmaktan beklenen reel getiri ile senedin reel getirisini (0) karsilastirir. Katilim = tavan x lojistik(egim x (tutma maliyeti + bedel - beklenen reel artis)). Tavan %40 ve egim 25 kalibre edilemez. Beklenti kurali (onceki reel KFE artisi) bir yil ilerisini sifir tahmininden iyi tahmin etmiyor (RMSE 21,0 vs 20,7 puan, n=9): davranis varsayimidir, tahmin degil. Tarihsel olarak negatif reel faiz donemi (2021-2023, reel faiz -%14 ile -%35) ile reel konut sicramasi (+%20, +%53, +%11) ortusuyor, kredi payi ayni donemde dusuyordu (%38'den %11'e). Kosul bugun: reel faiz +%3 ile +%6,5, reel konut -%6,5, katilim penceresi acik. Fiyat patlarken katilim sifira yakin: sistem ters donguludur.
 
-Ornek: 225 bin bos stokun %10'u girerse 22.500 daire, 80 mr TL giris degeri, 20 yilda yaklasik 36 mr TL (bugunku TL) yuk. Katilim %25 olursa 91 mr TL.
+Yurt disi benzerleri (`data/ANALOG.md`): Vancouver bos konut vergisi (%1'den %3-5'e) bos konut sayisini 2017-2022'de %54 azaltti, bunun yarisi sahibinin oturmasiyla. Fransa'da etkili olmadi, Irlanda'da kendi beyanla sinirli kaldi. Gonullu programlar cok dusuk: Portekiz kira sozlesmelerinin %0,12-0,4'u, Irlanda Repair and Leasing basvuranlarin %3,8'i. Gonullu tek basina yaklasik %4 katilim, guclu yaptirimla en fazla %50 civari.
 
-Ucuz semtte geri odeme %100 cikmasi Esenyurt fiyatinin turetilmis olmasina dayanir. Esenyurt aidati kaynaksiz varsayim.
+## 3. Dereceli kira, abonelik, subvansiyon
 
-Bu blokta olmayanlar: tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, katilim karari, kademeli giris.
+Kararlar: oturan dereceli kira oder (min(kira, %30 x gelir), alt %40 gelir dilimi, kura ile), aidat havuzda, abonelik (elektrik, dogalgaz, su, yaklasik 1.583 TL/ay, gaz ve su alt sinir) tam subvanse. Gelir dagilimi: TUIK 2025, medyan 241 bin, ortalama 333 bin, lognormal uydurma (ust %20 payi model %48,5 TUIK %48; alt %20 %5,0 vs %6,4).
 
-### Katilim simulasyonu
+Subvansiyon bos stoku kullandirmanin maliyeti degil, sosyal kira kararinin maliyetidir: oturan kiranin tamamini odese subvansiyon sifir olur, geri odeme degismez. Havuz her durumda tam kirayi alir. Aidati oturana gecirmek geri odemeyi %75'ten %91'e cikarir ama oturanin konut yukunu %30'dan %34-40'a cikarir. Kalan %25 anapara 20. yilda odenmemis durur: senet garantisi varsa gizli yukumluluk.
 
-Sahip, bos tutmaktan beklenen reel getiri ile senedin reel getirisini (0) karsilastirir. Katilim = tavan x lojistik(egim x (tutma maliyeti + bos tutma bedeli - beklenen reel artis)).
+## 4. Luks ust dilim
 
-Testler: `python -m unittest discover -s tests` (15 test, model degismezleri ve katilim kurali). Kalibrasyon ve bant: `python -m hekis.calibrate`.
+Orta tipteki bos stogun en pahali %20'si (45 bin daire, ortalama 9,5 mn TL) havuz disi, bos olsa bile, bedelden muaf degil, ayri tarife. Deger dagilimi lognormal (sigma 0,6, varsayim). Orta tipin kirasi degerle orantili olceklenir (yapisal secim): sabit politika kirasi tutulursa gelir/sub. orani 0,65 yerine 0,82 ve geri odeme %83 yerine %99 cikar.
 
-Kalibrasyon sonucu. Beklenti kurali (onceki yillarin reel KFE artisi) bir yil ilerisini tahmin etmede sifir tahmininden iyi degil: RMSE 20-24 puan, pencere farklari anlamsiz. n=9. Pencere 1 secildi, ama secim gurultuye yakin. Davranis modeli olarak tutulur, tahmin modeli olarak degil. Tavan (%40) ve egim (25) icin gozlem yok, kalibre edilemez.
+Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yuksek bedelde kacinma (%5 ustu her puan icin tahsilat 5 puan duser, taban %10). Toplam bedel geliri / yil 1 subvansiyon, luks bedel %1/3/5/8/12: karma sistem 0,55/0,70/0,82/0,87/0,79, Vancouver benzeri 0,74/0,84/0,92/0,96/0,90. Kacinma dahil luks gelirinin tepesi bedel %8,2 civari, yilda 5,5 mr TL: luks tek basina sistemi finanse edemez. %5 bedelde luks bos dairenin %62'si bosluktan cikar (yaklasik 28 bin daire, havuz disi).
 
-Bugun beklenen reel artis -%6,5. 450 bin bos stok, bedel %1, orta nokta (tavan %40, egim 25): yaklasik 161 bin daire, 571 mr TL giris degeri, 20 yilda 261 mr TL yuk. Tavan ve egim bandinda (tavan %10-60, egim 10-50) giren daire 32 bin ile 266 bin arasinda, yuk 51-432 mr TL. Sekiz kat fark.
+## 5. Uc sistem (luks ayrilmis, bugunku TL)
 
-Geriye donuk (pencere 1): 2021 %1, 2022 %0,3, 2023 %0, 2024 %3, 2025 %38, 2026 %26, bugun %35. Patlama rejiminde katilim sifir. Bos tutma bedeli %0-2 araliginda katilimi sadece birkac puan oynatir: tavan sinirlayici, insentif degil.
+| Sistem | Katilim | Daire | Giris | 20 yil odenen | Yil 1 sub. | 20 yil yuk | Gelir/sub. |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Gonullu tek basina | %4 | 18 bin | 51 mr | | 1,4 mr | 29 mr | 0 |
+| Karma (bedel %1, tavan %40) | %36 | 146 bin | 421 mr | %83 | 11,4 mr | 243 mr | 0,39 (luks bedelli 0,62) |
+| Vancouver benzeri (bedel %3, tavan %55) | %51 | 208 bin | 602 mr | | 16,4 mr | 347 mr | 0,62 (luks bedelli 1,09) |
 
-Yurt disi benzerleri (`data/ANALOG.md`). Bos stoktaki tepkiyi olcen tek net ornek Vancouver: bos konut vergisi degerin %1'inden %3-5'ine cikarken bos konut sayisi 2017-2022'de %54 azaldi (bir kismi sahibinin oturmasiyla, kiraya verilenler %25). Fransa'da vergi onemli olcude etkili olmadi, Irlanda'da kendi beyanli vergi sinirli kaldi. Yaptirimsiz gonullu programlar cok dusuk: Portekiz'de kira sozlesmelerinin %0,12-0,4'u, Irlanda Repair and Leasing'de basvuranlarin %3,8'i anlasma imzaladi. Bunlar secilmis kitle uzerinden, bos stoga orani degil.
+## 6. Kendini finanse etme
 
-Bu uc ucla sinirlanmis senaryolar (450 bin bos stok): gonullu tek basina %4 katilim, 20 bin daire, 32 mr TL yuk. Mevcut karma varsayim (bedel %1, tavan %40) 161 bin daire, 261 mr TL. Vancouver benzeri (bedel %3, tavan %55) 231 bin daire, 374 mr TL. Mevcut kanun taslagindaki bedel (%0,2-2) Vancouver'in altinda, Fransa'nin basarisiz kaldigi duzeye yakin. Merkezi %40 varsayimina ancak guclu yaptirimla ulasilir, gonullu program tek basina ulasmaz.
+Kosul: bedel x tahsilat >= (12 s / V) x p / (1 - p). s yerlesen daire basina aylik subvansiyon, V deger, p yerlesen oran. Katilim arttikca bedel odeyen taban erir. V 3,55 mn, s 8 bin TL/ay icin gerekli etkin bedel p %10'da %0,3, %36'da %1,5, %50'de %2,7, %60'ta %4,1 (`hekis.selffinance`).
 
-### Subvansiyon
+Monte Carlo (1500 cekilis, 18 parametre, ucgen dagilim, `hekis.analysis`): yerlesen daire %5/%50/%95 yuzdeliginde 19/105/211 bin, 20 yil yuk 33/168/407 mr TL. Kendini finanse eden cekilis %81, ama bu olcege bagli: yerlesen daire 25 bin altinda %100, 25-75 binde %99, 75-150 binde %84, 150 binin ustunde %55 (medyan oran 1,07). Spearman(daire, oran) = -0,75. Kucuk programlar kendini finanse eder, buyukler etmez. Baz durumda (146 bin daire) oran 0,82, yillik acik yaklasik 2 mr TL.
 
-`python -m hekis.subsidy`. Havuz sahibe piyasa kirasini oder, oturan sosyal kira oder, fark butcedir. 161 bin dairede (mevcut karma senaryo) yil 1 subvansiyonu yaklasik 12 mr TL, 20 yilda 261 mr TL (bugunku TL), daire basina ayda yaklasik 6.750 TL. Prim ve havuz acigi sifir: yukun tamami kira farkidir.
+Sonucu en cok belirleyenler (rank korelasyonu, tornado): beklenen reel konut artisi (0,58), katilim tavani (-0,51), genel bedel, ayrilan luks pay, kira/gelir kurali, uygun kitle, etkin tahsilat. Bakim orani, aidat, stok buyuklugu (oranda), enflasyon yolu neredeyse hic.
 
-Havuz her durumda tam kirayi aldigi icin oturanin odedigi pay sahibe geri odemeyi degistirmez: ayni 20 yilda %75. Oturan kiranin tamamini odese subvansiyon sifir olur, geri odeme degismez. Subvansiyon bos stoku kullandirmanin maliyeti degil, sosyal kira kararinin maliyetidir. Ayri karar, ayri tartisilmali.
+## 7. Gerceklik kontrolleri
 
-Kalan %25 anapara 20. yilda reel olarak odenmemis durur. Senedi devlet garanti ederse bu gizli yukumluluktur, modelde yuk olarak sayilmiyor.
+`hekis.checks`: 15 kontrol, 4 uyumlu, 9 uyari, 2 dogrulanamaz. Uyarilar: model bosluk orani (%3,7) bos stok tahminlerinin altinda; Esenyurt getirisi %7,3 vs Endeksa %10,04 (kaynaklar farkli); politika kirasi getirisi %3,8 vs piyasa %8,6; gelir dagilimi alt ucu fazla yoksul; ilk yil enflasyon yolu gozlenenin 2-3 puan altinda; beklenti kurali tahmin gucu yok; KFE Turkiye geneli Istanbul'dan 3 puan farkli; etkin tahsilat varsayimi iyimser; orta tip kirasi yapisal secim. Dogrulanamayan: katilim fonksiyonu, kisi basi subvansiyon.
 
-### Dereceli kira ve bedel geliri
+## Sonuc
 
-`python -m hekis.politics`. Gelir dagilimi: TUIK 2025 medyan 241 bin, ortalama 333 bin TL (`data/GELIR.md`), lognormal uydurma. Sinavi: ust %20 payi model %48,5 (TUIK %48), alt %20 model %5,0 (TUIK %6,4). Esdeger-hane katsayisi 2,0, gelir artisi (asgari ucret 2024-2026) ve hane sayisi varsayimdir.
-
-Oturan min(kira, a x gelir) oder, kura ile secilir. a %30, uygun kitle gelirin alt %40'i: ortalama odeme 9.990 TL, subvansiyon 6.830 TL/ay, yilda 13 mr TL (duz sosyal kira referansi 12,4 mr). Kesim dusurulursa (alt %20) subvansiyon 19 mr TL'ye cikar: en yoksulu hedeflemek pahali. 161 bin daire uygun kiracilarin %5,3'une yeter, %95'i disarida kalir.
-
-Bos tutma bedeli gelir olarak subvansiyonu karsilar mi: tahsilat %60 varsayimiyla bedel %2'de gelir/subvansiyon 0,9, %3'te 1,3. Yani Vancouver'in etkili bulunan %3 duzeyi ayni zamanda kendini finanse eden duzey. Bedel %1'de genel hane basina yilda yaklasik 250 TL yuk kalir.
-
-Duyarlilik (alt %40, a %30): bedel gelirinin subvansiyonu karsilamasi icin gereken en dusuk bedel (basabas) tahsilat %30'da %3,4-6,4, %60'ta %1,6-3,0, %90'da %1,0-1,9. Tahsilat %60 ve gelir artisi 1,65 iken %2,2. Sonuc en cok tahsilata, sonra gelir artisina bagli. Esdeger-hane katsayisinin etkisi daha kucuk.
-
-Duzeltme: tahsilat %60 varsayimini Irlanda'dan turetmistim, yanlisti. Irlanda'daki %59, beyan edilen bos konutlarin vergiye tabi olan payi. Gercek kayip daha onceki asamada: Revenue 50 binden fazla konutu isaretledi, sahipler 45 binini oturulu beyan etti, yaklasik 5 bini bos beyan etti, yaklasik 2 bini muafiyet istedi, yaklasik 3 bini vergiye tabi kaldi (~%6, kendi beyan). Tahsilat sorunu odeme gucu degil, tespit, beyan ve muafiyet. Etkin tahsilat basabas bedeli belirler: %6'da %25,7, %15'te %10,1, %30'da %4,8, %50'de %2,7, %60'ta %2,2, %90'da %1,5. Etkin tahsilat tespit x muafiyet disi pay x odeme oraninin carpimidir, uc oran da Turkiye icin bilinmiyor.
-
-Bedelin gelire orani (deger 3,55 mn TL): %3 bedelde alt %10 hane gelirinin %37'si, medyan %13, ust %20 siniri %7. Odeme gucu sorunu alt gelirli sahipte gercek ama bos konut sahipleri genelde ust gelirde.
-
-Gider kimde: modelde oturan yalniz kira oder. Emlak vergisi, DASK, bakim ve dolu dairenin aidati havuzdan duser. `Params.tenant_aidat=True` ile aidat oturana gecer: ortalama aidat 2.390 TL/ay, 20 yil geri odeme %75'ten %91'e, statik geri donus 30,1'den 24,5 yila, subvansiyon yuku ayni (261 mr). Oturanin gelire oranla konut gideri (kira %30 + aidat) alt %10'da %40'a, alt %40'ta %34'e cikar. Aidat oturana gecince yuk bitmez, oturanla havuz arasinda kayar.
-
-Karar: oturan kirayi oder (dereceli), aidati havuz oder, abonelik (elektrik, dogalgaz, su) subvanse edilir. Abonelik yaklasik 1.583 TL/ay (elektrik 648 EPDK tarifesi, dogalgaz 469 BOTAS toptan fiyati ve 1000 m3/yil varsayimi, su 466 eski ISKI tarifesi ve 10 m3/ay varsayimi, dogalgaz ve su alt sinir). Yil 1 subvansiyon 12,9'dan 15,8 mr TL'ye, 20 yil yuk 278'den 336 mr TL'ye cikar. Geri odeme degismez (%75), abonelik havuza girmez. Oturanin konut gideri (kira %30 + abonelik) abonelik sub. olmadan alt %10'da %37, olunca %30'da kalir.
-
-### Revize model, tek kosu
-
-`python -m hekis.final`. Aidat havuzda, oturan dereceli kira (a %30, alt %40), abonelik tam subvanse, OVP enflasyonu, 450 bin bos stok, beklenen reel konut artisi -%6,5. Bugunku TL.
-
-| Senaryo | Katilim | Daire | Giris | 20 yil odenen | Yil 1 sub. | 20 yil yuk |
-| --- | --- | --- | --- | --- | --- | --- |
-| Gonullu tek basina | %4 | 20 bin | 69 mr | %75 | 1,9 mr | 41 mr |
-| Karma (bedel %1, tavan %40) | %36 | 161 bin | 571 mr | %75 | 15,8 mr | 336 mr |
-| Vancouver benzeri (bedel %3, tavan %55) | %51 | 231 bin | 820 mr | %75 | 22,7 mr | 483 mr |
-
-Bedel geliri / yil 1 subvansiyon, etkin tahsilat %15 / %30 / %60 / %90: karma 0,10 / 0,19 / 0,39 / 0,58. Vancouver benzeri 0,15 / 0,31 / 0,62 / 0,92. Abonelik subvansiyonu eklenince onceki sonuc (bedel %3'te tahsilat %60'ta kendini finanse eder) gecerliligini yitirdi: kendini finanse etmek icin etkin tahsilat %90'a yakin olmali.
-
-### Kendi kendini finanse etme kosulu (modelden bagimsiz)
-
-`python -m hekis.selffinance`. Yerlesen daire basina yillik subvansiyon s, bos kalan daire basina bedel x deger V x tahsilat c, yerlesen oran p (bos stoktan). Kosul: bedel x tahsilat >= (12 s / V) x p / (1 - p). Katilim arttikca bedel odeyen taban erir.
-
-V = 3,55 mn TL icin gerekli etkin bedel (bedel x tahsilat, degerin yilda yuzdesi), s = 4 bin / 8 bin / 14 bin TL/ay: p %10'da 0,2 / 0,3 / 0,5; p %36'da 0,8 / 1,5 / 2,7; p %50'de 1,4 / 2,7 / 4,7; p %60'ta 2,0 / 4,1 / 7,1. Deger duyarliligi (p %36, s 8,4 bin): V 1,5 mn 3,8%, 2,4 mn 2,4%, 3,55 mn 1,6%, 4,7 mn 1,2%, 6 mn 0,9%. Bedel %5 ve tahsilat %90 (etkin %4,5) ile kendini finanse eden en yuksek yerlesen oran: s 8,4 bin, V 3,55 mn icin %61, s 14 bin ve V 2,4 mn icin %39.
-
-### Luks ust dilim ayrimi
-
-`python -m hekis.final`. Orta tipteki (Istanbul ortalamasi) bos stoktan en pahali %20 havuz disi birakilir, bos olsa bile. Deger dagilimi lognormal, ortalama sabit, sigma 0,6 (varsayim, ilce ortalamalarindan: Beşiktaş/Kadıköy/Sarıyer 155-177 bin TL/m2, Esenyurt 34 bin). Ucuz (Esenyurt) tipte luks yok varsayilir. Orta tipteki kira politika kirasi, degere bagli degil.
-
-Karma sistem: tum stok 161 bin daire, giris 572 mr, yil 1 sub. 15,8 mr, 20 yil yuk 337 mr, gelir/sub. 0,39. Luks ayrilinca 146 bin daire, giris 421 mr (-%26), yil 1 sub. 14,5 mr, yuk 307 mr, gelir/sub. 0,31. Luks daireler bedel odemeye devam ederse 0,49. Vancouver benzeri: 0,62 / 0,49 / 0,86. Gonullu: 20 bin / 18 bin daire. Luks pay %35-50'ye ve sigma 0,4-0,8'e cikarsa karma sistem 121-146 bin daire, 262-308 mr yuk, gelir/sub. 0,24-0,33.
-
-Luksu havuzdan ayirmak giris degerini cok dusurur (daire sayisini az), cunku deger ust dilimde yogun. Luksu bedel tabanindan da ayirmak gelir/sub. oranini dusurur: luks bos daire en verimli bedel odeyicidir.
-
-### Luks dilim: havuz disi, ayri bedel tarifesi
-
-Luks ust dilim (orta tip bos stogun en pahali %20'si, 45 bin daire, ortalama 9,5 mn TL) havuza girmez, bedele tabidir, bedel orani genelden ayri. Tepki: bosluga son verme (satis, kiralama, kendi oturmasi) Vancouver ankorlu: %3 bedelde %54, tavan %65 (varsayim). Yil 1 subvansiyona gore toplam bedel geliri (genel bedel dahil, tahsilat %60): karma sistemde luks bedel %1 / %3 / %5 / %8 / %12 icin 0,44 / 0,56 / 0,65 / 0,82 / 1,06. Vancouver benzerinde 0,58 / 0,66 / 0,73 / 0,85 / 1,01. Luks dilimden tek basina kendini finanse etmek icin bedel yaklasik %11-12 gerekir, bu Vancouver'in en yuksek %5'inin iki katindan fazla ve denenmemis. %5 bedelde luks bos dairenin %62'si bosluktan cikar (yaklasik 28 bin daire), havuz disi.
+Model, bos stoku kullandirmanin maliyetini kira farkindan ve abonelikten ibaret gosteriyor, stoku kullandirmanin kendisi bedava. Kendini finanse etme olcek meselesi: kucuk programlar finanse eder, buyukler etmez. Yon sonuclari sagdir (ters dongululuk, olcek erozyonu, bedelin katilimi artirmada zayifligi), buyukluk sonuclari degildir (katilim, tahsilat ve beklenti kalibre edilemez).
 
 ## Sinir
 
-Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.
+Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir. Tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, bakim orani Turkiye verisi, hane sayisi, 2024-2026 gelir artisi ve etkin tahsilat yok veya varsayimdir. Esenyurt satis fiyati gozlem degil, turetilmistir. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Fiziki uretim endeksi hala disaridan. Model yeni konut istahini kapatmaz, kaçinma tek bir parametreyle temsil edilir, hukuki cerceve (bedelin vergi mi harc mi oldugu, anayasal sinir) hic modellenmedi.
