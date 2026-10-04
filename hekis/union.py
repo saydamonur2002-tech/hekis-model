@@ -42,6 +42,38 @@ def ibbs_median(uplift: float) -> float:
     return IBB_POVERTY_LINE_2024 / 0.6 * uplift * politics.EQ_FACTOR / 12
 
 
+MEMUR_LOWEST = 70_224.0   # en dusuk memur maasi, aile yardimi dahil, Temmuz 2026
+MEMUR_FLAT = 55_000.0     # duz memur (13/1), kaba aktarim
+
+
+def quantile_of_income(monthly: float, scale: float = 1.0) -> float:
+    """Model dagilimda hane aylik geliri monthly olan haneden daha az kazananlarin payi."""
+    from statistics import NormalDist
+    base = politics.MEDIAN * scale * politics.EQ_FACTOR / 12 * politics.UPLIFT
+    return NormalDist().cdf((__import__("math").log(monthly / base)) / politics.SIGMA)
+
+
+def memur_report() -> None:
+    tl = lambda v: f"{v:,.0f}".replace(",", ".")
+    print("Memur maasi / asgari ucret (data/MEMUR.md):")
+    for name, m in (("en dusuk memur (aile yard. dahil)", MEMUR_LOWEST), ("duz memur (13/1), kaba", MEMUR_FLAT)):
+        q = quantile_of_income(m)
+        print(f"  {name:<34}{tl(m):>8} TL = asgari ucretin {m / MIN_WAGE_NET:.2f} kati, model hane dagiliminda yuzdelik {q:.0%}")
+    be = breakeven_scale(dict(g_e=reality.G_ISTANBUL, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=reality.INFL_YEAREND_EXP))
+    bm = BASE_MEDIAN * be
+    print(f"  Basabas hane medyani {tl(bm)} TL = asgari ucretin {bm / MIN_WAGE_NET:.2f} kati; en dusuk memur maasina oran {bm / MEMUR_LOWEST:.3f}.")
+    print()
+    print("Uygunluk kesimi memur maasina baglanirsa (hane geliri bu seviyenin altindaysa uygun), en olasi senaryo:")
+    print(f"{'kesim':<34}{'qcut':>6}{'uygun hane':>12}{'kapsam':>8}{'yil-1 sub':>10}{'oran':>6}{'20y yuk':>9}")
+    likely = dict(g_e=reality.G_ISTANBUL, cap=0.25, coll=0.30, fee=0.01, lux_fee=0.05, lux_coll=0.40, infl_first=reality.INFL_YEAREND_EXP)
+    for name, m in (("alt %40 (baz)", None), ("duz memur maasinin alti", MEMUR_FLAT), ("en dusuk memur maasinin alti", MEMUR_LOWEST)):
+        q = 0.40 if m is None else quantile_of_income(m)
+        o = E.evaluate({**likely, "qcut": q})
+        eligible = politics.HOUSEHOLDS * politics.TENANT_SHARE * q
+        print(f"{name:<34}{q:>6.2f}{tl(eligible):>12}{o['N'] / eligible:>8.1%}{o['sub1'] / 1e9:>10.1f}{o['ratio']:>6.2f}{o['yuk'] / 1e9:>9.0f}")
+    print()
+
+
 def main() -> int:
     tl = lambda v: f"{v:,.0f}".replace(",", ".")
     anchors = (
@@ -75,6 +107,8 @@ def main() -> int:
         sc = scale_for_median(MIN_WAGE_NET * k)
         o = E.evaluate({**likely, "inc_scale": sc})
         print(f"{k:>8.1f}{tl(MIN_WAGE_NET * k):>14}{o['ratio']:>7.2f}{o['sub1'] / 1e9:>10.1f}{o['yuk'] / 1e9:>9.0f}")
+    print()
+    memur_report()
     return 0
 
 
