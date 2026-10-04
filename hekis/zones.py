@@ -28,13 +28,21 @@ def band_factor(a: float, b: float, sigma: float) -> float:
     return (ND.cdf(zb - sigma) - ND.cdf(za - sigma)) / (b - a)
 
 
-def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float = 0.20, sigma: float = 0.6) -> dict:
+def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float = 0.20, sigma: float = 0.6,
+                   fee_buffer: float | None = None, lux_vac: float | None = None) -> dict:
+    """fee_buffer: tampon bedeli (varsayilan genel bedel). lux_vac: luks bandinin bos stoktaki payi (varsayilan cut: bosluk
+    deger sirasina esit dagilmis). Daha buyukse bosluk luks bandina kaymistir, kalan havuz ve tampon arasinda
+    q_h : (1 - q_h - cut) oraninda bolunur."""
     P = {**E.BASE, **LIKELY, **(P or {})}
     obs = E.make_obs(P)
     q_h = union.quantile_of_income(union.MEMUR_FLAT) if q_h is None else q_h
     stok = P["stok"]
-    S_h, S_l = stok * q_h, stok * cut
-    S_b = stok - S_h - S_l
+    fee_b = P["fee"] if fee_buffer is None else fee_buffer
+    lv = cut if lux_vac is None else lux_vac
+    S_l = stok * lv
+    rest = stok - S_l
+    S_h = rest * q_h / (q_h + (1 - q_h - cut))
+    S_b = rest - S_h
     # havuz: Esenyurt tipi daireler
     units_probe = activation.tier_units(obs, "ucuz", 1000)
     cnt = sum(u.count for u in units_probe)
@@ -56,8 +64,8 @@ def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float =
     V_h = val / cnt
     rev_pool = S_h * (1 - p) * V_h * P["fee"] * P["coll"]
     V_b = mean_orta * band_factor(q_h, 1 - cut, sigma)
-    resp_b = final.lux_response(P["fee"])
-    rev_buf = S_b * (1 - resp_b) * V_b * P["fee"] * final.effective_collection(P["fee"], P["coll"])
+    resp_b = final.lux_response(fee_b)
+    rev_buf = S_b * (1 - resp_b) * V_b * fee_b * final.effective_collection(fee_b, P["coll"])
     V_l = mean_orta * band_factor(1 - cut, 1.0, sigma)
     resp_l = final.lux_response(P["lux_fee"], P["lux_cap"])
     rev_lux = S_l * (1 - resp_l) * V_l * P["lux_fee"] * final.effective_collection(P["lux_fee"], P["lux_coll"])
@@ -99,6 +107,21 @@ def main() -> int:
         zz = run_three_zone(q_h=q)
         inc = politics.hh_monthly(q)
         print(f"{q:>6.2f}{tl(inc):>19}{zz['N'] / 1000:>7.0f}b{bn(zz['sub1']):>10.1f}{zz['ratio']:>6.2f}{bn(zz['yuk']):>9.0f}{zz['S'][1] / E.BASE['stok']:>13.0%}")
+    print()
+    print("Varyantlar (en olasi senaryo): tampon bedeli ve bos konutun luks bandina kaymasi")
+    print(f"{'varyant':<44}{'daire':>7}{'sub':>6}{'gelir':>7}{'oran':>6}{'yuk':>6}{'havuz':>9}{'luks':>9}{'cikan':>9}")
+    variants = (
+        ("temel: tampon %1, bosluk esit dagilmis", dict()),
+        ("tampon bedelsiz", dict(fee_buffer=0.0)),
+        ("bosluk luks bandinda %40", dict(lux_vac=0.40)),
+        ("bosluk luks bandinda %60", dict(lux_vac=0.60)),
+        ("tampon bedelsiz + luks %40", dict(fee_buffer=0.0, lux_vac=0.40)),
+        ("tampon bedelsiz + luks %60", dict(fee_buffer=0.0, lux_vac=0.60)),
+    )
+    for name, kw in variants:
+        zz = run_three_zone(**kw)
+        freed = zz["freed_buf"] + zz["freed_lux"]
+        print(f"{name:<44}{zz['N'] / 1000:>6.0f}b{bn(zz['sub1']):>6.1f}{bn(zz['rev']):>7.1f}{zz['ratio']:>6.2f}{bn(zz['yuk']):>6.0f}{tl(zz['S'][0]):>9}{tl(zz['S'][2]):>9}{tl(freed):>9}")
     return 0
 
 
