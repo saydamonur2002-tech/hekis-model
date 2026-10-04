@@ -265,5 +265,26 @@ class CityTests(unittest.TestCase):
         self.assertAlmostEqual(i["stok"], 450_000, delta=500)
 
 
+class ZoneTests(unittest.TestCase):
+    def test_band_factors_average_to_one(self):
+        from hekis import zones
+        qs = [0.0, 0.41, 0.80, 1.0]
+        total = sum((qs[i + 1] - qs[i]) * zones.band_factor(qs[i], qs[i + 1], 0.6) for i in range(3))
+        self.assertAlmostEqual(total, 1.0, places=9)
+
+    def test_zone_stock_partitions_and_outputs_finite(self):
+        from hekis import zones
+        z = zones.run_three_zone()
+        self.assertAlmostEqual(sum(z["S"]), 450_000, delta=1)
+        for k in ("N", "sub1", "yuk", "rev", "ratio", "coverage"):
+            self.assertTrue(math.isfinite(z[k]), k)
+        self.assertLess(z["V"][0], z["V"][1])
+        self.assertLess(z["V"][1], z["V"][2])
+
+    def test_wider_pool_band_houses_more(self):
+        from hekis import zones
+        self.assertLess(zones.run_three_zone(q_h=0.30)["N"], zones.run_three_zone(q_h=0.65)["N"])
+
+
 if __name__ == "__main__":
     unittest.main()

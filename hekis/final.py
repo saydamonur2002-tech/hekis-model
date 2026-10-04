@@ -113,14 +113,15 @@ def effective_collection(fee: float, collection: float, start: float = AVOID_STA
 
 
 def lux_economics(obs: dict, sigma: float, cut: float, fee_lux: float, collection: float, cap: float = LUX_CAP,
-                  avoid_slope: float = AVOID_SLOPE, avoid_start: float = AVOID_START, fs_pct: float = LUX_FS):
+                  avoid_slope: float = AVOID_SLOPE, avoid_start: float = AVOID_START, fs_pct: float = LUX_FS,
+                  stock_share: float = 0.5):
     """Ayrilan luks dilim: adet, ortalama deger, bedel geliri (TL/yil), bosluk bitirme orani."""
     from hekis import politics  # noqa: F401
     f_low, f_top = lux_factors(sigma, cut)
     stok_all = obs["bos_stok"]["ibb_elektrik_su_tabanli"]
     orta = activation.tier_units(obs, "orta", 1000)
     mean_orta = sum(u.price * u.count for u in orta) / sum(u.count for u in orta)
-    count = stok_all * 0.5 * cut
+    count = stok_all * stock_share * cut
     value = mean_orta * f_top
     r = lux_response(fee_lux, cap, fs_pct)
     c_eff = effective_collection(fee_lux, collection, avoid_start, avoid_slope)
