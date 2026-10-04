@@ -83,6 +83,14 @@ Havuz her durumda tam kirayi aldigi icin oturanin odedigi pay sahibe geri odemey
 
 Kalan %25 anapara 20. yilda reel olarak odenmemis durur. Senedi devlet garanti ederse bu gizli yukumluluktur, modelde yuk olarak sayilmiyor.
 
+### Dereceli kira, bedel ve siyasi hesap
+
+`python -m hekis.politics`. Gelir dagilimi: TUIK 2025 medyan 241 bin, ortalama 333 bin TL (`data/GELIR.md`), lognormal uydurma. Sinavi: ust %20 payi model %48,5 (TUIK %48), alt %20 model %5,0 (TUIK %6,4). Esdeger-hane katsayisi 2,0, gelir artisi (asgari ucret 2024-2026) ve hane sayisi varsayimdir.
+
+Oturan min(kira, a x gelir) oder, kura ile secilir. a %30, uygun kitle gelirin alt %40'i: ortalama odeme 9.990 TL, subvansiyon 6.830 TL/ay, yilda 13 mr TL (duz sosyal kira referansi 12,4 mr). Kesim dusurulursa (alt %20) subvansiyon 19 mr TL'ye cikar: en yoksulu hedeflemek pahali. 161 bin daire uygun kiracilarin %5,3'une yeter, %95'i disarida kalir.
+
+Bos tutma bedeli gelir olarak subvansiyonu karsilar mi: tahsilat %60 varsayimiyla bedel %2'de gelir/subvansiyon 0,9, %3'te 1,3. Yani Vancouver'in etkili bulunan %3 duzeyi ayni zamanda kendini finanse eden duzey. Bedel %1'de genel hane basina yilda yaklasik 250 TL yuk kalir.
+
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Bakim orani, aidat ve kira artisinin 12 aylik ortalamaya baglanmasi dogrulanmamistir. OVP yolu hedeftir, tahmin degil. 2029 sonrasi %9 varsayimdir. Model yeni konut istahini kapatmaz.

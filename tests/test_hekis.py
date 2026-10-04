@@ -96,5 +96,24 @@ class ParticipationTests(unittest.TestCase):
         self.assertAlmostEqual(b.real_eroded, a.real_eroded, places=3)
 
 
+class PoliticsTests(unittest.TestCase):
+    def test_income_model_matches_top_quintile(self):
+        from hekis import politics
+        top, bottom = politics.share_check()
+        self.assertAlmostEqual(top, 0.48, delta=0.01)
+        self.assertAlmostEqual(bottom, 0.064, delta=0.02)
+
+    def test_subsidy_falls_with_alpha_and_cut(self):
+        from hekis import politics
+        base = politics.graduated(16825.0, 0.30, 0.4)[1]
+        self.assertLess(politics.graduated(16825.0, 0.40, 0.4)[1], base)
+        self.assertLess(politics.graduated(16825.0, 0.30, 0.6)[1], base)
+
+    def test_pay_plus_subsidy_is_rent(self):
+        from hekis import politics
+        pay, sub = politics.graduated(16825.0, 0.30, 0.4)
+        self.assertAlmostEqual(pay + sub, 16825.0)
+
+
 if __name__ == "__main__":
     unittest.main()
