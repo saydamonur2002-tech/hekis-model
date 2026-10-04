@@ -6,7 +6,7 @@ Bu bir politika vaadi degil, hesap makinesidir. Repo ozel, kisisel modelleme. Do
 
 ## Calistirma
 
-Python 3, ek paket yok (sadece `data/` okuma icin degil, testler `unittest`).
+Python 3 yeter. Ek paket yok, testler `unittest`.
 
 ```bash
 python -m unittest discover -s tests   # 29 test
@@ -68,9 +68,9 @@ Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yukse
 
 | Sistem | Katilim | Daire | Giris | 20 yil odenen | Yil 1 sub. | 20 yil yuk | Gelir/sub. |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Gonullu tek basina | %4 | 18 bin | 51 mr | | 1,4 mr | 29 mr | 0 |
+| Gonullu tek basina | %4 | 18 bin | 51 mr | - | 1,4 mr | 29 mr | 0 |
 | Karma (bedel %1, tavan %40) | %36 | 146 bin | 421 mr | %83 | 11,4 mr | 243 mr | 0,39 (luks bedelli 0,62) |
-| Vancouver benzeri (bedel %3, tavan %55) | %51 | 208 bin | 602 mr | | 16,4 mr | 347 mr | 0,62 (luks bedelli 1,09) |
+| Vancouver benzeri (bedel %3, tavan %55) | %51 | 208 bin | 602 mr | - | 16,4 mr | 347 mr | 0,62 (luks bedelli 1,09) |
 
 ## 6. Kendini finanse etme
 
@@ -90,4 +90,4 @@ Model, bos stoku kullandirmanin maliyetini kira farkindan ve abonelikten ibaret 
 
 ## Sinir
 
-Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir. Tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, bakim orani Turkiye verisi, hane sayisi, 2024-2026 gelir artisi ve etkin tahsilat yok veya varsayimdir. Esenyurt satis fiyati gozlem degil, turetilmistir. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Fiziki uretim endeksi hala disaridan. Model yeni konut istahini kapatmaz, kaçinma tek bir parametreyle temsil edilir, hukuki cerceve (bedelin vergi mi harc mi oldugu, anayasal sinir) hic modellenmedi.
+Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir. Tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, bakim orani Turkiye verisi, hane sayisi, 2024-2026 gelir artisi ve etkin tahsilat yok veya varsayimdir. Esenyurt satis fiyati gozlem degil, turetilmistir. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Fiziki uretim endeksi hala disaridan. Model yeni konut istahini kapatmaz, kacinma tek bir parametreyle temsil edilir, hukuki cerceve (bedelin vergi mi harc mi oldugu, anayasal sinir) hic modellenmedi.
