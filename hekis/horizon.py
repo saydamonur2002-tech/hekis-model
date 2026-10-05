@@ -16,6 +16,7 @@ import statistics as st
 
 from hekis import evaluate as E
 from hekis import final
+from hekis.systems import ISTANBUL, System
 from hekis.zones import LIKELY, run_three_zone
 
 START, FULL = 3_800, 450_000
@@ -46,8 +47,8 @@ SHOCKS = {
 }
 
 
-def erosion_factor(size: float, erosion: float) -> float:
-    return 1 - erosion * math.log(max(size, START) / START) / math.log(FULL / START)
+def erosion_factor(size: float, erosion: float, full: float = FULL) -> float:
+    return 1 - erosion * math.log(max(size, START) / START) / math.log(full / START)
 
 
 def apply_shock(P: dict, shock: dict) -> dict:
@@ -81,17 +82,18 @@ def _binom(rng: random.Random, p: float, n: float) -> float:
 
 
 def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, erosion: float = EROSION,
-             growth_cap: float = GROWTH_CAP, years: int = YEARS) -> list[dict]:
+             growth_cap: float = GROWTH_CAP, years: int = YEARS, system: System = ISTANBUL) -> list[dict]:
     """rng None: kusursuz olcum."""
     P = {**{k: LIKELY[k] for k in UNCERTAIN}, **P}
     rows, size = [], float(START)
     for year in range(1, years + 1):
         Pt = apply_shock(P, shock) if shock and year >= SHOCK_YEAR else dict(P)
-        f = erosion_factor(size, erosion)
+        f = erosion_factor(size, erosion, system.full)
         Pt["coll"], Pt["lux_coll"] = Pt["coll"] * f, Pt["lux_coll"] * f
-        z = run_three_zone(P={**LIKELY, **Pt, "stok": size})
-        n_lux = z["S"][2] * (1 - final.lux_response(0.05))
-        n_gen = z["S"][0] * (1 - z["p"]) + z["S"][1] * (1 - final.lux_response(0.01))
+        base = {**LIKELY, **system.base}
+        z = system.runner({**base, **Pt}, size)
+        n_lux = z["S"][2] * (1 - final.lux_response(system.base["lux_fee"]))
+        n_gen = z["S"][0] * (1 - z["p"]) + z["S"][1] * (1 - final.lux_response(system.base["fee"]))
         rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"], "yuk": z["yuk"], "freed": z["freed_buf"] + z["freed_lux"]})
         c_true = Pt.get("alpha", E.BASE["alpha"]) / E.BASE["alpha"]   # kiraci tahsilat vekili (alpha_mult)
         inc_true = Pt.get("inc_scale", E.BASE["inc_scale"]) / E.BASE["inc_scale"]
@@ -102,21 +104,21 @@ def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, eros
             o_g, o_l, o_p = _binom(rng, Pt["coll"], n_gen), _binom(rng, Pt["lux_coll"], n_lux), _binom(rng, z["p"], z["S"][0])
             o_c = _binom(rng, min(1.0, c_true), n_hh)
             o_i = inc_true * math.exp(rng.gauss(0.0, 0.803 / math.sqrt(n_hh)))   # log hane geliri ornek ortalamasi
-        ratio_obs = run_three_zone(P={**LIKELY, **Pt, "stok": size, "coll": o_g, "lux_coll": o_l,
-                                      "alpha": E.BASE["alpha"] * o_c, "inc_scale": E.BASE["inc_scale"] * o_i})["ratio"]
+        ratio_obs = system.runner({**base, **Pt, "coll": o_g, "lux_coll": o_l, "alpha": E.BASE["alpha"] * o_c,
+                                   "inc_scale": E.BASE["inc_scale"] * o_i}, size)["ratio"]
         passed = ratio_obs >= SAFETY and P_RANGE[0] <= o_p <= P_RANGE[1] and o_c >= TENANT_MIN and o_i >= INCOME_MIN
         rows[-1]["gecti"] = passed
         if passed:
-            size = min(FULL, size * growth_cap)
+            size = min(system.full, size * growth_cap)
     return rows
 
 
-def monte_carlo(draws: int = 300, seed: int = 11, shock: dict | None = None, erosion: float = EROSION, years: int = YEARS) -> list[list[dict]]:
+def monte_carlo(draws: int = 300, seed: int = 11, shock: dict | None = None, erosion: float = EROSION, years: int = YEARS, system: System = ISTANBUL) -> list[list[dict]]:
     rng = random.Random(seed)
-    return [one_path(draw(rng), rng, shock, erosion, years=years) for _ in range(draws)]
+    return [one_path(draw(rng), rng, shock, erosion, years=years, system=system) for _ in range(draws)]
 
 
-def summarize(paths: list[list[dict]]) -> dict:
+def summarize(paths: list[list[dict]], full: float = FULL) -> dict:
     n = len(paths)
     net = [sum(r["rev"] - r["sub"] for r in p) for p in paths]
     return {
@@ -127,7 +129,7 @@ def summarize(paths: list[list[dict]]) -> dict:
         "yuk20": st.median(p[4]["yuk"] for p in paths),
         "acik5": st.median(p[4]["sub"] - p[4]["rev"] for p in paths),
         "ratio_lt1": sum(p[4]["ratio"] < 1.0 for p in paths) / n,
-        "full5": sum(p[4]["stok"] >= FULL for p in paths) / n,
+        "full5": sum(p[4]["stok"] >= full for p in paths) / n,
         "stuck": sum(p[4]["stok"] <= START for p in paths) / n,
     }
 

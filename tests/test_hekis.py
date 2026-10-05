@@ -437,3 +437,15 @@ class SocialTests(unittest.TestCase):
         det = horizon.one_path({}, None, sh)
         self.assertLess(det[-1]["stok"], horizon.FULL)
         self.assertLessEqual(det[-1]["stok"], det[2]["stok"] * horizon.GROWTH_CAP + 1)
+
+class SystemsTests(unittest.TestCase):
+    def test_two_systems(self):
+        from hekis import horizon
+        from hekis.systems import ANADOLU, ISTANBUL
+        z = ANADOLU.runner({**ANADOLU.base}, ANADOLU.full)
+        self.assertAlmostEqual(z["N"] / 1000, 67, delta=2)       # anadolu.py tarife 0,5/3 toplami
+        self.assertAlmostEqual(z["ratio"], 2.11, delta=0.05)
+        a = horizon.one_path({}, None, system=ANADOLU, years=7)
+        self.assertEqual(a[-1]["stok"], ANADOLU.full)
+        i = horizon.one_path({}, None, system=ISTANBUL, years=7)
+        self.assertEqual(i[-1]["stok"], ISTANBUL.full)
