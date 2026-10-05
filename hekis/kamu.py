@@ -19,6 +19,7 @@ from hekis.ucret import BRUT, onceki
 _D = os.path.join(os.path.dirname(__file__), "..", "data")
 K = json.load(open(os.path.join(_D, "kamu_zamlari.json")))
 PKA = json.load(open(os.path.join(_D, "pka_zaman_serisi.json")))["veri"]
+TYA = json.load(open(os.path.join(_D, "tufe_yillik_aylik.json")))["veri"]   # EVDS TP.TUKFIY2025.GENEL_3, yillik % degisim, aylik
 EMEKLI = {t: v for t, v, g in K["emekli_ssk_bagkur"]}
 HEDEF_UZUN = 5.0
 
@@ -38,6 +39,80 @@ def ocak_bek(y, alan="yilsonu"):
 def aralik_bek12(y):
     """Y-1 Aralik'ta 12 ay sonrasi (= Y yil sonu) beklenti."""
     return PKA["%d-12" % (y - 1)].get("ay12")
+
+
+def _ay(k, n):
+    t = int(k[:4]) * 12 + int(k[5:]) - 1 + n
+    return "%d-%02d" % (t // 12, t % 12 + 1)
+
+
+def _inv(a):
+    n = len(a)
+    m = [a[i][:] + [1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+    for i in range(n):
+        p = max(range(i, n), key=lambda k: abs(m[k][i]))
+        m[i], m[p] = m[p], m[i]
+        pv = m[i][i]
+        m[i] = [x / pv for x in m[i]]
+        for k in range(n):
+            if k != i:
+                f = m[k][i]
+                m[k] = [x - f * y for x, y in zip(m[k], m[i])]
+    return [r[n:] for r in m]
+
+
+def hac(X, y, L):
+    """OLS + Newey-West (Bartlett) se. Ust uste binen 12 aylik ufuklar icin klasik se yanlis (~3x kucuk)."""
+    b = ols(X, y)[0]
+    n, k = len(X), len(X[0])
+    e = [v - sum(bi * xi for bi, xi in zip(b, r)) for r, v in zip(X, y)]
+    S = [[0.0] * k for _ in range(k)]
+    for l in range(L + 1):
+        w = 1.0 if l == 0 else 1 - l / (L + 1.0)
+        for t in range(l, n):
+            for i in range(k):
+                for j in range(k):
+                    v = X[t][i] * X[t - l][j] * e[t] * e[t - l] * w
+                    S[i][j] += v
+                    if l > 0:
+                        S[j][i] += v
+    xi = _inv([[sum(r[i] * r[j] for r in X) for j in range(k)] for i in range(k)])
+    V = [[sum(xi[i][a] * S[a][c] * xi[c][j] for a in range(k) for c in range(k)) for j in range(k)] for i in range(k)]
+    yb = sum(y) / n
+    r2 = 1 - sum(v * v for v in e) / sum((v - yb) ** 2 for v in y)
+    return b, [V[i][i] ** .5 for i in range(k)], r2
+
+
+def aylik(h, alan):
+    """(ay, beklenti_t, pi_t, gerceklesen_pi_{t+h})"""
+    out = []
+    for k, d in sorted(PKA.items()):
+        if alan in d and k in TYA and _ay(k, h) in TYA:
+            out.append((k, d[alan], TYA[k], TYA[_ay(k, h)]))
+    return out
+
+
+def aylik_rapor(h, alan):
+    X = aylik(h, alan)
+    E = [x[1] for x in X]; pi = [x[2] for x in X]; R = [x[3] for x in X]
+    n = len(X)
+    err = [r - e for r, e in zip(R, E)]
+    nv = [r - p for r, p in zip(R, pi)]
+    rm = lambda v: (sum(a * a for a in v) / len(v)) ** .5
+    L = ["  ufuk {} ay ({}), n={} ({}..{}), ust uste binen: Newey-West se (gecikme {})".format(h, alan, n, X[0][0], X[-1][0], h)]
+    L.append("    ort. hata (gerc-bek) {:+.1f}; MAE beklenti {:.1f} vs saf (bugunku yillik TUFE) {:.1f}; RMSE {:.1f} vs {:.1f}".format(
+        statistics.mean(err), statistics.mean(abs(a) for a in err), statistics.mean(abs(a) for a in nv), rm(err), rm(nv)))
+    for ad, cols in (("gerc = a + b*bek", [[1, e] for e in E]), ("gerc = a + b*bek + c*bugun", [[1, e, p] for e, p in zip(E, pi)])):
+        b, se, r2 = hac(cols, R, h)
+        L.append("    {:<28} ".format(ad) + "  ".join("{:.2f}({:.2f})".format(x, s) for x, s in zip(b, se)) + "  R2 {:.2f}".format(r2))
+    b, se, r2 = hac([[1, p] for p in pi], E, h)
+    L.append("    bek = a + d*bugun             d={:.2f}({:.2f})  R2 {:.2f}  (beklenti bugunku enflasyonun fonksiyonu)".format(b[1], se[1], r2))
+    for a, z in (("2014", "2020"), ("2021", "2023"), ("2024", "2026")):
+        idx = [i for i, x in enumerate(X) if a <= x[0][:4] <= z]
+        if idx:
+            L.append("    alt donem {}-{}: n={} ort. hata {:+.1f}, MAE beklenti {:.1f} vs saf {:.1f}".format(
+                a, z, len(idx), statistics.mean(err[i] for i in idx), statistics.mean(abs(err[i]) for i in idx), statistics.mean(abs(nv[i]) for i in idx)))
+    return L, (err, nv, E, pi, R)
 
 
 def rapor() -> str:
@@ -78,6 +153,11 @@ def rapor() -> str:
     u = [(m, v["uzun"]) for m, v in sorted(PKA.items()) if "uzun" in v]
     L.append("  uzun vade (basligi dogrulanmadi) {} .. {}: min {:.1f} max {:.1f}; hedef 5 ile fark son {:.1f}".format(
         u[0][0], u[-1][0], min(x for _, x in u), max(x for _, x in u), u[-1][1] - HEDEF_UZUN))
+    L.append("")
+    L.append("5. AYLIK TEST (gercek TUFE yillik serisi, EVDS TP.TUKFIY2025.GENEL_3; ilk bolum 3'un yerine bu esastir)")
+    for h, alan in ((12, "ay12"), (24, "ay24")):
+        t, _ = aylik_rapor(h, alan)
+        L.extend(t)
     return "\n".join(L)
 
 
@@ -94,6 +174,13 @@ def testler():
     out.append(("T-K3 beklenti hatasi ort. {:+.1f} puan: beklenti gerceklesmeyi sistematik dusuk tahmin".format(err), err > 0, "yonlu, anlamliligi n=11'de zayif"))
     u = PKA["2026-09"]["ay24"]
     out.append(("T-K4 24 ay beklentisi {:.1f} vs hedef 5: capa yok".format(u), u > 2 * HEDEF_UZUN, "beklenti hedefe capalanmamis"))
+    X = aylik(12, "ay12")
+    err = [x[3] - x[1] for x in X]; nv = [x[3] - x[2] for x in X]
+    me, mn = statistics.mean(abs(a) for a in err), statistics.mean(abs(a) for a in nv)
+    out.append(("T-K6 12 ay beklentisi MAE {:.1f} vs 'bugunku enflasyon devam' {:.1f} (n={}): beklenti saf kurali %15'ten fazla gecemiyor (kucuk fark)".format(me, mn, len(X)), me > 0.85 * mn, "beklentinin ek bilgi icerigi yok/az"))
+    pi = [x[2] for x in X]; E = [x[1] for x in X]
+    b, se, r2 = hac([[1, p] for p in pi], E, 12)
+    out.append(("T-K7 beklenti = {:.1f} + {:.2f}*bugunku enflasyon, R2 {:.2f}".format(b[0], b[1], r2), r2 > 0.8, "beklenti buyuk olcude geriye bakis (adaptif)"))
     out.append(("T-K5 kamu zam verisi arama ozeti, 2024 degerleri dusuk guven; resmi tablo gerek", None, "BILGI"))
     return out
 

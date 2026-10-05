@@ -227,3 +227,6 @@ Veri: `data/asgari_ucret.json` (arama sonuclari, resmi PDF okunamadi), `data/pka
 ## Dezenflasyon politikasinin enflasyonist etkisi (hekis/dezenf.py)
 `python -m hekis.dezenf`. Politika = yuksek reel faiz (~13,8 puan ex-ante) + kontrollu kur kaymasi. Dogrudan maliyet: firma faiz maliyeti +0,5, butce/mali +0,2 (toplam ~0,7 puan/yil, parametreler onsel); kur kazanci -5,4 [4-10] puan/yil (karsi-olgu: kur = TUFE kadar kayardi; kasitli uc nokta). Dogrudan net dezenflasyonist.
 Asil maliyet kazancin BORC ALINMIS olmasi: kirilmada 3 yil kum. +22 puan; kirilma olasiligi %73'u gecerse 3 yillik net kazanc sifirin altina iner. Kirilma olasiligi bilinmiyor. Olculmeyenler: yonetilen fiyat/vergi telafisi, talep kanali (dusurucu), ihracat rekabeti.
+
+### Aylik beklenti testi (kamu.py bolum 5; data/tufe_yillik_aylik.json EVDS TP.TUKFIY2025.GENEL_3)
+12 ay beklentisi (n=138, 2014-04..2025-09, Newey-West): MAE 12,5 vs 'bugunku yillik TUFE devam' 13,1; ort. hata +11,7 (2021-23 +34; 2014-20 +3,5; 2024-26 +5,0). bek = 4,5 + 0,47*bugun, R2 0,92: beklenti buyuk olcude geriye bakis. gerc ~ 0,79(0,51)*bek + 0,20(0,21)*bugun: ikisi ayrisamiyor. 2024-26'da beklenti saf kurali belirgin geciyor (MAE 5,0 vs 16,3, n=21): beklenti 2024'ten sonra daha bilgilendirici. 24 ay beklentisi saf kurali gecemiyor (19,2 vs 17,7). Bu bir NEDENSELLIK testi degil.
