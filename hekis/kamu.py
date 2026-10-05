@@ -46,7 +46,7 @@ def rapor() -> str:
     for y, hz in ((2025, 35.05), (2026, 32.11)):
         c = ((1 + EMEKLI["%d-01" % y] / 100) * (1 + EMEKLI["%d-07" % y] / 100) - 1) * 100
         L.append("  {}: artislar {:.2f} ve {:.2f} -> bilesik {:.1f}; Haz {} yillik TUFE {:.2f} {}".format(
-            y, EMEKLI["%d-01" % y], EMEKLI["%d-07" % y], c, y, hz, "(2025 degeri hafizadan)" if y == 2025 else "(TUIK)"))
+            y, EMEKLI["%d-01" % y], EMEKLI["%d-07" % y], c, y, hz, "(2025: arama ozeti, TUIK aktarimi)" if y == 2025 else "(TUIK)"))
     L.append("  Bu bir mekanizma gozlemi: emekli geliri (~yuzde 10+ nufus, yuksek tuketim payi) gecmis enflasyona YASAYLA bagli. 2024 Oca artisi 49,25: mekanik degerin ustunde olabilir (dusuk guven).")
     L.append("")
     L.append("2. MEMUR: Oca 2026 %18,60 (11 + 6,85 fark), Tem 2026 %13,52 (7 + 6,09 fark). Tek parca zam %18,6 / onceki yil TUFE 30,9 = 0,60;")
