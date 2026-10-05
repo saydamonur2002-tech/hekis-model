@@ -25,3 +25,9 @@ Dosya sektör kırılımı vermiyor (tekstil/mobilya istihdamı yok), bilançoda
 - B (hedefle kârlı kılınacak): tekstil, giyim, mobilya, (tarım girdi tarafı). HEKİS donatım/üretim devresiyle en doğrudan örtüşenler bunlar; ama en zayıf bilanço ve en düşük kapasite kullanımı da bunlarda.
 - Çelişki: HEKİS'e talep veren sektörler (mobilya, tekstil) tam da zarar edenler; kârlı olanlar HEKİS talebinden bağımsız. Senet devresi B'ye ancak sipariş garantisi (donatım alımı) bağlanırsa anlamlı.
 - Sınır: bilanço tek yıl, istihdam sektörsüz, panel tahmin. Sonuç yön gösterir, ölçü değildir.
+
+## Karar: devre kârlı, iç talebe bağlı sektörlere bağlanır (mobilya tipi)
+- Giriş koşulu (üçü birden): (1) kârlı veya kâra yakın, (2) ithal girdi payı düşük, (3) satışı ağırlıkla iç talep. Zarar eden sektör (tekstil, giyim) listeden çıkar; ihracat pazarına bağlı olduğu için HEKİS talebi onu kurtarmaz.
+- Bağ: HEKİS havuzu donatım alımını bu sektörlerden yapar (sipariş), senet fonu peşin/avans finansmanı verir. Talep kaynağı HEKİS'e yerleşen hane sayısıdır.
+- Ölçek: donatım talebi 4.3-12.9 mlr TL/yıl ≈ mobilya üretiminin %0.7-2.2'si. Yani bu bir kurtarma değil, ek sipariş kalemi. Mobilya tek başına devreyi taşımaz; beyaz eşya, tekstil ürünü (ev tekstili), gıda gibi kalemlerle genişletilmeli.
+- Dikkat: 2025'te mobilya kârının silindiği ve kapasitenin ~%60'a indiği bulgusu duruyor. "Kârlı" etiketi mobilya için tartışmalı; iç talebe bağlı olması onu seçme gerekçesi, kârlılığı değil.
