@@ -1,0 +1,157 @@
+"""TUIK TUFE metod kirilimlari: ne kirildi, modele ne yapar.
+
+    python -m hekis.metod
+
+Kaynak: arama ozetleri (TUIK ve TCMB siteleri bu ortamdan acilamadi, metodoloji dokumani okunamadi).
+Guven duzeyi her satirda yazili. Hicbir sayi TUIK metodoloji belgesinden dogrudan okunmadi.
+"""
+
+import random
+import statistics
+
+from hekis.enflasyon import TUFE_YILLIK, cek, kanallar, yuzdelik
+
+# ---- KIRILIM KATALOGU -------------------------------------------------------------
+KIRILIMLAR = [
+    # (tarih, ne, etki, guven)
+    ("2014", "TUFE 2010 bazli endekse gecis, 2003=100 ve 1983 TEFE'ye baglandi", "zincirleme, seviye surekli", "orta (arama ozeti)"),
+    ("Nisan 2022", "TUIK urun bazli fiyatlari yayimlamayi birakti", "olcum degil dogrulanabilirlik kirilimi", "orta (arama ozeti)"),
+    ("2024 bulteni", "2014-2023 bulten tablolari Eurostat metodolojisine gore revize", "yayin tablolari, endeks degil", "orta"),
+    ("Ocak 2026", "baz 2003=100 -> 2025=100; COICOP -> ECOICOP v2; 12 -> 13 ana grup; 407 -> 428 madde; "
+                  "grup agirliklari HBA -> Ulusal Hesaplar HHNTH", "bkz. asagi", "orta-yuksek (cok kaynak)"),
+]
+
+AGIRLIK_2025_2026 = {   # grup: (2025, 2026), yuzde. 2025 yalniz arama ozetinde verilenler.
+    "Gida ve alkolsuz icecek": (24.96, 24.44),
+    "Konut, su, elektrik, gaz": (15.21, 11.40),
+    "Ulastirma": (15.34, 16.62),
+}
+AGIRLIK_2026_DIGER = {
+    "Alkollu icecek ve tutun": 2.75, "Saglik": 2.79, "Bilgi ve iletisim": 3.10, "Egitim": 2.02,
+    "Giyim ve ayakkabi": 7.90, "Lokanta ve konaklama": 11.13, "Sigorta ve finansal hizmet (YENI)": 1.07,
+}
+# Agustos 2026 yillik degisim ve katki (arama ozeti, TUIK bulteni aktarimi)
+AGU26 = {"Gida ve alkolsuz icecek": (33.79, 8.12), "Ulastirma": (35.08, 5.94), "Konut, su, elektrik, gaz": (39.77, 5.01)}
+TCMB_ETKI = {"agirlik yapisinin Ocak aylik etkisi": -0.1, "hizmet payi artisinin yillik etkisi": +1.0, "mal/hizmet kaymasi (puan)": 7.4}
+JAN26 = {"aylik": 4.84, "yillik": 30.65}
+ENAG_HAZ26 = {"TUIK": 32.11, "ENAG": 51.49}   # Haziran 2026 yillik, Euronews aktarimi; ENAG'in yontemi ve guvenilirligi tartismali
+
+
+def rapor() -> str:
+    L = ["TUIK TUFE METOD KIRILIMLARI", ""]
+    L.append("KIRILIM KATALOGU (kaynak: arama ozetleri; TUIK/TCMB siteleri acilamadi)")
+    for t, n, e, g in KIRILIMLAR:
+        L.append("  {:<11} {}".format(t, n))
+        L.append("              etki: {}   [guven: {}]".format(e, g))
+    L.append("")
+    L.append("2026 AGIRLIK DEGISIMI (yuzde)")
+    top = 0.0
+    for g, (a, b) in AGIRLIK_2025_2026.items():
+        L.append("  {:<28}{:>7.2f} -> {:>6.2f}  ({:+.2f})".format(g, a, b, b - a))
+        top += b
+    for g, w in AGIRLIK_2026_DIGER.items():
+        L.append("  {:<28}{:>7} -> {:>6.2f}".format(g, "?", w))
+        top += w
+    L.append("  bilinen 10 grubun toplami {:.2f}; geri kalan 3 grup (mobilya, eglence-kultur, kisisel bakim/diger) toplam {:.2f}".format(top, 100 - top))
+    L.append("")
+    L.append("TCMB DEGERLENDIRMESI (arama ozeti): agirlik yapisi Ocak enflasyonunu ~{:+.1f} puan etkiler; hizmet payi artisi yillik enflasyona ~{:+.1f} puan (mal-hizmet kaymasi {:.1f} puan)".format(
+        TCMB_ETKI["agirlik yapisinin Ocak aylik etkisi"], TCMB_ETKI["hizmet payi artisinin yillik etkisi"], TCMB_ETKI["mal/hizmet kaymasi (puan)"]))
+    L.append("TUIK: baz gecisinde aylik ve yillik oranlar zincirleme, gecmis seri kirilmadi. Ocak 2026 aylik %{:.2f}, yillik %{:.2f}.".format(JAN26["aylik"], JAN26["yillik"]))
+    L.append("")
+
+    # Agustos 2026 ayristirma
+    L.append("AGUSTOS 2026 KATKI AYRISTIRMASI (yillik %31,51)")
+    L.append("  grup                         yillik   katki   efektif agirlik(katki/yillik)")
+    toplam_k, toplam_w = 0.0, 0.0
+    for g, (y, k) in AGU26.items():
+        L.append("  {:<28}{:>7.2f}{:>8.2f}   %{:.1f}".format(g, y, k, 100 * k / y))
+        toplam_k += k
+        toplam_w += k / y
+    konut_y, konut_k = AGU26["Konut, su, elektrik, gaz"]
+    w_konut = konut_k / konut_y
+    tufe = 31.51
+    fark = konut_k - w_konut * tufe
+    L.append("  3 grubun katkisi {:.2f} puan (toplamin %{:.0f}'i), efektif agirlik toplami %{:.1f}".format(toplam_k, 100 * toplam_k / tufe, 100 * toplam_w))
+    L.append("  Konut grubu genel enflasyon hizinda artsaydi katki {:.2f}; gercek {:.2f}: genel ustu fazla = {:.2f} puan".format(w_konut * tufe, konut_k, fark))
+    L.append("  (grup elektrik, gaz, su, bakim da icerir: kira tek basina bu fazlanin altindadir)")
+    L.append("")
+
+    # A kanali ust siniri
+    rng = random.Random(2026)
+    a_dir = []
+    for _ in range(20000):
+        p = cek(rng)
+        prim = max(0.0, p["r_kira"] - (TUFE_YILLIK + p["yapisal"]))
+        a_dir.append(p["w_kira"] * prim * p["bosluk_pay"] * p["kiralanabilir"] * 100)
+    asma = sum(1 for x in a_dir if x > fark) / len(a_dir)
+    L.append("A KANALI UST SINIR TESTI: dogrudan A katkisi (haircut oncesi, kira carpani oncesi) medyan {:.2f} [{:.2f}-{:.2f}], konut fazlasi {:.2f}'i asma olasiligi %{:.1f}".format(
+        statistics.median(a_dir), yuzdelik(a_dir, .1), yuzdelik(a_dir, .9), fark, 100 * asma))
+    # tam bos stok cozumu: konutun tum primi kapanirsa
+    tam = []
+    rng = random.Random(7)
+    for _ in range(20000):
+        p = cek(rng)
+        prim = max(0.0, p["r_kira"] - (TUFE_YILLIK + p["yapisal"]))
+        tam.append(p["w_kira"] * prim * 100)
+    L.append("  Kira tam adil duzeye insaydi (atif payi 1): dogrudan {:.2f} [{:.2f}-{:.2f}] puan; konut grubu fazlasi {:.2f}".format(
+        statistics.median(tam), yuzdelik(tam, .1), yuzdelik(tam, .9), fark))
+    L.append("")
+
+    # model aciginin kirilim ile ilgisi
+    L.append("MODEL ACIGI VE KIRILIM")
+    L.append("  gozlenen kur temposuyla model 2026 TUFE ~26.0 (kirilma.py T-K3); gozlem Agustos yillik 31,5. Acik ~5.5 puan.")
+    L.append("  TCMB'ye gore hizmet payi artisi ~+1.0 puan: acigin ~%{:.0f}'ini kirilim aciklar. Kalan ~4.5 puan baska surucu.".format(100 * 1.0 / 5.5))
+    L.append("  Not: model Aralik/Aralik yilligi kalibre; gozlem Agustos yilligi. Zaman uyumsuzlugu da aciga girer.")
+    L.append("  ENAG-TUIK (Haziran 2026): {:.1f} vs {:.1f}, fark {:.1f} puan. ENAG'in yontemi tartismali, olcum belirsizligi siniri olarak yazilir, dogru kabul edilmez.".format(
+        ENAG_HAZ26["ENAG"], ENAG_HAZ26["TUIK"], ENAG_HAZ26["ENAG"] - ENAG_HAZ26["TUIK"]))
+    return "\n".join(L)
+
+
+def testler():
+    out = []
+    bil = sum(v[1] for v in AGIRLIK_2025_2026.values()) + sum(AGIRLIK_2026_DIGER.values())
+    kalan = 100 - bil
+    out.append(("M1 agirlik kontrolu: bilinen 10 grup {:.2f}, kalan 3 grup {:.2f} (pozitif ve makul)".format(bil, kalan), 5 < kalan < 25, "kimlik/makullugu"))
+    # efektif agirlik kimligi
+    ef = {g: k / y for g, (y, k) in AGU26.items()}
+    sap = [abs(100 * ef[g] - AGIRLIK_2025_2026[g][1]) for g in ef]
+    out.append(("M2 katki/yillik = efektif agirlik, baz agirliktan en fazla {:.1f} puan sapti (fiyat kaymasi)".format(max(sap)), max(sap) < 2.5, "kimlik"))
+    konut_y, konut_k = AGU26["Konut, su, elektrik, gaz"]
+    fark = konut_k - konut_k / konut_y * 31.51
+    rng = random.Random(2026)
+    asma = 0
+    for _ in range(20000):
+        p = cek(rng)
+        prim = max(0.0, p["r_kira"] - (TUFE_YILLIK + p["yapisal"]))
+        if p["w_kira"] * prim * p["bosluk_pay"] * p["kiralanabilir"] * 100 > fark:
+            asma += 1
+    out.append(("M3 A kanali dogrudan katkisi konut grubunun genel ustu fazlasini ({:.2f} puan) asmiyor: asma olasiligi %{:.1f}".format(fark, 100 * asma / 20000),
+                asma / 20000 < 0.01, "ust sinir testi"))
+    out.append(("M4 kira agirligi (TUFE'de) bu turda dogrulanamadi: w_kira 4,0-7,5% VARSAYIM, ust sinir konut grubu %11,4 eksi elektrik-gaz-su", None, "BILGI: TUIK 2026 agirlik tablosu gerek"))
+    out.append(("M5 TUIK metodoloji dokumani ve TCMB analizi dogrudan okunamadi (ag politikasi); rakamlar arama ozetinden", None, "BILGI: dokumanlar yuklenirse dogrulanir"))
+    return out
+
+
+def test_blogu():
+    L = ["GERCEKLIK TESTLERI (metod)"]
+    gec = say = 0
+    for msg, ok, n in testler():
+        if ok is None:
+            L.append("  [BILGI] {}  ({})".format(msg, n))
+            continue
+        say += 1
+        gec += bool(ok)
+        L.append("  [{}] {}  ({})".format("GECTI" if ok else "KALDI", msg, n))
+    L.append("  {}/{} gecti (bilgi satirlari sayilmadi)".format(gec, say))
+    return "\n".join(L)
+
+
+def main() -> int:
+    print(rapor())
+    print()
+    print(test_blogu())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -130,3 +130,13 @@ Veri: `data/usdtry_2026.json`, `data/USDTRY.md` (TCMB EVDS gunluk, 2 Oca-6 Eki 2
 - `enflasyon.cek` d_yil'i gozleme cekildi (%16-20, onceki %20-28 varsayimdi). Model bu kur hiziyla 2026 TUFE'yi ~26 veriyor, gozlem 31,5: ~5 puan eksik (T8 ve T-K3 kaldi).
 - Kirilma senaryosu: J = kayma ustu sicrama, tarihte +20 (2018), +62 (2021), +20 (2022), +37 (2023) puan. TUFE'ye yil 1 12,3 puan, 3 yilda kumulatif 22. Cozumun (A+B+C+dongu) 3 yillik kazanci 2,7 puan. Maliyet/kazanc 8x; cozum kirilma olasiligini mutlak ~12 puan dusurse esitlenir. Olasilik bilinmiyor.
 
+### TUIK metod kirilimlari (metod.py)
+
+`python -m hekis.metod`. Kaynak arama ozetleri; TUIK/TCMB siteleri bu ortamdan acilamadi, metodoloji dokumani okunamadi.
+
+- Ocak 2026: baz 2003=100 -> 2025=100, ECOICOP v2, 12 -> 13 grup (sigorta ve finansal hizmet yeni), 407 -> 428 madde, grup agirliklari HBA -> Ulusal Hesaplar. Konut %15,21 -> %11,40, ulastirma %15,34 -> %16,62, gida %24,96 -> %24,44. TUIK: aylik ve yillik oranlar zincirleme, gecmis seri kirilmadi. TCMB: agirlik Ocak etkisi ~-0,1 puan, hizmet payi artisi (mal-hizmet kaymasi 7,4 puan) yillik enflasyona ~+1 puan.
+- Agustos 2026 yillik %31,51: konut grubu %39,77 (katki 5,01 puan), efektif agirlik %12,6, genel enflasyon hizinda artsaydi katki 3,97, genel ustu fazla 1,04 puan. Bu, A (kira) kanalinin ust siniri: dogrudan A medyan 0,13, asma olasiligi %0.
+- `enflasyon.cek`: w_kira 4,0-7,5% (onceki 6-10), r_kira 42-55% (onceki 40-50). Kira agirligi dogrulanamadi.
+- Model 2026 aciginin (~5,5 puan) ~1 puani kirilimla aciklanir, ~4,5 puan baska surucu.
+- TCMB YKKE (Sub 2026): yeni kiraci %34,2, mevcut kiraci %53,9. TUFE kirasi mevcut sozlesmeleri izler: yuksek olcum kismen eski sozlesmelerin yetismesi, guncel kitlik degil.
+

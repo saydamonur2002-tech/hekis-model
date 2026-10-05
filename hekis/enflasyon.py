@@ -45,8 +45,8 @@ def cek(rng):
     """Bir senaryo icin tum belirsiz parametreleri cek. Hepsi VARSAYIM."""
     return {
         # A kira
-        "w_kira": rng.uniform(0.06, 0.10),        # konut grubu icinde kira payi (agirlik 0.142 gozlem, alt pay varsayim)
-        "r_kira": rng.uniform(0.40, 0.50),        # TUFE kira endeksi yillik; konut TUFE 2025 %49,5 ve yeni kira %34,5 arasi
+        "w_kira": rng.uniform(0.04, 0.075),       # kira TUFE agirligi. 2026 konut grubu %11,40 (2025: %15,21), elektrik-gaz-su dusulunce kira <= ~%7. Dogrulanmadi, VARSAYIM
+        "r_kira": rng.uniform(0.42, 0.55),        # TUFE kira yillik; konut grubu Agu 2026 %39,8, TCMB mevcut kiraci Sub 2026 %53,9 / yeni kiraci %34,2
         "yapisal": rng.uniform(-0.02, 0.04),      # stok cozulse de kalacak reel kira artisi
         "bosluk_pay": rng.uniform(0.15, 0.60),    # kira priminin ne kadari atil stoktan
         "kiralanabilir": rng.uniform(0.20, 0.70), # atil stokun talep olan yerde ve kiralanabilir kismi
