@@ -25,6 +25,8 @@ YEARS = 5
 SHOCK_YEAR = 3
 SAFETY = 1.25
 P_RANGE = (0.15, 0.38)
+TENANT_MIN = 0.80   # kiraci odeme tahsilati, operasyonel esik (karar); finansal taban %38
+INCOME_MIN = 0.85   # olculen hane geliri / varsayilan, alt sinir (karar)
 UNCERTAIN = ("g_e", "cap", "coll", "lux_coll")
 
 SHOCKS = {
@@ -91,12 +93,18 @@ def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, eros
         n_lux = z["S"][2] * (1 - final.lux_response(0.05))
         n_gen = z["S"][0] * (1 - z["p"]) + z["S"][1] * (1 - final.lux_response(0.01))
         rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"], "yuk": z["yuk"]})
+        c_true = Pt.get("alpha", E.BASE["alpha"]) / E.BASE["alpha"]   # kiraci tahsilat vekili (alpha_mult)
+        inc_true = Pt.get("inc_scale", E.BASE["inc_scale"]) / E.BASE["inc_scale"]
+        n_hh = max(z["N"], 1.0)
         if rng is None:
-            o_g, o_l, o_p = Pt["coll"], Pt["lux_coll"], z["p"]
+            o_g, o_l, o_p, o_c, o_i = Pt["coll"], Pt["lux_coll"], z["p"], min(1.0, c_true), inc_true
         else:
             o_g, o_l, o_p = _binom(rng, Pt["coll"], n_gen), _binom(rng, Pt["lux_coll"], n_lux), _binom(rng, z["p"], z["S"][0])
-        ratio_obs = run_three_zone(P={**LIKELY, **Pt, "stok": size, "coll": o_g, "lux_coll": o_l})["ratio"]
-        passed = ratio_obs >= SAFETY and P_RANGE[0] <= o_p <= P_RANGE[1]
+            o_c = _binom(rng, min(1.0, c_true), n_hh)
+            o_i = inc_true * math.exp(rng.gauss(0.0, 0.803 / math.sqrt(n_hh)))   # log hane geliri ornek ortalamasi
+        ratio_obs = run_three_zone(P={**LIKELY, **Pt, "stok": size, "coll": o_g, "lux_coll": o_l,
+                                      "alpha": E.BASE["alpha"] * o_c, "inc_scale": E.BASE["inc_scale"] * o_i})["ratio"]
+        passed = ratio_obs >= SAFETY and P_RANGE[0] <= o_p <= P_RANGE[1] and o_c >= TENANT_MIN and o_i >= INCOME_MIN
         rows[-1]["gecti"] = passed
         if passed:
             size = min(FULL, size * growth_cap)
@@ -151,7 +159,7 @@ def main() -> int:
     print("Kusursuz olcum, en olasi senaryo, erozyon yok, buyume tavani yok (onceki varsayim):")
     print(f"  yerlesen: " + " / ".join(f"{r['N']:,.0f}" for r in det).replace(",", "."))
     det2 = one_path({}, None)
-    print(f"Kusursuz olcum, erozyon %{EROSION:.0%}, yillik buyume tavani x{GROWTH_CAP}:")
+    print(f"Kusursuz olcum, erozyon {EROSION:.0%}, yillik buyume tavani x{GROWTH_CAP}:")
     print(f"{'yil':>4}{'olcek':>10}{'yerlesen':>10}{'sub (mr)':>10}{'bedel (mr)':>12}{'oran':>7}")
     for r in det2:
         print(f"{r['yil']:>4}{r['stok']:>10,.0f}{r['N']:>10,.0f}{bn(r['sub']):>10.2f}{bn(r['rev']):>12.2f}{r['ratio']:>7.2f}".replace(",", "."))
@@ -161,7 +169,7 @@ def main() -> int:
     for e in (0.0, 0.25, 0.5):
         r = summarize(monte_carlo(erosion=e))
         print(f"{e:>8.0%}{r['size5']:>14,.0f}{r['N5']:>10,.0f}{bn(r['net']):>11.2f}{r['stuck']:>8.0%}".replace(",", "."))
-    print(f"\nSok direnci ({SHOCK_YEAR}. yildan itibaren, 300 cekim, erozyon %{EROSION:.0%}):")
+    print(f"\nSok direnci ({SHOCK_YEAR}. yildan itibaren, 300 cekim, erozyon {EROSION:.0%}):")
     print(f"{'sok':<34}{'5. yil olcek':>13}{'yerlesen':>10}{'5y net mr':>11}{'zarar %':>9}{'oran<1 %':>10}")
     for name, sh in SHOCKS.items():
         r = summarize(monte_carlo(shock=sh))
@@ -173,7 +181,7 @@ def main() -> int:
         print(f"{name:<44}{bn(r['yuk20']):>9.1f}{bn(r['acik5']):>12.2f}")
     b = breakpoints()
     print(f"\nKirilma noktalari (tam olcek, oran {b['ratio_now']:.2f}):")
-    print(f"  luks tahsilat en olasi degerin x{b['lux_carpan']:.2f}'ine inerse (%{LIKELY['lux_coll'] * b['lux_carpan']:.0%}) oran 1'e iner")
+    print(f"  luks tahsilat en olasi degerin x{b['lux_carpan']:.2f}'ine inerse ({LIKELY['lux_coll'] * b['lux_carpan']:.0%}) oran 1'e iner")
     print(f"  genel tahsilat x{b['genel_carpan']:.2f}'ine inerse oran 1'e iner (luks yerindeyken)")
     print(f"  beklenen reel konut artisi +{b['g_e_artis']:.1%} puan yukselirse katilim %15'in altina iner (finansal degil, olcek sorunu)")
     return 0

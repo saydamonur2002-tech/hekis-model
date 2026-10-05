@@ -37,9 +37,9 @@ def main() -> int:
     print("2024 tasarruf finansman (dis capa, benzetme yok):")
     print(f"  musteri basina ortalama sozlesme {r['ort_sozlesme']:,.0f} TL (konut+tasit karisik)".replace(",", "."))
     print(f"  HEKIS havuz birim degeri {r['birim_deger']:,.0f} TL".replace(",", "."))
-    print(f"  HEKIS yerlesen hane {r['hekis_hane']:,.0f} = sistemin 2024 musterisinin %{r['hane_orani']:.1%}".replace(",", "."))
-    print(f"  sistem aktifi mevduatin %{r['aktif_mevduat']:.2%}, HEKIS senedi %{r['senet_mevduat']:.2%}; senet / aktif = {r['senet_aktif']:.2f}")
-    print(f"  HEKIS kapsami (uygun kiraciya) %{r['kapsam']:.1%}: talep siniri degil, arz ve katilim siniri")
+    print(f"  HEKIS yerlesen hane {r['hekis_hane']:,.0f} = sistemin 2024 musterisinin {r['hane_orani']:.1%}".replace(",", "."))
+    print(f"  sistem aktifi mevduatin {r['aktif_mevduat']:.2%}, HEKIS senedi {r['senet_mevduat']:.2%}; senet / aktif = {r['senet_aktif']:.2f}")
+    print(f"  HEKIS kapsami (uygun kiraciya) {r['kapsam']:.1%}: talep siniri degil, arz ve katilim siniri")
     print("Okuma: en hizli buyuyen 2024 kanali bile mevduatin ~%0,3'unu cekti; senet ayni mertebede. Dolarizasyon kapasitesi ~0 sonucu dis olcekle de uyumlu.")
     print("Sinir: sistemin musterisi tasarruf eden orta gelir; HEKIS'in uygun kiraciisi (duz memur maasi alti) baska nufus. Talep kaniti sayilmaz.")
     return 0

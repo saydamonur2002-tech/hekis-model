@@ -420,3 +420,20 @@ class ShockExtraTests(unittest.TestCase):
         ann = horizon.summarize(horizon.monte_carlo(60, shock=horizon.SHOCKS["bedel iptali (hukuki)"]))
         self.assertLess(ann["net"], base["net"])
         self.assertLess(ann["size5"], base["size5"])
+
+class SocialTests(unittest.TestCase):
+    def test_social_and_cost(self):
+        from hekis import social
+        s = social.social()
+        self.assertLess(s["gini"][1], s["gini"][0])
+        self.assertLess(s["gini"][0] - s["gini"][1], 0.01)
+        c = social.cost_of_living()
+        self.assertLess(c["rent"][0.6][0], 0)
+        self.assertLess(c["rent"][0.3][0], c["rent"][1.0][0])
+
+    def test_gate_stops_on_income_shock(self):
+        from hekis import horizon
+        sh = horizon.SHOCKS["gelir erimesi (hane -%20, kiraci tahsilat x0.8)"]
+        det = horizon.one_path({}, None, sh)
+        self.assertLess(det[-1]["stok"], horizon.FULL)
+        self.assertLessEqual(det[-1]["stok"], det[2]["stok"] * horizon.GROWTH_CAP + 1)

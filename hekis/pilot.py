@@ -114,7 +114,7 @@ def tests() -> list[tuple[str, bool, str]]:
     out = []
     a, b = run(PILOT_STOK), run(int(E.BASE["stok"]))
     d = abs(a["ratio"] - b["ratio"]) / b["ratio"]
-    out.append(("olcek degismezligi (yapi geregi dogrusal; zayif test, gercek olcek etkisini pilot olcer)", d < 0.01, f"fark %{d:.2%}"))
+    out.append(("olcek degismezligi (yapi geregi dogrusal; zayif test, gercek olcek etkisini pilot olcer)", d < 0.01, f"fark {d:.2%}"))
     n0, n1 = (run(PILOT_STOK, dict(P={"fee": f}))["N"] for f in (0.0, 0.01))
     out.append(("bedel artarsa yerlesen az olmaz", n1 >= n0, f"{n0:.0f} -> {n1:.0f}"))
     g = [run(PILOT_STOK, dict(P={"g_e": x}))["N"] for x in (-0.10, -0.037, 0.0, 0.05)]
@@ -122,10 +122,10 @@ def tests() -> list[tuple[str, bool, str]]:
     z = run(PILOT_STOK)
     out.append(("butce kimligi: bedel - sub - prim = denge", abs(z["rev"] - z["sub1"] - z["prem_cost"] - z["balance"]) < 1e-3 * max(z["rev"], 1), f"denge {z['balance']:,.0f}"))
     yield_ = z["sub1"] / z["N"] / z["V"][0]
-    out.append(("birim sub. degerin %0-8'i (kira getirisi bandi)", 0 < yield_ < 0.08, f"%{yield_:.1%}"))
+    out.append(("birim sub. degerin %0-8'i (kira getirisi bandi)", 0 < yield_ < 0.08, f"{yield_:.1%}"))
     p, n_elig = z["p"], z["S"][0]
     se = math.sqrt(p * (1 - p) / n_elig)
-    out.append(("pilot katilimi ±10 puan icinde olcebilir (95% GA)", 1.96 * se < 0.10, f"katilim %{p:.0%} ±{1.96 * se:.1%}, uygun {n_elig:.0f} birim"))
+    out.append(("pilot katilimi ±10 puan icinde olcebilir (95% GA)", 1.96 * se < 0.10, f"katilim {p:.0%} ±{1.96 * se:.1%}, uygun {n_elig:.0f} birim"))
     rng = random.Random(7)
     ok = tot = 0
     for _ in range(300):
@@ -134,7 +134,7 @@ def tests() -> list[tuple[str, bool, str]]:
         zz = run_three_zone(P={**LIKELY, **P})
         tot += 1
         ok += zz["ratio"] >= 1.0
-    out.append(("belirsizlik taramasi (bilgi): bedel >= sub orani, 300 cekim", ok / tot >= 0.5, f"%{ok / tot:.0%} cekimde oran >= 1"))
+    out.append(("belirsizlik taramasi (bilgi): bedel >= sub orani, 300 cekim", ok / tot >= 0.5, f"{ok / tot:.0%} cekimde oran >= 1"))
     return out
 
 
@@ -142,7 +142,7 @@ def main() -> int:
     print(f"Mikro pilot: tek mahalle, {PILOT_STOK:,} bos birim (en olasi senaryo)".replace(",", "."))
     print(f"{'kademe':<28}{'daire':>7}{'kapsam':>8}{'sub/birim yil-1':>17}{'bedel/sub':>11}{'bosaltan':>10}")
     for name, u in ladder():
-        extra = f"  prim %{u['prim']:.2%}" if "prim" in u else ""
+        extra = f"  prim {u['prim']:.2%}" if "prim" in u else ""
         print(f"{name:<28}{u['daire']:>7.0f}{u['kapsam']:>8.0%}{u['sub_birim']:>17,.0f}{u['oran']:>11.2f}{u['cikan']:>10.0%}{extra}".replace(",", "."))
     print("\nOlcek kademesi (K2 kurallari):")
     for name, u in scale_ladder():
@@ -150,9 +150,9 @@ def main() -> int:
     g = gates()
     print("\nKademe gecis esikleri (modelden turetilmis, bedel/sub >= 1,25; havuz 1.000 birim):")
     for gen, lux in g["frontier"]:
-        print(f"  genel tahsilat %{gen:.0%} ise luks tahsilat >= %{lux:.0%} (olcum hatasi ±{g['se_lux']:.0%} eklenir)")
-    print(f"  katilim: en fazla %{g['p_max']:.0%} (ustunde sub. bedeli asar), alt sinir amaca bagli (karar), olcum ±{g['se_p']:.1%}")
-    print(f"  kiraci odeme tahsilati: finansal taban %{g['tenant_min']:.0%}")
+        print(f"  genel tahsilat {gen:.0%} ise luks tahsilat >= {lux:.0%} (olcum hatasi ±{g['se_lux']:.0%} eklenir)")
+    print(f"  katilim: en fazla {g['p_max']:.0%} (ustunde sub. bedeli asar), alt sinir amaca bagli (karar), olcum ±{g['se_p']:.1%}")
+    print(f"  kiraci odeme tahsilati: finansal taban {g['tenant_min']:.0%}")
     big = lux_pilot_size()
     gb = gates(big)
     print(f"\nGenisletilmis luks pilotu: {big:,} birim -> luks tahsilat olcum hatasi ±{gb['se_lux']:.1%}, genel ±{gb['se_gen']:.1%}, katilim ±{gb['se_p']:.1%}".replace(",", "."))
