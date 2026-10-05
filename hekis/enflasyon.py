@@ -26,6 +26,11 @@ FINANSMAN_GIDERI = 4300.0    # milyar TL, 2025 firma finansman gideri
 IHTIYAC_STOK = 3065.7        # milyar TL, ticari ihtiyac kredisi (Olcum.csv)
 BUTCE_FAIZI = 2054.0         # milyar TL, 2025
 
+# ---- DISARIDAN (arama ile, ham seri indirilemedi: TCMB/EVDS ag politikasiyla kapali) ----
+# TCMB: sepet kuru %10 artarsa maliyet kaynakli 1 yillik TUFE etkisi ~2,5 puan.
+# Mekanik ithal icerik ~3,3 puan. Beklentiler dahil 6 ay kosullu manset ~6,6 puan.
+# Kur: 2025 ~%21, 2026 ~%24 yillik dolar/TL artisi YAKLASIK (JPM 2026 sonu 53,5 beklentisi). Seriyle degistirin.
+
 # ---- TURETILMIS -----------------------------------------------------------
 R_EFEKTIF = FINANSMAN_GIDERI / TICARI_STOK      # ~%24,9 efektif firma faizi
 IHTIYAC_PAY = IHTIYAC_STOK / TICARI_STOK        # ~%17,7, kilit kredisi icin ust tutarlilik cercevesi
@@ -55,6 +60,13 @@ def cek(rng):
         # C ic borclanma
         "acik_fazla": rng.triangular(0.3, 2.5, 1.2),  # esik ustu acik, GSYH yuzdesi (low, high, mode)
         "beta": rng.uniform(0.15, 0.50),          # %1 GSYH mali itis basina enflasyon puani (net, verimlilik dahil)
+        # D doviz
+        "d_yil": rng.uniform(0.20, 0.28),         # dolar/TL yillik artis, bu yil (yaklasik)
+        "d_onceki": rng.uniform(0.18, 0.24),      # onceki yil (gecikmeli geciskenlik icin)
+        "d_cozum": rng.uniform(0.03, 0.12),       # doviz kisiti cozulunce kalacak yillik deger kaybi
+        "phi1": rng.uniform(0.18, 0.38),          # ayni yil geciskenlik (TCMB 1 yil toplam ~0,25; beklenti dahil ~0,45)
+        "phi2": rng.uniform(0.05, 0.15),          # gecikmeli geciskenlik
+        "ortusme_fx": rng.uniform(0.0, 0.20),     # kurun bir kismi A-C kanallarinin sonucu, cift sayim
         # ortak
         "atalet": rng.uniform(0.30, 0.60),        # gecmis enflasyona endekslenme
         "ortusme": rng.uniform(0.05, 0.30),       # B ve C ayni faiz/kredi hattini sayar, cift sayim payi
@@ -83,7 +95,17 @@ def kanallar(p, uygulama=1.0):
 
     toplam = (a + b + c) * (1.0 - p["ortusme"])
     k = p["ortusme"]
+
+    # D: doviz. Kur artisi cozum rejiminde d_cozum'a iner. Yil 1'de yalniz ayni yil
+    # geciskenligi kalkar, gecikmeli kisim gecmis kurdan gelir (yil 2'de kalkar).
+    fark = max(0.0, p["d_yil"] - p["d_cozum"])
+    d1 = p["phi1"] * fark * 100
+    d3 = (p["phi1"] + p["phi2"]) * fark * 100 * (1 + p["atalet"])
+    cift = 1.0 - p["ortusme_fx"]
     return {
+        "D doviz": d1 * cift * uygulama,
+        "D doviz y3": d3 * cift * uygulama,
+        "hepsi": (toplam + d1 * cift) * uygulama,
         "A kira": a * uygulama,
         "B mahsup": b * uygulama,
         "C ic borc": c * uygulama,
@@ -152,12 +174,39 @@ def rapor() -> str:
         TUFE_YILLIK * 100 - kal))
     satir.append("")
 
-    satir.append("Neyi surukluyor? Spearman, toplam ile parametre:")
+    satir.append("Neyi surukluyor? Spearman, ikincil toplam ile parametre:")
     adlar = list(draws[0].keys())
     skor = sorted(((spearman([p[a] for p in draws], tot), a) for a in adlar), key=lambda t: -abs(t[0]))
     for r, a in skor[:7]:
         satir.append("  {:<16}{:>7.2f}".format(a, r))
+    satir.append("")
+
+    satir.extend(_doviz_blogu(draws, sonuc))
     return "\n".join(satir)
+
+
+def _doviz_blogu(draws, sonuc):
+    """Doviz kanali ve butun resim. Yil 3 = ikincil y3 + doviz y3, cift sayim dusulmus."""
+    satir = ["== DOVIZ KANALI EKLENIRSE (hepsi birlikte cozulurse) =="]
+    d1 = [s["D doviz"] for s in sonuc]
+    d3 = [s["D doviz y3"] for s in sonuc]
+    h1 = [s["hepsi"] for s in sonuc]
+    h3 = [yil3(p, s["toplam"]) + s["D doviz y3"] for p, s in zip(draws, sonuc)]
+    for ad, v in (("D doviz, yil 1", d1), ("D doviz, yil 3", d3),
+                  ("HEPSI, yil 1", h1), ("HEPSI, yil 3", h3)):
+        satir.append("  {:<18}{:>6.2f}  [{:.2f} - {:.2f}]".format(
+            ad, statistics.median(v), yuzdelik(v, 0.10), yuzdelik(v, 0.90)))
+    satir.append("")
+    for ad, v in (("yil 1", h1), ("yil 3", h3)):
+        satir.append("  Baslangic %{:.1f}, {} sonrasi: %{:.1f}  [%{:.1f} - %{:.1f}]".format(
+            TUFE_YILLIK * 100, ad, TUFE_YILLIK * 100 - statistics.median(v),
+            TUFE_YILLIK * 100 - yuzdelik(v, 0.90), TUFE_YILLIK * 100 - yuzdelik(v, 0.10)))
+    satir.append("")
+    satir.append("Hepsini surukleyen:")
+    skor = sorted(((spearman([p[a] for p in draws], h3), a) for a in draws[0]), key=lambda t: -abs(t[0]))
+    for r, a in skor[:6]:
+        satir.append("  {:<16}{:>7.2f}".format(a, r))
+    return satir
 
 
 def main() -> int:

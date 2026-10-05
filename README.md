@@ -45,3 +45,5 @@ python -m hekis.enflasyon
 Uc ikincil kanal (konut/kira, tedarik zinciri mahsubu, ic borclanma) cozulurse yillik TUFE kac puan duser. Katki ayristirmasidir, tahmin degil. Gozlem repo verisinden, varsayimlar aralik olarak cekilir (Monte Carlo, 20 bin cekim). Doviz kisiti modelde yok, kalan olarak raporlanir.
 
 Baz sonuc: tam cozumde yil 1 icin medyan 1,1 puan (aralik 0,7-1,5), ataletle 3. yilda 1,8 puan (1,2-2,6). Yarim uygulamada bunun yarisi. En belirsiz sayi, kilitli alacagin kapali dongu payi. Bu sayiyi e-fatura eslesme verisi olcer, model olcmez.
+
+Doviz kanali eklendi (D). Cekirdek: TCMB'nin yayimladigi %10 kur artisi basina ~2,5 puan, 1 yil, maliyet kaynakli. Ham kur serisi indirilemedi (TCMB/EVDS ag politikasiyla kapali), kur artisi yaklasik. Hepsi birlikte cozulurse medyan: yil 1 ~5 puan, yil 3 ~10 puan (aralik 7-13), yani %31,5 -> yaklasik %22 (%18-24).
