@@ -381,3 +381,14 @@ class AnchorTests(unittest.TestCase):
         r = anchor.report()
         self.assertTrue(0.001 < r["senet_mevduat"] < 0.01)
         self.assertTrue(0.5 < r["senet_aktif"] < 2.0)
+
+
+class GateTests(unittest.TestCase):
+    def test_gates_frontier_monotone_and_floor_restored(self):
+        from hekis import final, pilot
+        before = final.AVOID_FLOOR
+        g = pilot.gates()
+        self.assertEqual(final.AVOID_FLOOR, before)
+        lux = [l for _, l in g["frontier"]]
+        self.assertEqual(lux, sorted(lux))  # genel tahsilat dustukce luks esigi yukselir
+        self.assertLess(g["p_max"], 0.5)

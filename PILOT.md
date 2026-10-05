@@ -16,14 +16,21 @@ Kapsam: tek mahalle, 1.000 boş birim, İstanbul en olası senaryo. Senet, duran
 ## Dürüst not
 Ölçek değişmezliği modelin doğrusal olmasından gelir, kanıt değildir. Gerçek ölçek etkisini (tahsilat erozyonu, katılım doygunluğu) yalnız pilot verisi gösterir. Testler model tutarlılığını sınar; gerçeklik testi değildir.
 
-## Kademe geçiş eşikleri (pilottan ölçülecek)
-- Katılım: uygun birimin ≥%15'i (model %20 ±4 puan; 407 uygun birimle ölçülebilir).
-- Fiili tahsilat ≥%25 (model: genel %30).
-- Lüks bedel tahsilatı ≥%30 (model %40).
-- Kiracı ödemesi/kira ≤%30 ve tahsil ≥%90.
-- Eşik tutmazsa bir sonraki kademeye geçilmez; ilk bozulan parça düzeltilir.
+## Kademe geçiş eşikleri (revize: modelden türetilmiş)
+Eski eşikler (%15 / %25 / %30 / %30 / %90) dayanaksızdı; model çıktısının biraz altı olarak seçilmişti. Yeni kural: bedel/sub oranını ≥1,25'e (tespit, tahsil, idari maliyet modelde yok; %25 pay, karar) taşıyan en küçük değer; ölçüm hatası (%95 GA) üstüne eklenir. Kod: `pilot.gates()`.
 
-Sıra: K0 mahalle → K1 bedel → K2 üç bölge → K3 prim → ilçe (20 bin) → İstanbul → Anadolu → senet/duran inşaat.
+| Ölçüm | Eski | Yeni | Dayanak |
+|---|---|---|---|
+| Katılım (uygun birim) | ≥%15 | %15-38 | alt: amaç (karar); üst: %38 üstünde sub. bedeli aşar |
+| Genel bedel tahsilatı | ≥%25 | ≥%20 | lüks tahsilatla birlikte okunur (aşağı) |
+| Lüks bedel tahsilatı | ≥%30 | ≥%18 (genel %20 ise) | sınır eğrisi: genel %30→lüks %13, %20→%18, %10→%24 |
+| Kiracı ödeme/kira | ≤%30 | ≤%30 (tasarım) | değişmedi |
+| Kiracı tahsilat | ≥%90 | finansal taban %38; operasyonel ≥%80 (karar) | %90 finansal değil, tahmindi |
+
+Bulgular:
+- Genel ve lüks tahsilat birbirinin yerine geçiyor; tek tek eşik yerine eğri. Lüksün yüksek olması genelin düşüklüğünü kapatır. Genel bedel tek başına (lüks yok) ancak %42 tahsilatla yeter: gerçekçi değil.
+- Modelde %10 tahsilat tabanı vardı (AVOID_FLOOR): tahsilat 0'da bile oran >1 görünüyordu, yani kendi kendini finanse etme sonucu varsayımla korunuyordu. Eşikler tabansız hesaplandı. Ana modeldeki taban hâlâ duruyor; sonuçları (oran 2,39) hafifçe iyimser olabilir.
+- Mikro pilot lüks tahsilatını ölçemez: 1.000 birimde ~77 lüks vergilendirilen birim var, hata ±9 puan. ±5 puan için ~4.000 birim gerekir. Katılım (407 uygun birim, ±3,9) ölçülür.
 
 ## Dış çapa: 2024 tasarruf finansman (benzetme yok)
 `python -m hekis.anchor`. Sistem yalnız ölçek ve talep için dış kontrol; HEKİS tasarımı o sisteme benzemez (o: üye birikimi, sıra/çekiliş; HEKİS: boş stoğu havuza alan kira sistemi). Veri haber özetlerinden, doğrulanmamış; konut/taşıt ayrımı yok; baz yıl 2024, model 2026.

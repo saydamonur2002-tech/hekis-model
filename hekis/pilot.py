@@ -14,6 +14,7 @@ import math
 import random
 
 from hekis import evaluate as E
+from hekis import final
 from hekis.zones import LIKELY, run_three_zone, solve_premium
 
 PILOT_STOK = 1_000
@@ -54,6 +55,54 @@ def scale_ladder() -> list[tuple[str, dict]]:
             (("mahalle", PILOT_STOK), ("ilce", ILCE_STOK), ("Istanbul", int(E.BASE["stok"])))]
 
 
+SAFETY = 1.25  # bedel/sub orani >= 1,25: tespit, tahsil ve idari maliyet modelde yok, %25 pay (karar)
+
+
+def _ratio(**P) -> float:
+    return run_three_zone(P={"stok": PILOT_STOK, **P})["ratio"]
+
+
+def _smallest(key: str, target: float, **extra) -> float:
+    lo, hi = 0.0, 1.0
+    for _ in range(50):
+        m = (lo + hi) / 2
+        if _ratio(**{key: m, **extra}) >= target:
+            hi = m
+        else:
+            lo = m
+    return hi
+
+
+def gates() -> dict:
+    """Esikler modelden turetilir: orani SAFETY'ye tasiyan en kucuk tahsilat; olcum hatasi (95% GA) ayrica eklenir.
+    Modelin %10 tahsilat tabani (AVOID_FLOOR) kaldirilir: yoksa tahsilat 0'da bile kendini finanse ediyor gorunur."""
+    old = final.AVOID_FLOOR
+    final.AVOID_FLOOR = 0.0
+    try:
+        b = run_three_zone(P={"stok": PILOT_STOK})
+        n_lux = b["S"][2] * (1 - final.lux_response(0.05))
+        n_gen = b["S"][0] * (1 - b["p"]) + b["S"][1] * (1 - final.lux_response(0.01))
+        se = lambda n, p: 1.96 * math.sqrt(p * (1 - p) / n)
+        frontier = [(g, _smallest("lux_coll", SAFETY, coll=g)) for g in (0.30, 0.20, 0.10)]
+        cap_hi = _smallest_cap_max(SAFETY)
+        c_ten = 1 - (b["ratio"] - SAFETY) / ((b["ratio"] - _ratio(alpha=0.30 * 0.6)) / 0.4)
+        return {"frontier": frontier, "se_lux": se(n_lux, 0.2), "se_gen": se(n_gen, 0.2), "p_max": cap_hi, "ratio": b["ratio"],
+                "tenant_min": c_ten, "se_p": se(b["S"][0], b["p"])}
+    finally:
+        final.AVOID_FLOOR = old
+
+
+def _smallest_cap_max(target: float) -> float:
+    lo, hi = 0.01, 1.0
+    for _ in range(50):
+        m = (lo + hi) / 2
+        if run_three_zone(P={"stok": PILOT_STOK, "cap": m})["ratio"] >= target:
+            lo = m
+        else:
+            hi = m
+    return run_three_zone(P={"stok": PILOT_STOK, "cap": lo})["p"]
+
+
 def tests() -> list[tuple[str, bool, str]]:
     out = []
     a, b = run(PILOT_STOK), run(int(E.BASE["stok"]))
@@ -91,6 +140,12 @@ def main() -> int:
     print("\nOlcek kademesi (K2 kurallari):")
     for name, u in scale_ladder():
         print(f"{name:<28}{u['daire']:>7.0f}{u['kapsam']:>8.0%}{u['sub_birim']:>17,.0f}{u['oran']:>11.2f}".replace(",", "."))
+    g = gates()
+    print("\nKademe gecis esikleri (modelden turetilmis, bedel/sub >= 1,25; havuz 1.000 birim):")
+    for gen, lux in g["frontier"]:
+        print(f"  genel tahsilat %{gen:.0%} ise luks tahsilat >= %{lux:.0%} (olcum hatasi ±{g['se_lux']:.0%} eklenir)")
+    print(f"  katilim: en fazla %{g['p_max']:.0%} (ustunde sub. bedeli asar), alt sinir amaca bagli (karar), olcum ±{g['se_p']:.1%}")
+    print(f"  kiraci odeme tahsilati: finansal taban %{g['tenant_min']:.0%}")
     print("\nGerceklik testleri (model tutarliligi; gercek dogrulama pilot verisiyle):")
     fails = 0
     for name, ok, note in tests():
