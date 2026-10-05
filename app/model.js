@@ -138,10 +138,10 @@
       }
       return rows;
     }
-    function draw(rng) { const o = {}; for (const k of Object.keys(SPACE)) o[k] = tri(rng, SPACE[k][0], SPACE[k][1], LIKELY[k]); return o; }
-    function monteCarlo(sys, n, seed, shock, opt) {
+    function draw(rng, center) { const o = {}; for (const k of Object.keys(SPACE)) { const [lo, hi] = SPACE[k]; const c = Math.min(hi, Math.max(lo, (center || LIKELY)[k])); o[k] = tri(rng, lo, hi, c); } return o; }
+    function monteCarlo(sys, n, seed, shock, opt, center) {
       const rng = mulberry(seed || 11); const out = [];
-      for (let i = 0; i < n; i++) out.push(onePath(sys, draw(rng), rng, shock, opt));
+      for (let i = 0; i < n; i++) out.push(onePath(sys, draw(rng, center), rng, shock, opt));
       return out;
     }
     const med = (a) => { const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
