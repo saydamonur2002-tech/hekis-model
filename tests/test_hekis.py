@@ -424,10 +424,14 @@ class ShockExtraTests(unittest.TestCase):
 class SocialTests(unittest.TestCase):
     def test_social_and_cost(self):
         from hekis import social
-        s = social.social()
+        from hekis.systems import ISTANBUL
+        z = ISTANBUL.runner({**ISTANBUL.base}, ISTANBUL.full)
+        s = social.social(z, ISTANBUL)
         self.assertLess(s["gini"][1], s["gini"][0])
         self.assertLess(s["gini"][0] - s["gini"][1], 0.01)
-        c = social.cost_of_living()
+        c = social.cost_of_living(z["N"], z["freed_buf"] + z["freed_lux"], ISTANBUL)
+        self.assertLess(c["cpi_nat"][0.6][0], c["cpi"][0.6][0] * -1 + 1e-9)
+        self.assertGreater(c["cpi_nat"][0.6][0], c["cpi"][0.6][0])
         self.assertLess(c["rent"][0.6][0], 0)
         self.assertLess(c["rent"][0.3][0], c["rent"][1.0][0])
 
