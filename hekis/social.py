@@ -8,7 +8,7 @@ cikar; serbest kalan lux/tampon birimlerin yalniz bir kismi (RENTED) kiraya gide
 
 from __future__ import annotations
 
-from hekis import final, politics
+from hekis import final, horizon, politics
 from hekis.bind import load_obs
 from hekis.reality import gini_with_benefit
 from hekis.zones import run_three_zone
@@ -53,6 +53,30 @@ def cost_of_living(z: dict | None = None, N: float | None = None, freed: float |
     return out
 
 
+def by_year(paths: list[list[dict]] | None = None, shock: dict | None = None) -> list[dict]:
+    """Yil bazli etki. paths None: kusursuz olcum yolu; verilirse yil basina medyan (yerlesen, sub, bedel, serbest kalan)."""
+    if paths is None:
+        paths = [horizon.one_path({}, None, shock)]
+    out = []
+    for t in range(horizon.YEARS):
+        med = lambda k: sorted(p[t][k] for p in paths)[len(paths) // 2]
+        N, sub, rev, freed = med("N"), med("sub"), med("rev"), med("freed")
+        B = sub / max(N, 1)
+        g0, g1, p0, p1 = gini_with_benefit(N, B)
+        cum = sorted(sum(r['rev'] - r['sub'] for r in p[: t + 1]) for p in paths)[len(paths) // 2]
+        c = cost_of_living(N=N, freed=freed, z={"N": N, "freed_buf": 0, "freed_lux": 0, "V": (0, 0, 0), "rev": rev, "sub1": sub})
+        out.append({"yil": t + 1, "olcek": med("stok"), "N": N, "kapsam": N / (TENANTS * 0.41), "sub": sub, "rev": rev, "cum": cum,
+                    "dgini": g1 - g0, "dpov": (p1 - p0) * 100, "rent": c["rent"][0.6][0] * 100, "cpi": c["cpi"][0.6][0], "cpi_all": c["cpi"][0.6][1]})
+    return out
+
+
+def print_by_year(rows: list[dict], title: str) -> None:
+    print(title)
+    print(f"{'yil':>4}{'olcek':>9}{'yerlesen':>10}{'kapsam':>8}{'sub mr':>8}{'bedel mr':>9}{'kum net':>8}{'dGini':>9}{'dYoks.':>8}{'kira%':>7}{'TUFE':>7}{'TUFE(+arz)':>11}")
+    for r in rows:
+        print(f"{r['yil']:>4}{r['olcek']:>9,.0f}{r['N']:>10,.0f}{r['kapsam']:>8.2%}{r['sub'] / 1e9:>8.2f}{r['rev'] / 1e9:>9.2f}{r['cum'] / 1e9:>8.2f}{r['dgini']:>9.5f}{r['dpov']:>8.3f}{r['rent']:>7.2f}{r['cpi']:>7.3f}{r['cpi_all']:>11.3f}".replace(",", "."))
+
+
 def main() -> int:
     z = run_three_zone()
     s = social(z)
@@ -77,6 +101,12 @@ def main() -> int:
     print(f"  5. yil (12 bin hane, 5 yillik yol): talep etkisi {-11_500 / TENANTS / 0.6:.1%} (esneklik 0,6), TUFE {W_KIRA * -11_500 / TENANTS / 0.6 * 100:.2f} puan")
     print(f"  Maliyeti kim oder: havuz sinifi bos birim sahibi yilda ~{tl(c['fee_pool'])} TL, luks bos birim sahibi ~{tl(c['fee_lux'])} TL (etkin tahsilatla beklenen)")
     print(f"  Hane basina ortalama (Istanbul, {politics.HOUSEHOLDS / 1e6:.1f} mn hane): bedel {tl(c['per_hh_cost'])} TL/yil (yalniz bos birim sahibi oder, dagilim esit degil), sub. {tl(c['per_hh_benefit'])} TL/yil; net kamu fazlasi {c['fiscal_net'] / 1e9:.1f} mr TL (vergi/para basimi yok)")
+    print()
+    print_by_year(by_year(), "YIL BAZLI ETKI (kusursuz olcum, erozyon %25, buyume x2,5; kira esnekligi 0,6; TUFE puan = kira agirligi %6,76)")
+    print()
+    mc = horizon.monte_carlo(200)
+    print_by_year(by_year(mc), "YIL BAZLI ETKI (belirsiz degerler + olcum hatasi, 200 cekim medyan)")
+    print("(TUFE puani tek seferlik duzey etkisi, yillik enflasyona eklenmez; birikimli degil.) dGini/dYoks. puan; TUFE(+arz) ust sinir.")
     return 0
 
 

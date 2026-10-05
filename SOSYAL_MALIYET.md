@@ -16,3 +16,15 @@ Maliyeti boş birim sahibi öder: havuz sınıfı birim yılda ~7,2 bin TL, lük
 
 ## Kapı revizyonu (horizon)
 Kapı artık kiracı tahsilatını (≥%80) ve ölçülen hane gelirini (≥%85) de ölçer; bedel/sub oranı bu ölçümlerle yeniden hesaplanır. Sonuç: gelir şokları büyümeyi durdurur. Gelir erimesi (hane −%20, kiracı tahsilat ×0,8): önce 148 bin ölçek, 20 yıl yük 32,4 mr; şimdi 23,7 bin ölçekte durur, 20 yıl yük 6,0 mr. Hane geliri −%30: 20 yıl yük 31,9 → 5,7 mr. Şoksuz taban 11,6 bin hane (önce 11,7): gelir ölçümündeki rastlantısal gürültü bazen yanlış durdurur, bedeli küçük. Ağır kriz: %11 zarar, 20 yıl yük 1,3 mr.
+
+## Yıl bazlı etki (`python -m hekis.social`, en olası senaryo, erozyon %25, büyüme ×2,5, kira esnekliği 0,6)
+Kusursuz ölçüm yolu:
+| yıl | ölçek | yerleşen | kapsam | sub mr | bedel mr | kümülatif net mr | ΔGini | Δyoksulluk (puan) | kira % | TÜFE puanı |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 3.800 | 312 | %0,06 | 0,03 | 0,08 | 0,05 | −0,00001 | −0,001 | −0,04 | −0,003 |
+| 2 | 9.500 | 780 | %0,14 | 0,08 | 0,19 | 0,15 | −0,00001 | −0,003 | −0,09 | −0,006 |
+| 3 | 23.750 | 1.951 | %0,35 | 0,21 | 0,45 | 0,39 | −0,00003 | −0,008 | −0,24 | −0,016 |
+| 4 | 59.375 | 4.877 | %0,86 | 0,52 | 1,06 | 0,93 | −0,00009 | −0,021 | −0,59 | −0,040 |
+| 5 | 148.438 | 12.193 | %2,16 | 1,29 | 2,50 | 2,14 | −0,00022 | −0,053 | −1,48 | −0,100 |
+Belirsiz değerler + ölçüm hatası (200 çekim medyanı) neredeyse aynı: 5. yıl 11,8 bin hane, kümülatif net +2,0 mr TL, TÜFE −0,10 (serbest kalan birim arzı dahil üst sınır −0,24).
+Okuma: 5 yılda etki yok denecek kadar küçük: Gini −0,0002, yoksulluk −0,05 puan, kira −%1,5, TÜFE −0,1 puan. Sistem ilk 5 yılda kendini finanse eder (kümülatif +2 mr TL) ama toplumsal etkisi 5. yıldan sonra tam ölçeğe (37 bin hane) ulaşıldığında belirginleşir (Gini −0,0007, TÜFE −0,18 ile −0,6 puan). TÜFE puanı tek seferlik düzey etkisidir, yıllık enflasyona eklenmez.

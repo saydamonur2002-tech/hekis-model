@@ -92,7 +92,7 @@ def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, eros
         z = run_three_zone(P={**LIKELY, **Pt, "stok": size})
         n_lux = z["S"][2] * (1 - final.lux_response(0.05))
         n_gen = z["S"][0] * (1 - z["p"]) + z["S"][1] * (1 - final.lux_response(0.01))
-        rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"], "yuk": z["yuk"]})
+        rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"], "yuk": z["yuk"], "freed": z["freed_buf"] + z["freed_lux"]})
         c_true = Pt.get("alpha", E.BASE["alpha"]) / E.BASE["alpha"]   # kiraci tahsilat vekili (alpha_mult)
         inc_true = Pt.get("inc_scale", E.BASE["inc_scale"]) / E.BASE["inc_scale"]
         n_hh = max(z["N"], 1.0)
