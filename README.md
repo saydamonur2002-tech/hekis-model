@@ -61,3 +61,13 @@ python -m hekis.gerceklik   # 8 test, gecmeyeni gizlemez
 
 `gerceklik`: 6/8 gecti. Kalan iki test ornek disi: kur-TUFE iliskisi 2023-25'i 7-44 puan yanlis tahmin ediyor (RMSE 28, naif 19). Eksik degisken para politikasi gorunuyor. Reel faiz eklenince 2024-25 duzelir ama 2022-23 kotulesir, genel hata 33,5. Bu yuzden modele eklenmedi. Doviz kanali sonuclari bu nedenle ust sinir okunmali.
 
+## Doviz dorduncu etki, ic olusan (borc_doviz)
+
+```bash
+python -m hekis.borc_doviz
+```
+
+Doviz dissal kisit degil, A (konut/varlik enflasyonu), B (mahsup), C (ic borclanma) sonucu kademeli birikmis doviz borcudur. Reel kesim net doviz acigi 2023-25: 70 -> 148 -> 189 mlr $ (GSYH'nin %6,2 -> %10,7 -> %11,6'si, Drive V21). 2024'te artis (78) cari acigin (13) 6 kati. Faiz-kur farki (carry) yuksekken en hizli artmis.
+
+Sonuc: doviz borcu uzerinden etki 5. yilda 0,5 puan (0,1-1,5). Onceki dissal D (yil 5 ~10 puan) bu yapida kappa ~12 gerektirir, makul degil, bu yuzden `acmaz.py` icindeki D dissal okuma olarak ust sinirdir ve reddedilir. kappa veriden tanimlanamaz (3 stok gozlemi). Gerceklik testleri 4/7.
+
