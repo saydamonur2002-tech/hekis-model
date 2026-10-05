@@ -25,7 +25,7 @@ EROSION = 0.25
 YEARS = 5
 SHOCK_YEAR = 3
 SAFETY = 1.25
-P_RANGE = (0.15, 0.38)
+P_RANGE = (0.15, 1.0)   # ust sinir yok: butce sinirini bedel/sub >= 1,25 kapisi zaten uygular
 TENANT_MIN = 0.80   # kiraci odeme tahsilati, operasyonel esik (karar); finansal taban %38
 INCOME_MIN = 0.85   # olculen hane geliri / varsayilan, alt sinir (karar)
 UNCERTAIN = ("g_e", "cap", "coll", "lux_coll")

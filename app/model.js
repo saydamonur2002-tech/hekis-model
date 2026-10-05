@@ -3,7 +3,7 @@
 (function (root) {
   const LIKELY = { g_e: -0.037, cap: 0.25, coll: 0.30, lux_coll: 0.40 };
   const SPACE = { g_e: [-0.15, 0.15], cap: [0.10, 0.60], coll: [0.15, 0.90], lux_coll: [0.30, 0.90] };
-  const START = 3800, YEARS_DEFAULT = 10, SHOCK_YEAR = 3, SAFETY = 1.25, P_RANGE = [0.15, 0.38], TENANT_MIN = 0.80, INCOME_MIN = 0.85;
+  const START = 3800, YEARS_DEFAULT = 10, SHOCK_YEAR = 3, SAFETY = 1.25, P_RANGE = [0.15, 1.0], TENANT_MIN = 0.80, INCOME_MIN = 0.85;
   const SHOCKS = {
     'yok': {},
     'Fiyat rallisi (beklenen reel artis +10 puan)': { g_e_add: 0.10 },

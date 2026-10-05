@@ -61,6 +61,11 @@ svg text { fill: var(--muted); font-family: var(--f-num); font-size: 11px; }
 .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
 .legend i { display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: -1px; border-radius: 2px; }
 .warnbox { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--fg); border-radius: 6px; padding: 10px 12px; font-size: 13.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { font: inherit; font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 99px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.scdesc { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; min-height: 2.8em; }
+tr.cur td { background: var(--accent-soft); }
 ul.lim { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; } ul.lim li { margin-bottom: 4px; }
 </style>
 
@@ -76,6 +81,9 @@ ul.lim { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; } ul.lim li { m
 
 <div class="layout">
 <aside aria-label="Parametreler">
+  <h2>Senaryo</h2>
+  <div class="chips" id="chips" role="group" aria-label="Senaryo seçimi"></div>
+  <p class="scdesc" id="scdesc"></p>
   <h2>Parametreler</h2>
   <div class="grp-title">Politika</div>
   <div class="ctl"><label for="fee">Genel bedel <output id="o-fee"></output></label><input type="range" id="fee" min="0" max="3" step="0.1"><small>Boş konutun beyan değerine yıllık oran (HEKİS bandı ve tampon).</small></div>
@@ -100,12 +108,18 @@ ul.lim { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; } ul.lim li { m
     <p class="note" id="ozet-note"></p>
   </section>
 
+  <section aria-labelledby="h-kar">
+    <h2 id="h-kar">Senaryo karşılaştırması</h2>
+    <div class="tw"><table id="kar"></table></div>
+    <p class="note">Her satır, seçili sistemin kendi tarifesiyle ve ilgili varsayımlarla hesaplanır (100 rastgele çekim). Satıra tıklayınca parametreler o senaryoya ayarlanır. "Tam ölçek" sütunları şoksuzdur; şok senaryolarında yol 3. yıldan sonra bozulur. Katılım alt sınırı (%15) benim kararımdır: reel faiz sıfıra yaklaşınca katılım bu sınırın altına iner ve kapı hiç geçilmez.</p>
+  </section>
+
   <section aria-labelledby="h-yol">
     <h2 id="h-yol">10 yıllık kademeli yol</h2>
     <div id="chart"></div>
     <div class="legend"><span><i style="background:var(--accent)"></i>yerleşen hane (bin)</span><span><i style="background:var(--warn)"></i>kümülatif net (milyar TL)</span></div>
     <div class="tw"><table id="path"></table></div>
-    <p class="note">Her yıl sonunda kapı: katılım %15-38, kiracı tahsilatı ≥%80, ölçülen gelir ≥%85, bedel/sübvansiyon ≥1,25. Geçilmezse kapsam büyümez (sarı satır).</p>
+    <p class="note">Her yıl sonunda kapı: katılım ≥%15, kiracı tahsilatı ≥%80, ölçülen gelir ≥%85, bedel/sübvansiyon ≥1,25. Geçilmezse kapsam büyümez (sarı satır).</p>
   </section>
 
   <section aria-labelledby="h-mc">
@@ -143,7 +157,7 @@ const K = {"inc":[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.35,1.5],"alpha":[0.4,0.6,0.7
 (function (root) {
   const LIKELY = { g_e: -0.037, cap: 0.25, coll: 0.30, lux_coll: 0.40 };
   const SPACE = { g_e: [-0.15, 0.15], cap: [0.10, 0.60], coll: [0.15, 0.90], lux_coll: [0.30, 0.90] };
-  const START = 3800, YEARS_DEFAULT = 10, SHOCK_YEAR = 3, SAFETY = 1.25, P_RANGE = [0.15, 0.38], TENANT_MIN = 0.80, INCOME_MIN = 0.85;
+  const START = 3800, YEARS_DEFAULT = 10, SHOCK_YEAR = 3, SAFETY = 1.25, P_RANGE = [0.15, 1.0], TENANT_MIN = 0.80, INCOME_MIN = 0.85;
   const SHOCKS = {
     'yok': {},
     'Fiyat rallisi (beklenen reel artis +10 puan)': { g_e_add: 0.10 },
@@ -306,13 +320,31 @@ const $ = (id) => document.getElementById(id);
 const nf = (v, d = 0) => v.toLocaleString('tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const pc = (v, d = 1) => '%' + nf(v * 100, d);
 const bn = (v, d = 2) => nf(v / 1e9, d);
+const SCEN = [
+  { id: 'baz', ad: 'En olası', not: 'Bugünkü veri: katılım tavanı %25, tahsilat genel %30 / lüks %40, reel konut fiyatı düşüyor (−%3,7).', o: {} },
+  { id: 'iyi', ad: 'İyimser', not: 'Güçlü yaptırım ve iyi tahsilat: katılım tavanı %55, tahsilat %60 / %60, erozyon %10.', o: { cap: 55, coll: 60, lcoll: 60, eros: 10 } },
+  { id: 'kotu', ad: 'Kötümser', not: 'Gönüllü ve zayıf: katılım tavanı %8, tahsilat %15 / %30, erozyon %40. Katılım kapının %15 alt sınırının altında kalır.', o: { cap: 8, coll: 15, lcoll: 30, eros: 40 } },
+  { id: 'rf0', ad: 'Reel faiz sıfıra iner', not: 'Faiz kanalı: reel faiz 0 iken beklenen reel konut artışı +%0,5 (2019-2025 regresyonu, n=7). Katılım düşer.', o: { ge: 0.5 } },
+  { id: 'rf5', ad: 'Reel faiz −%5', not: 'Reel faiz −%5 iken beklenen artış ≈ +%7,2. Konut yeniden değer saklama aracı olur, katılım çöker.', o: { ge: 7.2 } },
+  { id: 'irl', ad: 'Tahsilat İrlanda gibi', not: 'Lüks tahsilat %10, genel %15: İrlanda\'da işaretlenenin yalnız ~%6\'sı bedele tabi kaldı.', o: { coll: 15, lcoll: 10 } },
+  { id: 'huk', ad: 'Hukuki iptal (3. yıl)', not: 'Bedel 3. yılda tamamen iptal edilir. Yeni yerleştirme durur, yerleşmiş haneler korunur.', o: { shock: 'Bedel iptali (hukuki, tum bedel)' } },
+  { id: 'agir', ad: 'Ağır kriz', not: 'Fiyat rallisi + lüks bedelin iptali + gelir erimesi 3. yıldan itibaren.', o: { shock: 'Agir kriz (ralli + luks iptali + gelir erimesi)' } },
+];
+let scId = 'baz';
 let sysKey = 'istanbul';
 try { const h = location.hash.replace('#', ''); if (h === 'anadolu') sysKey = 'anadolu'; } catch (e) {}
 const DEF = (s) => ({ fee: s.tarife[0] * 100, lux: s.tarife[1] * 100, growth: 2.5, cap: 25, ge: -3.7, coll: 30, lcoll: 40, eros: 25, elas: 0.6, shock: 'yok', year: 10 });
 let S = DEF(K.sistem[sysKey]);
+const scenState = (id) => ({ ...DEF(K.sistem[sysKey]), ...SCEN.find(s => s.id === id).o });
 
 SH.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = SHLABEL[k] || k; $('shock').appendChild(o); });
 
+function buildChips() {
+  $('chips').innerHTML = SCEN.map(s => `<button class="chip" data-id="${s.id}" aria-pressed="${s.id === scId}">${s.ad}</button>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => pickScenario(b.dataset.id)));
+  $('scdesc').textContent = (SCEN.find(s => s.id === scId) || {}).not || 'Özel ayar (kaydırıcılar elle değiştirildi).';
+}
+function pickScenario(id) { scId = id; S = scenState(id); sync(); schedule(); }
 function bindControls() {
   const map = { fee: ['fee', v => pc(v / 100, 1)], lux: ['lux', v => pc(v / 100, 1)], growth: ['growth', v => '×' + nf(v, 1)], cap: ['cap', v => pc(v / 100, 0)], ge: ['ge', v => (v >= 0 ? '+' : '−') + nf(Math.abs(v), 1) + '%'], coll: ['coll', v => pc(v / 100, 0)], lcoll: ['lcoll', v => pc(v / 100, 0)], eros: ['eros', v => pc(v / 100, 0)], elas: ['elas', v => nf(v, 1)], year: ['year', v => v + '. yıl'] };
   for (const id in map) { const el = $(id); el.value = S[id]; $('o-' + id).textContent = map[id][1](+S[id]); }
@@ -320,11 +352,11 @@ function bindControls() {
   return map;
 }
 const MAP = bindControls();
-function sync() { for (const id in MAP) { $(id).value = S[id]; $('o-' + id).textContent = MAP[id][1](+S[id]); } $('shock').value = S.shock; $('tab-istanbul').setAttribute('aria-pressed', sysKey === 'istanbul'); $('tab-anadolu').setAttribute('aria-pressed', sysKey === 'anadolu'); }
-for (const id in MAP) $(id).addEventListener('input', e => { S[id] = +e.target.value; $('o-' + id).textContent = MAP[id][1](S[id]); schedule(); });
-$('shock').addEventListener('change', e => { S.shock = e.target.value; schedule(); });
-$('reset').addEventListener('click', () => { S = DEF(K.sistem[sysKey]); sync(); schedule(); });
-function setSys(k) { sysKey = k; S = DEF(K.sistem[k]); sync(); schedule(); try { history.replaceState(null, '', '#' + k); } catch (e) {} }
+function sync() { buildChips(); for (const id in MAP) { $(id).value = S[id]; $('o-' + id).textContent = MAP[id][1](+S[id]); } $('shock').value = S.shock; $('tab-istanbul').setAttribute('aria-pressed', sysKey === 'istanbul'); $('tab-anadolu').setAttribute('aria-pressed', sysKey === 'anadolu'); }
+for (const id in MAP) $(id).addEventListener('input', e => { S[id] = +e.target.value; $('o-' + id).textContent = MAP[id][1](S[id]); if (id !== 'year') { scId = ''; buildChips(); } schedule(); });
+$('shock').addEventListener('change', e => { S.shock = e.target.value; scId = ''; buildChips(); schedule(); });
+$('reset').addEventListener('click', () => pickScenario('baz'));
+function setSys(k) { sysKey = k; scId = 'baz'; S = scenState('baz'); sync(); schedule(); try { history.replaceState(null, '', '#' + k); } catch (e) {} }
 $('tab-istanbul').addEventListener('click', () => setSys('istanbul'));
 $('tab-anadolu').addEventListener('click', () => setSys('anadolu'));
 
@@ -366,7 +398,31 @@ function render() {
     card('Zarar eden çekim', pc(sm.deficit, 0), '10 yıl net < 0');
   $('mc-note').textContent = 'Sonuç iki kutuplu: ya kapı hiç geçilmez (katılım %15 altında kalır) ya da sistem 7. yıl civarında tam ölçeğe ulaşır. Medyan bu iki küme arasında kararsız; olasılıklara bakın.';
 
+  compare(sys);
   social(sys, rows, full);
+}
+
+function scenMetrics(sys, s) {
+  const st = { g_e: s.ge / 100, cap: s.cap / 100, coll: s.coll / 100, lux_coll: s.lcoll / 100, fee: s.fee / 100, lux_fee: s.lux / 100, inc: 1, alpha: 1, cost: 1 };
+  const full = M.runSystem(sys, st, sys.full);
+  const shock = HEKIS.SHOCKS[s.shock]; const sk = Object.keys(shock).length ? shock : null;
+  const opt = { erosion: s.eros / 100, growth: s.growth, years: 10, tariff: [st.fee, st.lux_fee] };
+  const P0 = { g_e: st.g_e, cap: st.cap, coll: st.coll, lux_coll: st.lux_coll };
+  const line = M.onePath(sys, P0, null, sk, opt);
+  const sm = M.summarize(M.monteCarlo(sys, 100, 11, sk, opt, P0), sys);
+  return { full, N10: line[9].N, sm };
+}
+let cmpCache = {};
+function compare(sys) {
+  let h = '<tr><th>Senaryo</th><th>Tam ölçek: hane</th><th>Oran</th><th>10. yılda hane (kusursuz yol)</th><th>Tam ölçeğe ulaşma</th><th>Pilotta takılma</th><th>10 yıl net, medyan (mr TL)</th></tr>';
+  SCEN.forEach(sc => {
+    const s = scenState(sc.id);
+    const key = sysKey + sc.id; const m = cmpCache[key] || (cmpCache[key] = scenMetrics(sys, s));
+    const [bc] = badge(m.full.ratio);
+    h += `<tr class="${sc.id === scId ? 'cur' : ''}" data-id="${sc.id}" style="cursor:pointer"><td>${sc.ad}</td><td>${nf(m.full.N)}</td><td>${nf(m.full.ratio, 2)} <span class="pill ${bc}">${bc === 'ok' ? 'yeterli' : bc === 'warn' ? 'sınırda' : 'açık'}</span></td><td>${nf(m.N10)}</td><td>${pc(m.sm.full, 0)}</td><td>${pc(m.sm.stuck, 0)}</td><td>${bn(m.sm.net, 1)}</td></tr>`;
+  });
+  $('kar').innerHTML = h;
+  $('kar').querySelectorAll('tr[data-id]').forEach(r => r.addEventListener('click', () => pickScenario(r.dataset.id)));
 }
 
 function social(sys, rows, full) {
