@@ -89,3 +89,17 @@ Kanal sinirlari: carry modeli 2015-18'de borcun arttigi hafizayi (kuresel likidi
 
 s.18: reel sektorun net doviz pozisyonu acigi Subat 2015'te 177,8 mlr $, 2014 ortasindan beri belirgin bozulma yok, kisa vadeli acik 10 mlr $. s.25 (ayri tanim, finansal hesaplar): 2009 63 -> 2014 150 mlr $, kapsam farkli, kullanilmadi. birikim.py N0'i 177,8 +-12'ye bagladi. Sonuc: c_dn 0,6-0,7 (prior siniria dayanmadi), 2014 NOP/GSYH ~%18-19, 2025'te %11,9. Yani dolar bazinda 2025 (189) 2014 (178) ile yakin. 2023'teki 70 cukuru gecici, 2024-25 yeniden insa. 'Kademeli artis' 2014'ten bakinca net birikim degil, derin bir cozulmeden sonra geri donustur.
 
+### TCMB resmi serisi (FKDFDVY, Temmuz 2026) ile yeniden kalibrasyon
+
+Veri: `data/fkdfdvy_2026_07.json`, `data/FKDFDVY.md`. Kod: `hekis/nop_veri.py`. `birikim.py` artik ABC yerine gercek seriyi kullanir.
+
+Bulgular:
+- NOP 2014 174 -> 2017 200 (yillik tepe) -> 2023 71 -> 2025 190 -> 2026-07 211 mlr $. Dolar bazinda seri tepesi asildi. GSYH'ye oran %11,8 (2017 %23, 2014 ~%19), yani oran olarak yarisi.
+- Carry katsayisi 11 yillik resmi seride 0,75 (se 0,34), R2 0,35. 2023'e kadar fit c = -0,04: carry 2024 oncesini aciklamaz. 2024-25 rejimi 2,6 ve 2,1. Iki rejim `borc_doviz.REJIM` ile ("tam" / "son2yil").
+- Eski iki noktadan c=2,4 kestirimi 3 kat fazlaydi. 2015-17'de borc carry negatifken arttigi dogrulandi (kuresel likidite).
+- 2024 bozulmasi (+75,6): yukumluluk +49, varlik -26,7. Yurt ici banka doviz kredisi +39,8, yurt disi +1,6. 2025: yukumluluk +68,4, varlik +24,2; yurt ici +27,3, yurt disi +25,3.
+- Kisa vadeli net pozisyon (likidite tamponu) 70 (2022) -> 4,4 mlr $ (2026-07). Modelde yok.
+- Model baz 2026-07 icin 203 (190-212) verdi, gercek 210,8. 2026 kalibrasyona girmedi.
+- Ileri enflasyon iki rejimde de ~%28,8 (2030). Tarihsel karsi-olgusal: 2025'te 4,8 puan dusuk, kacinilan NOP 85 mlr $.
+- Testler 2/5: carry anlamli ama 2015-17 isareti ve ornek disi 2024-25 tahmini tutmuyor, likidite tamponu modelde yok.
+

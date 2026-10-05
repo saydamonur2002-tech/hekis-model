@@ -21,7 +21,8 @@ from hekis.enflasyon import BUTCE_FAIZI, GSYH, TICARI_STOK, TUFE_YILLIK, cek, yu
 from hekis.acmaz import degerler, yol
 
 # ---- GOZLEM (Drive Secici_Kredi_Veri_MOBIL.pdf) ---------------------------------
-NOP = {2023: 70.0, 2024: 148.0, 2025: 188.551}   # reel kesim net doviz acik pozisyonu, mlr $ (V21)
+from hekis.nop_veri import NOP, boot_havuzu   # TCMB resmi seri (FKDFDVY), tum yillar, mlr $, pozitif = acik
+REJIM = "tam"   # "tam": 2015-25 bootstrap; "son2yil": 2024-25 rejimi (c ~ 1,9-2,7)
 GSYH_TL = {2023: 27091.5, 2024: 44676.0, 2025: 63240.5}  # V15
 CARI_TL = {2023: 982.2, 2024: 426.7, 2025: 1192.2}       # V16 (pozitif acik)
 FAIZ = {2023: 18.6, 2024: 48.7, 2025: 43.2}              # V22 politika faizi yil ort.
@@ -35,8 +36,13 @@ RAMPA = {"yavas": [0.25, 0.5, 0.75, 1.0, 1.0], "hizli": [0.5, 1, 1, 1, 1], "yari
 
 def cek_fx(rng):
     p = cek(rng)
+    if REJIM == "tam":
+        a_, c_ = rng.choice(boot_havuzu())     # DNOP = a + c*carry, resmi seri 2015-25, bootstrap
+    else:
+        a_, c_ = rng.uniform(-5, 5), rng.uniform(1.9, 2.7)   # 2024-25: dNOP/carry 2,70 ve 1,89
     q = {
-        "c": rng.uniform(1.5, 3.0),          # mlr $ / puan carry. Veri: 2024 2,70, 2025 1,89 (iki nokta)
+        "a": a_,                             # carry'den bagimsiz yillik doviz borc artisi, mlr $
+        "c": c_,                             # mlr $ / puan carry
         "faiz26": rng.uniform(30, 42),       # 2026 politika faizi, V22 2026 bos: VARSAYIM
         "decay": rng.uniform(0.60, 0.95),    # carry ve borc akisinin yillik sonmesi
         "gusd": rng.uniform(0.05, 0.09),     # GSYH dolar buyumesi
@@ -61,8 +67,7 @@ def cek_fx(rng):
 def baz_akis(p, q):
     """Cozum yokken yillik net doviz borc akisi (mlr $), 5 yil. 2026 carry'den."""
     carry = max(0.0, q["faiz26"] - p["d_yil"] * 100)
-    f = q["c"] * carry
-    return [f * q["decay"] ** t for t in range(5)]
+    return [max(0.0, q["a"] + q["c"] * carry * q["decay"] ** t) for t in range(5)]
 
 
 def fx_etki(p, q, pay, rampa, kappa=None):
@@ -189,7 +194,7 @@ def simule(p, q, pay, rampa, dongu=True, kappa=None, taylor=None):
     for t in range(5):
         g = rampa[t]
         carry0 = carry26 * q["decay"] ** t
-        f0 = q["c"] * carry0
+        f0 = max(0.0, q["a"] + q["c"] * carry0)
         di = taylor * e_onceki if dongu else 0.0                      # faiz indirimi, puan
         carry = max(0.0, carry0 - di + dd_onceki) if dongu else carry0
         dcarry = carry0 - carry                                       # + ise carry daraldi
@@ -261,16 +266,18 @@ def testler():
         ca = CARI_TL[t] / KUR_ORT[t]
         out.append(("R1 {}: dNOP {:.1f} mlr$ / cari acik {:.1f} mlr$ = {:.1f}x".format(t, dn, ca, dn / ca),
                     dn / ca > 1.0, "carry/arbitraj aciklamasi cari acik aciklamasindan guclu"))
-    # R2: carry ile dNOP sirasi. Iki nokta, test degil.
-    c24 = (NOP[2024] - NOP[2023]) / (FAIZ[2024] - DEP[2024])
-    c25 = (NOP[2025] - NOP[2024]) / (FAIZ[2025] - DEP[2025])
-    out.append(("R2 carry katsayisi: 2024 {:.2f}, 2025 {:.2f} mlr$/puan (fark %{:.0f})".format(c24, c25, 100 * (c24 - c25) / c24),
-                abs(c24 - c25) / c24 < 0.5, "iki nokta, tanimlayici ama test degil"))
-    # R3: 2024 katsayisiyla 2025'i tahmin et
-    tah = c24 * (FAIZ[2025] - DEP[2025])
-    err = tah - (NOP[2025] - NOP[2024])
-    out.append(("R3 ornek disi: 2024 katsayisiyla 2025 dNOP tahmini {:.1f}, gercek {:.1f}, hata {:+.1f}".format(tah, NOP[2025] - NOP[2024], err),
-                abs(err) / (NOP[2025] - NOP[2024]) < 0.25, "hata %{:.0f}".format(100 * abs(err) / (NOP[2025] - NOP[2024]))))
+    # R2: carry katsayisi resmi seride (11 yil) sifirdan ayrisiyor mu
+    from hekis.nop_veri import boot_havuzu as _bh, fit as _fit, CARRY as _CARRY, DNOP as _DNOP
+    cs = sorted(x[1] for x in _bh())
+    c10, c90 = cs[int(.1 * len(cs))], cs[int(.9 * len(cs))]
+    out.append(("R2 carry katsayisi resmi seri 2015-25: bootstrap p10-p90 {:.2f}-{:.2f} mlr$/puan (kestirim 0,75)".format(c10, c90),
+                c10 > 0, "iki ucu sifirin ustundeyse carry anlamli"))
+    # R3: ornek disi: 2023'e kadar fit, 2024-25 tahmin
+    b23, _, _, _ = _fit(list(range(2015, 2024)))
+    h = [(b23[0] + b23[1] * _CARRY[t]) - _DNOP[t] for t in (2024, 2025)]
+    out.append(("R3 ornek disi: 2023'e kadar fit (a={:.1f}, c={:.2f}) ile 2024-25 dNOP tahmini {:+.1f}/{:+.1f}, gercek {:+.1f}/{:+.1f}".format(
+        b23[0], b23[1], _DNOP[2024] + h[0], _DNOP[2025] + h[1], _DNOP[2024], _DNOP[2025]),
+        max(abs(x) for x in h) < 25, "carry 2023'e kadar acikladiginin yanindan gecmiyor: rejim degisimi"))
     # R4: baz yorungeyi makul mu
     s = kos()
     r = RAMPA["yavas"]

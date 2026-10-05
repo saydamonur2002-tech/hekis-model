@@ -1,192 +1,148 @@
-"""Doviz borcu birikimi 2014'ten: geriye kurma, kalibrasyon, tarihsel karsi-olgusal, ileri.
+"""Doviz borcu birikimi 2014'ten, TCMB resmi serisiyle.
 
     python -m hekis.birikim
 
-Net doviz acigi (NOP) 2014-2022 icin Drive'da bos. Baslangic stoku N0 TCMB Mayis 2015 raporuna baglidir (177,8 mlr $):
-  NOP_t = NOP_{t-1} + c_up * max(carry_t, 0) - c_dn * max(-carry_t, 0),   carry = politika faizi - kur artisi
-N0 TCMB'ye (177,8 +-12), (c_up, c_dn) 2023-25 gozlemlerine (70, 148, 188,6 +-12) uydurulur: ABC, kabul-ret.
-Kabul edilen uclu, ayni cekilen diger parametrelerle tarihsel karsi-olgusal ve ileri kosuya girer.
-
-Kur 2014-2022: hafizadan, dogrulanmadi (hekis.kalibre). Faiz ve GSYH: Drive Secici_Kredi_Veri V22, V15.
-2014-18 carry negatif iken borc artti diye hatirlaniyor (kuresel dolar likiditesi). Model bunu
-aciklamaz, bu bilincli bir sinir. Test T-B2 bunu isaretler.
+Gercek net doviz acigi (NOP) 2014-2025 ve 2026-07, TCMB FKDFDVY (hekis/nop_veri.py).
+Onceki surum N0 ve katsayilari ABC ile uyduruyordu. Artik seri gercek: uyduracak bir sey yok,
+model sinanir. Karsi-olgusal: A-C 2014'ten cozulseydi, gercek dNOP'tan kacinilan pay dusulur.
 """
 
 import random
-import statistics
 
 from hekis.kalibre import KUR, TUFE
 from hekis.enflasyon import TUFE_YILLIK, yuzdelik, TOHUM
 from hekis.acmaz import degerler
-from hekis.borc_doviz import (GSYH_USD_2025, NOP, RAMPA, cek_fx, simule, aralik, med)
+from hekis.nop_veri import (CARRY, DEP, DNOP, KV_NET, KV_NET_2026_07, NOP, NOP_2026_07,
+                            S, YIL, boot_havuzu, fit)
+import hekis.borc_doviz as bd
+from hekis.borc_doviz import RAMPA, aralik, cek_fx, med, simule
 
-FAIZ = {2015: 7.6, 2016: 7.6, 2017: 8.0, 2018: 15.6, 2019: 20.6, 2020: 10.2, 2021: 17.8,
-        2022: 12.9, 2023: 18.6, 2024: 48.7, 2025: 43.2}  # Drive V22
 GSYH_TL = {2015: 2354.1, 2016: 2630.0, 2017: 3151.5, 2018: 3806.5, 2019: 4402.1, 2020: 5141.7,
-           2021: 7433.8, 2022: 15325.9, 2023: 27091.5, 2024: 44676.0, 2025: 63240.5}  # Drive V15
+           2021: 7433.8, 2022: 15325.9, 2023: 27091.5, 2024: 44676.0, 2025: 63240.5}   # Drive V15
 YILLAR = list(range(2015, 2026))
-DEP = {t: (KUR[t] / KUR[t - 1] - 1) * 100 for t in YILLAR}
-CARRY = {t: FAIZ[t] - DEP[t] for t in YILLAR}
 GSYH_USD = {t: GSYH_TL[t] / ((KUR[t - 1] + KUR[t]) / 2) for t in YILLAR}
-TOL = 12.0   # NOP gozlemleri yuvarlak aktarim, +-12 mlr $
-# 2014 CIPASI: TCMB Finansal Istikrar Raporu, Mayis 2015, s.18: reel sektor net doviz pozisyonu acigi
-# Subat 2015'te 177,8 mlr $; 2014 ortasindan beri belirgin bozulma yok -> 2014 sonu ~ ayni duzey.
-# (S.25'te ayri tanim, finansal hesaplar: 2009 63 -> 2014 150 mlr $. Kapsam farkli, kullanilmadi.)
-N0_TCMB = 177.8
-N0_ARALIK = (N0_TCMB - TOL, N0_TCMB + TOL)
 
 
-def akis(c_up, c_dn, carry):
-    return c_up * carry if carry > 0 else c_dn * carry   # carry<0 ise borc cozulur
+def i(t):
+    return YIL[t]
 
 
-def hindcast(c_up, c_dn, n0):
-    nop, s = {}, n0
+def veri_blogu():
+    L = ["GERCEK SERI (TCMB FKDFDVY), mlr $, pozitif = net doviz acigi"]
+    L.append("  yil    NOP  NOP/GSYH$   dNOP  carry   KV net   dVarlik dYukuml")
     for t in YILLAR:
-        s += akis(c_up, c_dn, CARRY[t])
-        nop[t] = s
-    return nop
+        dv = S["VARLIK"][i(t)] - S["VARLIK"][i(t - 1)]
+        dy = S["YUKUMLULUK"][i(t)] - S["YUKUMLULUK"][i(t - 1)]
+        L.append("  {}  {:>5.0f}  {:>7.1f}%  {:>+6.1f} {:>+6.1f}  {:>6.1f}  {:>+7.1f} {:>+7.1f}".format(
+            t, NOP[t], NOP[t] / GSYH_USD[t] * 100, DNOP[t], CARRY[t], KV_NET[t], dv, dy))
+    L.append("  2026-07  {:>4.0f}   (Aralik 2025'ten +{:.1f}; KV net {:.1f})".format(NOP_2026_07, NOP_2026_07 - NOP[2025], KV_NET_2026_07))
+    mx = max(NOP.items(), key=lambda x: x[1])
+    L.append("  Yillik tepe: {} {:.1f}. 2026-07 {:.1f}: dolar bazinda seri tepesini asti mi: {}".format(mx[0], mx[1], NOP_2026_07, NOP_2026_07 > mx[1]))
+    return L
 
 
-def kalibre(n=200000, tohum=TOHUM, atla=None):
-    """ABC. atla: bir yili dislayip tahmin etmek icin."""
-    rng = random.Random(tohum)
-    kabul = []
-    for _ in range(n):
-        c_up, c_dn, n0 = rng.uniform(1.5, 3.0), rng.uniform(0.0, 1.5), rng.uniform(*N0_ARALIK)
-        h = hindcast(c_up, c_dn, n0)
-        if all(abs(h[t] - NOP[t]) <= TOL for t in (2023, 2024, 2025) if t != atla):
-            kabul.append((c_up, c_dn, n0, h))
-    return kabul
-
-
-def karsi_olgusal(p, q, c_up, c_dn, n0, rampa_g=1.0):
-    """A-C 2014'ten itibaren tam cozulseydi (g=1): doviz borcu ve enflasyon. Dongu dahil."""
-    toplam_pay = q["sA"] + q["sB"] + q["sC"]
+def karsi_olgusal(p, q, c, rampa_g=1.0):
+    """Gercek dNOP'tan kacinilan pay: pay*max(f,0) + dongu. Enflasyon: dogrudan A-C + doviz borcu yolu."""
+    pay = q["sA"] + q["sB"] + q["sC"]
     v = degerler(p)
     dir_y = (v["A"] + v["B"] + v["C"]) * rampa_g
-    e = e_fx = e_dir = 0.0
+    e_dir = e_fx = 0.0
     kum = 0.0
     e_onc = dd_onc = 0.0
     ya = {}
     for t in YILLAR:
         di = q["taylor"] * e_onc
-        carry_cf = CARRY[t] - di + dd_onc
-        f_act = akis(c_up, c_dn, CARRY[t])
-        f_cf = (1 - toplam_pay * rampa_g) * akis(c_up, c_dn, carry_cf) if carry_cf > 0 else akis(c_up, c_dn, carry_cf)
-        kac = f_act - f_cf
+        loop = c * max(0.0, di - dd_onc)                      # carry daralmasindan ek kacinilan
+        kac = pay * rampa_g * max(DNOP[t], 0.0) + loop
         kum += kac
         oran = kum / GSYH_USD[t] * 100
         dd = q["kappa"] * oran
         a_risk = p["phi1"] * dd
         a_bs = q["rho_bs"] * (oran / 100) * DEP[t] / 100 / p["maliyet_tabani"] * 100
-        a_gecis = -p["phi1"] * q["kappa_f"] * (max(kac, 0) / GSYH_USD[t] * 100) * (1 - q["ca_uyum"])
-        y_fx = a_risk + a_bs + a_gecis
-        e_fx = p["atalet"] * e_fx + y_fx
+        a_gecis = -p["phi1"] * q["kappa_f"] * (kac / GSYH_USD[t] * 100) * (1 - q["ca_uyum"])
+        e_fx = p["atalet"] * e_fx + a_risk + a_bs + a_gecis
         e_dir = p["atalet"] * e_dir + dir_y
-        e = e_fx + e_dir
-        ya[t] = (e, e_fx, kum, oran)
-        e_onc, dd_onc = e, dd
+        ya[t] = (e_dir + e_fx, e_fx, kum)
+        e_onc, dd_onc = e_dir + e_fx, dd
     return ya
 
 
 def rapor() -> str:
-    L = ["BIRIKIM 2014'TEN: net doviz acigi (NOP) geriye kurma ve karsi-olgusal"]
+    L = ["BIRIKIM 2014'TEN, GERCEK TCMB SERISI", ""]
+    L += veri_blogu()
+    b, se, r2, _ = fit()
+    cs = [x[1] for x in boot_havuzu()]
     L.append("")
-    L.append("Girdi (Drive V22/V15, kur 2014-22 hafizadan):")
-    L.append("  yil    kur%   faiz   carry   NOP gozlem")
-    for t in YILLAR:
-        L.append("  {}  {:>6.1f}  {:>5.1f}  {:>+6.1f}   {}".format(t, DEP[t], FAIZ[t], CARRY[t], "%.0f" % NOP[t] if t in NOP else "-"))
-    kab = kalibre()
-    L.append("")
-    L.append("KALIBRASYON (ABC, 200 bin cekim, tolerans +-{:.0f} mlr $): kabul {} ({:.2f}%)".format(TOL, len(kab), len(kab) / 2000))
-    if not kab:
-        return "\n".join(L + ["Hicbir cekim 2023-25 gozlemlerine uymadi, model reddedildi."])
-    cu = [k[0] for k in kab]; cd = [k[1] for k in kab]; n0 = [k[2] for k in kab]
-    L.append("  c_up (mlr $ / carry puan)  medyan {:.2f} [{}]".format(med(cu), aralik(cu)))
-    L.append("  c_dn (borc cozulme)         medyan {:.2f} [{}]".format(med(cd), aralik(cd)))
-    L.append("  N0 (2014 sonu NOP, mlr $)   medyan {:.0f} [{}]".format(med(n0), aralik(n0)))
-    L.append("")
-    L.append("  Ima edilen NOP yolu (medyan, mlr $) ve NOP/GSYH$:")
-    L.append("    yil   " + "".join("{:>7}".format(t) for t in YILLAR))
-    L.append("    NOP   " + "".join("{:>7.0f}".format(med([k[3][t] for k in kab])) for t in YILLAR))
-    L.append("    %GSYH " + "".join("{:>7.1f}".format(med([k[3][t] / GSYH_USD[t] * 100 for k in kab])) for t in YILLAR))
-    L.append("")
+    L.append("CARRY ILISKISI (resmi seri 2015-25): dNOP = a + c*carry: a={:.1f} (se {:.1f}), c={:.2f} (se {:.2f}), R2={:.2f}".format(b[0], se[0], b[1], se[1], r2))
+    L.append("  bootstrap c p10-p90: {:.2f}-{:.2f}; c<0 olasiligi %{:.0f}".format(yuzdelik(cs, .1), yuzdelik(cs, .9), 100 * sum(c < 0 for c in cs) / len(cs)))
+    b23, _, r23, _ = fit(list(range(2015, 2024)))
+    L.append("  2023'e kadar fit: a={:.1f}, c={:.2f}, R2={:.2f}. Yani 2024 oncesi carry hicbir sey acikla(ma)miyor.".format(b23[0], b23[1], r23))
+    L.append("  2024-25 rejimi: dNOP/carry = {:.2f} ve {:.2f}".format(DNOP[2024] / CARRY[2024], DNOP[2025] / CARRY[2025]))
 
-    # karsi-olgusal
+    bd.REJIM = "tam"
     rng = random.Random(TOHUM + 1)
-    sm = kab[:3000]
     sonuc = []
-    for c_up, c_dn, n0_, h in sm:
+    for _ in range(3000):
         p, q = cek_fx(rng)
-        q["c"] = c_up
-        sonuc.append((p, q, karsi_olgusal(p, q, c_up, c_dn, n0_), h))
-    L.append("TARIHSEL KARSI-OLGUSAL: A-C 2014'ten itibaren tam cozulseydi (dongu dahil, medyan)")
+        sonuc.append((p, q, karsi_olgusal(p, q, q["c"])))
+    L.append("")
+    L.append("TARIHSEL KARSI-OLGUSAL: A-C 2014'ten cozulseydi (dongu dahil, medyan)")
     L.append("    yil          " + "".join("{:>7}".format(t) for t in YILLAR[4:]))
     L.append("    gercek TUFE  " + "".join("{:>7.1f}".format(TUFE[t]) for t in YILLAR[4:]))
     L.append("    karsi-olg.   " + "".join("{:>7.1f}".format(med([TUFE[t] - x[2][t][0] for x in sonuc])) for t in YILLAR[4:]))
-    L.append("    NOP/GSYH% gercek " + "".join("{:>7.1f}".format(med([x[3][t] / GSYH_USD[t] * 100 for x in sonuc])) for t in YILLAR[4:]))
-    L.append("    NOP/GSYH% karsi  " + "".join("{:>7.1f}".format(med([(x[3][t] - x[2][t][2]) / GSYH_USD[t] * 100 for x in sonuc])) for t in YILLAR[4:]))
+    L.append("    NOP gercek   " + "".join("{:>7.0f}".format(NOP[t]) for t in YILLAR[4:]))
+    L.append("    NOP karsi    " + "".join("{:>7.0f}".format(med([NOP[t] - x[2][t][2] for x in sonuc])) for t in YILLAR[4:]))
     d25 = [x[2][2025][0] for x in sonuc]
     f25 = [x[2][2025][1] for x in sonuc]
     k25 = [x[2][2025][2] for x in sonuc]
-    L.append("")
-    L.append("  2025: enflasyon dususu medyan {:.1f} puan [{}]; bunun doviz borcu uzerinden kismi {:.2f} [{}]".format(
-        med(d25), aralik(d25), med(f25), aralik(f25)))
-    L.append("  2025: kacinilan birikmis doviz borcu {:.0f} mlr $ [{}] (gercek NOP 189)".format(med(k25), aralik(k25)))
+    L.append("  2025 enflasyon dususu {:.1f} puan [{}], doviz borcu kismi {:.2f} [{}]; kacinilan NOP {:.0f} mlr $ [{}]".format(
+        med(d25), aralik(d25), med(f25), aralik(f25), med(k25), aralik(k25)))
 
-    # ileri, kalibre c ile
-    r = RAMPA["yavas"]
-    rng = random.Random(TOHUM + 2)
-    ileri = []
-    for c_up, c_dn, n0_, h in sm:
-        p, q = cek_fx(rng)
-        q["c"] = c_up
-        pay = {"A": q["sA"], "B": q["sB"], "C": q["sC"]}
-        ileri.append(simule(p, q, pay, r, dongu=True)["toplam"])
     L.append("")
-    L.append("ILERI 2026-30, c kalibre (yavas rampa, dongulu): enflasyon %, baz %{:.1f}".format(TUFE_YILLIK * 100))
-    L.append("    yil      " + "".join("{:>8}".format(2026 + t) for t in range(5)))
-    L.append("    medyan   " + "".join("{:>8.1f}".format(TUFE_YILLIK * 100 - med([x[t] for x in ileri])) for t in range(5)))
-    L.append("    p10-p90  " + "".join("{:>8}".format("{:.0f}-{:.0f}".format(
-        TUFE_YILLIK * 100 - yuzdelik([x[t] for x in ileri], .9), TUFE_YILLIK * 100 - yuzdelik([x[t] for x in ileri], .1))) for t in range(5)))
+    L.append("ILERI 2026-30 (yavas rampa, dongulu): enflasyon %, baz %{:.1f}".format(TUFE_YILLIK * 100))
+    for rj in ("tam", "son2yil"):
+        bd.REJIM = rj
+        rng = random.Random(TOHUM + 2)
+        ileri, nop30 = [], []
+        for _ in range(3000):
+            p, q = cek_fx(rng)
+            pay = {"A": q["sA"], "B": q["sB"], "C": q["sC"]}
+            ileri.append(simule(p, q, pay, RAMPA["yavas"], dongu=True)["toplam"])
+            nop30.append(NOP[2025] + sum(bd.baz_akis(p, q)))
+        L.append("  rejim={:<8} ".format(rj) + "".join("{:>7.1f}".format(TUFE_YILLIK * 100 - med([x[t] for x in ileri])) for t in range(5))
+                 + "   (p10-p90 2030: {:.0f}-{:.0f}); baz NOP 2030 {:.0f} mlr $".format(
+                     TUFE_YILLIK * 100 - yuzdelik([x[4] for x in ileri], .9), TUFE_YILLIK * 100 - yuzdelik([x[4] for x in ileri], .1), med(nop30)))
+    bd.REJIM = "tam"
     return "\n".join(L)
 
 
 def testler():
     out = []
-    kab = kalibre()
-    cu = [k[0] for k in kab]
-    ok1 = bool(kab) and yuzdelik(cu, .1) <= 2.70 and yuzdelik(cu, .9) >= 1.89
-    out.append(("T-B1 uyum: {} cekim kabul (%{:.2f}, N0 genis oldugu icin dusuk beklenir). c_up {} ile dogrudan 2024-25 kestirimi 1,89-2,70 ortusuyor mu".format(
-        len(kab), len(kab) / 2000, aralik(cu) if kab else "-"), ok1, "oran degil ortusme olculur"))
-    # T-B2: carry modeli 2015-18 birikimini aciklar mi. Model: carry<0 iken borc cozulur.
-    h = [k[3] for k in kab]
-    dus = med([x[2018] - x[2015] for x in h]) if h else float("nan")
-    out.append(("T-B2 2015-18 model NOP degisimi {:+.0f} mlr $ (carry negatif). Hafiza: o yillarda borc ARTTI (kuresel likidite). Model yanlis isaret".format(dus),
-                dus > 0, "carry kanali yalniz 2019 sonrasi rejim icin gecerli"))
-    # T-B3: bir yili disarida birak, 2025 tahmini
-    kab2 = kalibre(atla=2025)
-    if kab2:
-        tah = [k[3][2025] for k in kab2]
-        hata = med(tah) - NOP[2025]
-        out.append(("T-B3 2025 gozlemi disarida, tahmin {:.0f} [{}] vs gercek {:.0f}".format(med(tah), aralik(tah), NOP[2025]),
-                    abs(hata) < TOL * 1.5, "hata {:+.0f}".format(hata)))
-    else:
-        out.append(("T-B3 2025 disarida kabul 0", False, ""))
-    # T-B4: ima edilen stok negatif olmamali
-    neg = sum(1 for k in kab if min(k[3].values()) < 0) / max(len(kab), 1)
-    out.append(("T-B4 ima edilen NOP yolunda negatif deger orani %{:.0f}".format(100 * neg), neg < 0.2, "negatif stok anlamsiz"))
-    # T-B5: N0 makul mu (mutlak kistas yok, yalniz yorum)
-    cd = [k[1] for k in kab]
-    ok5 = bool(kab) and yuzdelik(cd, .9) < 1.4
-    out.append(("T-B5 N0 TCMB'ye bagli (177,8): model 2014'ten 2023'e 178->70 inisini yakaliyor mu. c_dn {} (prior 0-1,5), kabul %{:.2f}".format(
-        aralik(cd) if kab else "-", len(kab) / 2000), ok5, "c_dn prior siniria dayaniyorsa model gerilir"))
+    cs = [x[1] for x in boot_havuzu()]
+    out.append(("T-B1 carry katsayisi resmi seride: c {:.2f}-{:.2f} (p10-p90)".format(yuzdelik(cs, .1), yuzdelik(cs, .9)),
+                yuzdelik(cs, .1) > 0, "p10 > 0 ise carry anlamli"))
+    ayni = sum(1 for t in (2015, 2016, 2017) if (DNOP[t] > 0) == (CARRY[t] > 0))
+    out.append(("T-B2 2015-17: dNOP isareti (+,+,+), carry isareti (-,-,+): {}/3 uyumlu. Borc carry negatifken artti".format(ayni),
+                ayni >= 2, "carry 2015-16'yi aciklamaz, kuresel likidite hafizasi dogru cikti"))
+    b23, _, _, _ = fit(list(range(2015, 2024)))
+    h = [(b23[0] + b23[1] * CARRY[t]) - DNOP[t] for t in (2024, 2025)]
+    out.append(("T-B3 ornek disi: 2023'e kadar fit 2024-25 dNOP'u {:+.0f}/{:+.0f} mlr $ yanlis tahmin ediyor (gercek {:+.0f}/{:+.0f})".format(
+        h[0], h[1], DNOP[2024], DNOP[2025]), max(abs(x) for x in h) < 25, "rejim degisimi"))
+    rng = random.Random(9)
+    bd.REJIM = "tam"
+    tah = []
+    for _ in range(3000):
+        p, q = cek_fx(rng)
+        tah.append(NOP[2025] + bd.baz_akis(p, q)[0] * 7 / 12)
+    out.append(("T-B4 2026-07 kor tahmin (model baz, 7 ay): {:.0f} [{}] vs gercek {:.1f}".format(med(tah), aralik(tah), NOP_2026_07),
+                abs(med(tah) - NOP_2026_07) < 15, "2026 verisi kalibrasyona girmedi"))
+    out.append(("T-B5 kisa vadeli net pozisyon (likidite tamponu): 2022 {:.0f} -> 2026-07 {:.1f} mlr $. Model bunu icermiyor".format(KV_NET[2022], KV_NET_2026_07),
+                False, "acik bulgu, modelde olmayan kirilganlik"))
     return out
 
 
 def test_blogu():
-    L = ["GERCEKLIK TESTLERI (birikim)"]
+    L = ["GERCEKLIK TESTLERI (birikim, resmi seri)"]
     gec = 0
     tl = testler()
     for msg, ok, n in tl:
