@@ -223,3 +223,7 @@ Veri: `data/asgari_ucret.json` (arama sonuclari, resmi PDF okunamadi), `data/pka
 - Memur zammi / onceki yil TUFE: 2025 0,26, 2026 0,60; asgari ucret 0,68 ve 0,87 (toplu sozlesme asgariden dusuk).
 - PKA: Ocak yil-sonu beklentisi onceki yil gerceklesmesiyle korelasyon 0,97 (beklenti = a + 0,54*onceki yil), gerceklesmeyi ort. +10,4 puan dusuk tahmin etmis; gerceklesme ~ beklenti (b 1,38) ama onceki yil eklenince ayrisamiyor (n=11). 24 ay beklentisi 18,3 (hedef 5): capa yok.
 - Sonuc: atalet **beklenti ve yasal/idari endeksleme kanallarindan geriye bakisla tasiniyor**; hangisinin NEDEN oldugu bu veriyle ayrilamaz. Kamu zam verisi resmi tabloyla dogrulanmali.
+
+## Dezenflasyon politikasinin enflasyonist etkisi (hekis/dezenf.py)
+`python -m hekis.dezenf`. Politika = yuksek reel faiz (~13,8 puan ex-ante) + kontrollu kur kaymasi. Dogrudan maliyet: firma faiz maliyeti +0,5, butce/mali +0,2 (toplam ~0,7 puan/yil, parametreler onsel); kur kazanci -5,4 [4-10] puan/yil (karsi-olgu: kur = TUFE kadar kayardi; kasitli uc nokta). Dogrudan net dezenflasyonist.
+Asil maliyet kazancin BORC ALINMIS olmasi: kirilmada 3 yil kum. +22 puan; kirilma olasiligi %73'u gecerse 3 yillik net kazanc sifirin altina iner. Kirilma olasiligi bilinmiyor. Olculmeyenler: yonetilen fiyat/vergi telafisi, talep kanali (dusurucu), ihracat rekabeti.
