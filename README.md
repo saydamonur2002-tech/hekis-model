@@ -180,3 +180,12 @@ Veri: `data/ito_enflasyon_endeksi.json`, `data/ITO.md` (ITO PDF, Ocak 2023-Eylul
 - Tuketici-toptan makasi +12 (2023), +15, +17 (2025), Agu 2026 +14,5, Eyl 2026 +10,4: enflasyon mal/kur tarafinda degil hizmet ve marj tarafinda.
 - Duzeltme: onceki surumde 'ITO Ara 2025 %23,25, TUIK'in altinda' demistim, bu toptan endeksiydi (arama ozeti karistirmisti).
 
+### Kira bilesen: TCMB YKKE (kira.py)
+
+Veri: `data/ykke_2026_08.json` (TCMB EVDS TP.YKKE.*, 2018-01..2026-08, 19 bolge). NOT: istenen 'Istanbul Ucretliler hizmet/kira bileseni' ITO'nun degildi; gelen dosya TCMB Yeni Kiraci Kira Endeksi. ITO alt kalemi hala yok. `python -m hekis.kira`.
+
+- SEVIYE: yeni kira 2019-2025 yillik %10,3 / 26 / 53,5 / 122,5 / 117,2 / 57,7 / 36,0; reel yeni kira x2,5 (Oca 2018 -> Ara 2025 x2,2). 'Kira asla bu kadar yuksek olamaz' tezi SEVIYEDE destekleniyor (2021-23 reel +13/+35/+32).
+- AKIS: Agustos 2026 yeni kira yillik TR %26,4 (TUIK 31,5: reel -3,9), Istanbul %34,5 (reel +2,3). Guncel kira primi yok. Onceki 'yeni kira reel ~sifir, tez zayif' sonucum tek noktaya (Subat 2026) dayaniyordu ve seviye icin YANLIS, akis icin dogruydu.
+- HIPOTEZ (tek nokta): TUFE kira (mevcut sozlesme) ~ YKKE yillik 12 ay once. Subat 2026'da mevcut kiraci %53,9 = YKKE Subat 2025 %53,9 (6 ay: 45,4, 18 ay: 61,7 tutmuyor). Konut grubu Agu 2026 %39,77 ile tutarli (elektrik-gaz-su artisi 29-37%).
+- Dogruysa TUFE kirasi kendiliginden duser: Ara 2025 57,7 -> Agu 2026 45,4 -> Ara 2026 36,0 -> Agu 2027 ~26,4. Kira agirligi 4,0-7,5% varsayimiyla TUFE'ye katki: 2026 ~1,2 puan [0,9-1,6], 2027 ~0,6 puan. OVP'nin istedigi ek dezenflasyonun (-3,7) ~%15'i. A kanalinin dogrudan etkisi (0,2) bunun yaninda ikincil.
+
