@@ -1,6 +1,6 @@
 # Sonuc: en olasi senaryoda sistem calisiyor mu?
 
-**Guncelleme (kademeli pilot, erozyon, sok, 10 yil; ayrinti PILOT.md, SOSYAL_MALIYET.md, SISTEMLER.md):** Tam olcege kademeli yolla 7. yilda ulasilir (olcek erozyonu varsayimiyla bedel 7,0 mr, sub. 3,9 mr, oran 1,79; 10 yilda kumulatif net +17 mr TL). Etki kucuk: Gini -0,0007, yoksulluk -0,16 puan, Istanbul TUFE -0,3 puan (ulusal -0,05). Sistem finansal sokta ayakta, ama katilim fiyat beklentisine bagli: beklenen reel artis ~4 puan yukselirse katilim cokar. Luks tahsilati henuz olculmedi; pilot gerekli. Asagidaki rakamlar erozyonsuz tam olcek, onceki hesap.
+**Guncelleme (kademeli pilot, erozyon, sok, 10 yil; ayrinti PILOT.md, SOSYAL_MALIYET.md, SISTEMLER.md):** Tam olcege kademeli yolla 7. yilda ulasilir (olcek erozyonu varsayimiyla bedel 7,0 mr, sub. 3,9 mr, oran 1,79; 10 yilda kumulatif net +17 mr TL). Etki kucuk: Gini -0,0007, yoksulluk -0,16 puan, Istanbul TUFE -0,3 puan (ulusal -0,05). Sistem finansal sokta ayakta, ama katilim fiyat beklentisine bagli: beklenen reel artis ~4 puan yukselirse katilim cokar. Luks tahsilati henuz olculmedi; pilot gerekli. **Monte Carlo duzeltmesi:** belirsiz degerli kademeli yol iki kutuplu: ~%40 pilotta takilir (katilim %15 altinda), ~%50 7. yilda tam olcege ulasir; 10 yil net medyan +7,7 mr TL (P10 +0,7, P90 +37,9). Asagidaki rakamlar erozyonsuz tam olcek, onceki hesap.
 
 Kisa cevap: evet, ama kucuk ve kirilgan. Kapsam Istanbul, veri Ekim 2026. Kisisel modelleme, dogrulanmis kamu maliyesi modeli degildir.
 

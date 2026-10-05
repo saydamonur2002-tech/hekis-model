@@ -45,6 +45,12 @@ Geçiş kuralı (okunan değer): genel tahsilat %30 ise lüks ≥%18 (13+4,6); %
 Not: hata hesabı bağımsız birim varsayar; aynı sahibin birden fazla birimi, aynı mahallede kümelenme hatayı büyütür.
 
 ## 5 yıllık kademeli genişleme, ölçek erozyonu, şok direnci (`python -m hekis.horizon`)
+
+> **DÜZELTME (Monte Carlo hatası).** `horizon.draw` üçgen dağılımı yanlış parametre sırasıyla çekiyordu (`triangular(lo, mode, hi)` yerine `(low, high, mode)` beklenir); belirsiz değerli tüm çekimler çarpıktı. Düzeltildi. Aşağıdaki "kusursuz ölçüm" yolu ve kırılma noktaları etkilenmedi; **Monte Carlo (çekimli) sayıları geçersizdi, yenileri:**
+> - Dağılım artık iki kutuplu: İstanbul'da çekimlerin yaklaşık %40-43'ü pilotta takılır (çoğu katılımın %15'in altında kalması: katılım tavanı ve fiyat beklentisi belirsizliği), yaklaşık %50'si 7. yılda tam ölçeğe ulaşır, kalanı arada. Anadolu'da %38-40 takılır, %48-50 tam ölçek. Medyan bu iki küme arasında kararsızdır (200 vs 300 çekimde farklı çıkar); bu yüzden medyan yerine olasılık verilir.
+> - 5. yıl yerleşen medyanı yaklaşık 9,5 bin (İstanbul; eski 11,8 bin), 5 yıl net yaklaşık +0,9 mr TL (eski +2,0). 10 yıl net: İstanbul medyan +7,7 mr (P10 +0,7, P90 +37,9), Anadolu +4,7 mr (P10 +0,3, P90 +23,5).
+> - Şok tablosu yeniden: yok 3,9 bin hane / +0,89 mr; ralli 329 hane; lüks tahsilat çöküşü 1,5 bin / +0,36 mr / %6 zarar; bedel iptali −0,20 mr / %60 zarar; kısmi iptal %31; ağır kriz 296 hane / %10 zarar (5. yıl medyan, 300 çekim). Nitel sonuçlar aynı (kapı büyümeyi durdurur, zarar sınırlı, ralli katılımı çökertir, lüks bedel iptali yıkıcı).
+> Eski sayıları içeren tablolar tarihsel kayıttır; geçerli değildir.
 Kurgu: 3.800 birimle başlar; her yıl ölçüm, eşik tutarsa ertesi yıl ölçek ×2,5 (tavan 450.000). Eşik: ölçülen tahsilatlarla oran ≥1,25, ölçülen katılım %15-38; tutmazsa dondurulur. Ölçek erozyonu (VARSAYIM, veri yok): tahsilat 3.800→450.000 arasında log ölçekte %25 düşer. Şok 3. yıldan itibaren. 300 çekim.
 
 Önceki varsayımla (erozyon yok, büyüme sınırı yok) yerleşen: 312 / 1.249 / 4.994 / 19.977 / 36.963. Erozyon ve ×2,5 tavanıyla: 312 / 780 / 1.951 / 4.877 / 12.193; 5. yılda ölçek 148 bin (tüm İstanbul'a ulaşılmaz), 5 yıl net +2,1 mr TL (öncekinin +12,4'ü şişkindi). Oran 2,39'dan 1,93'e iner.
