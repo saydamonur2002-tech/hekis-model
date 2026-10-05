@@ -77,3 +77,11 @@ Sonuc: doviz borcu uzerinden etki 5. yilda 0,5 puan (0,1-1,5). Onceki dissal D (
 
 Sonuc: dongu 5. yilda +0,13 puan (0-0,3), carpan medyan 1,06 (max 1,23), yani zayif ve kararli. Toplam 5. yil dusus 2,5-2,9 puan (taylor 0 -> 1). Gerceklik testleri 6/10.
 
+### Birikim 2014'ten (birikim.py)
+
+`python -m hekis.birikim`: net doviz acigi (NOP) 2014'ten kurulur, N0 bilinmeyen. NOP_t = NOP_{t-1} + c_up*max(carry,0) - c_dn*max(-carry,0), (N0, c_up, c_dn) 2023-25 gozlemlerine (70/148/189, +-12) ABC ile uydurulur. Sonuc: c_up 2,1-2,7 (kalibre), c_dn 0,1-0,7, N0 ~132 (67-193). 2025'i disarida birakinca tahmin 202 (gercek 189).
+
+Tarihsel karsi-olgusal (A-C 2014'ten cozulseydi): 2025 enflasyonu medyan 4,6 puan dusuk (2,6-7,7), kacinilan NOP ~82 mlr $, NOP/GSYH %11,9 -> %6,8. Not: dogrudan A-C katkisi 2026 kalibrasyonundan yila sabit tasindi (anakronik), sonucu yukari esikler.
+
+Kanal sinirlari: carry modeli 2015-18'de borcun arttigi hafizayi (kuresel likidite) aciklamaz, o yillarda yanlis isaret verir. Kur 2014-22 hafizadan. Gercek TCMB NOP serisi 2014-22 gelirse N0 ve c_dn dogrulanir.
+
