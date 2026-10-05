@@ -28,6 +28,7 @@ Kod: `hekis/systems.py`, `python -m hekis.social` (her şey iki sistem için ayr
 
 ## İki sistem, aynı şok (150 çekim, 3. yıldan itibaren, 5. yıl medyanı; `python -m hekis.horizon`)
 
+> **GÜNCEL (kapı düzeltmesi sonrası, 150 çekim, 5. yıl medyan):** şoksuz İst. 10,8 bin hane +1,72 mr / %1 zarar; Anad. 12,9 bin +0,94 mr / %2; lüks tahsilat çöküşü %9 / %19 zarar; hane geliri −%30: %4 / %9; bedel iptali %65 / %70; kısmi iptal %36 / %47; ağır kriz %14 / %33; toplam net şoksuz +2,7 mr. Nitel sonuç aynı: Anadolu daha kırılgan, ulusal şokta ikisi birlikte düşer, ralli ikisini de çökertir.
 > **DÜZELTME:** aşağıdaki iki sistem şok tablosu hatalı Monte Carlo çekimleriyle üretilmişti (bkz. PILOT.md düzeltme notu). Geçerli değerler (150 çekim, 5. yıl medyan): yok: İst. 9,5 bin hane +1,38 mr / %1 zarar; Anad. 11,6 bin +0,65 mr / %2; lüks tahsilat çöküşü: %7 / %16 zarar; hane geliri −%30: %3 / %7; bedel iptali: %65 / %70; kısmi iptal: %33 / %45; ağır kriz: %11 / %31; toplam net şoksuz +2,0 mr. Sonuç aynı: Anadolu daha kırılgan, ulusal şokta ikisi birlikte düşer, ralli ikisini de çökertir.
 | şok | İst. yerleşen | İst. net mr | İst. zarar | Anad. yerleşen | Anad. net mr | Anad. zarar | toplam net |
 |---|---|---|---|---|---|---|---|

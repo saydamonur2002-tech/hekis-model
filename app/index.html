@@ -111,7 +111,7 @@ ul.lim { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; } ul.lim li { m
   <section aria-labelledby="h-kar">
     <h2 id="h-kar">Senaryo karşılaştırması</h2>
     <div class="tw"><table id="kar"></table></div>
-    <p class="note">Her satır, seçili sistemin kendi tarifesiyle ve ilgili varsayımlarla hesaplanır (100 rastgele çekim). Satıra tıklayınca parametreler o senaryoya ayarlanır. "Tam ölçek" sütunları şoksuzdur; şok senaryolarında yol 3. yıldan sonra bozulur. Katılım alt sınırı (%15) benim kararımdır: reel faiz sıfıra yaklaşınca katılım bu sınırın altına iner ve kapı hiç geçilmez.</p>
+    <p class="note">Her satır, seçili sistemin kendi tarifesiyle ve ilgili varsayımlarla hesaplanır (100 rastgele çekim; olasılıklarda yaklaşık ±5 puan örnekleme hatası, çekim aralığı senaryo merkezine göre kaydırılır). Satıra tıklayınca parametreler o senaryoya ayarlanır. "Tam ölçek" sütunları şoksuzdur; şok senaryolarında yol 3. yıldan sonra bozulur. Katılım alt sınırı (%15) benim kararımdır: reel faiz sıfıra yaklaşınca katılım bu sınırın altına iner ve kapı hiç geçilmez.</p>
   </section>
 
   <section aria-labelledby="h-yol">
@@ -292,7 +292,17 @@ const K = {"inc":[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.35,1.5],"alpha":[0.4,0.6,0.7
       }
       return rows;
     }
-    function draw(rng, center) { const o = {}; for (const k of Object.keys(SPACE)) { const [lo, hi] = SPACE[k]; const c = Math.min(hi, Math.max(lo, (center || LIKELY)[k])); o[k] = tri(rng, lo, hi, c); } return o; }
+    // Cekim araligi, senaryo merkezi etrafinda baz dagilimin genisligiyle kaydirilir (alt/ust genislik LIKELY'e gore).
+    function draw(rng, center) {
+      const o = {};
+      for (const k of Object.keys(SPACE)) {
+        const [lo, hi] = SPACE[k]; const c = (center || LIKELY)[k];
+        let a = c - (LIKELY[k] - lo), b = c + (hi - LIKELY[k]);
+        if (k !== 'g_e') { a = Math.max(0.01, a); b = Math.min(0.95, b); }
+        o[k] = tri(rng, a, b, Math.min(b, Math.max(a, c)));
+      }
+      return o;
+    }
     function monteCarlo(sys, n, seed, shock, opt, center) {
       const rng = mulberry(seed || 11); const out = [];
       for (let i = 0; i < n; i++) out.push(onePath(sys, draw(rng, center), rng, shock, opt));

@@ -138,7 +138,17 @@
       }
       return rows;
     }
-    function draw(rng, center) { const o = {}; for (const k of Object.keys(SPACE)) { const [lo, hi] = SPACE[k]; const c = Math.min(hi, Math.max(lo, (center || LIKELY)[k])); o[k] = tri(rng, lo, hi, c); } return o; }
+    // Cekim araligi, senaryo merkezi etrafinda baz dagilimin genisligiyle kaydirilir (alt/ust genislik LIKELY'e gore).
+    function draw(rng, center) {
+      const o = {};
+      for (const k of Object.keys(SPACE)) {
+        const [lo, hi] = SPACE[k]; const c = (center || LIKELY)[k];
+        let a = c - (LIKELY[k] - lo), b = c + (hi - LIKELY[k]);
+        if (k !== 'g_e') { a = Math.max(0.01, a); b = Math.min(0.95, b); }
+        o[k] = tri(rng, a, b, Math.min(b, Math.max(a, c)));
+      }
+      return o;
+    }
     function monteCarlo(sys, n, seed, shock, opt, center) {
       const rng = mulberry(seed || 11); const out = [];
       for (let i = 0; i < n; i++) out.push(onePath(sys, draw(rng, center), rng, shock, opt));

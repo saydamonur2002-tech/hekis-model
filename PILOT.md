@@ -21,7 +21,7 @@ Eski eşikler (%15 / %25 / %30 / %30 / %90) dayanaksızdı; model çıktısını
 
 | Ölçüm | Eski | Yeni | Dayanak |
 |---|---|---|---|
-| Katılım (uygun birim) | ≥%15 | %15-38 | alt: amaç (karar); üst: %38 üstünde sub. bedeli aşar |
+| Katılım (uygun birim) | ≥%15 | ≥%15 (üst sınır kaldırıldı) | alt: amaç (karar); üst sınırı oran ≥1,25 kapısı zaten uygular (baz tahsilatta bütçe sınırı ≈%38) |
 | Genel bedel tahsilatı | ≥%25 | ≥%20 | lüks tahsilatla birlikte okunur (aşağı) |
 | Lüks bedel tahsilatı | ≥%30 | ≥%18 (genel %20 ise) | sınır eğrisi: genel %30→lüks %13, %20→%18, %10→%24 |
 | Kiracı ödeme/kira | ≤%30 | ≤%30 (tasarım) | değişmedi |
@@ -46,6 +46,7 @@ Not: hata hesabı bağımsız birim varsayar; aynı sahibin birden fazla birimi,
 
 ## 5 yıllık kademeli genişleme, ölçek erozyonu, şok direnci (`python -m hekis.horizon`)
 
+> **İKİNCİ DÜZELTME (kapı kuralı).** Kapıdaki katılım üst sınırı (%38) bedel/sübvansiyon ≥1,25 kapısıyla aynı bütçe sınırını ikinci kez uyguluyordu ve tahsilatın iyi olduğu senaryolarda sistemi haksız yere pilotta tutuyordu. Kaldırıldı: kapı artık katılım ≥%15 (alt sınır, amaçtan gelen kararım) ve oran ≥1,25. Güncel Monte Carlo sayıları (öncekilerin yerine): İstanbul çekimlerin ~%37-38'i pilotta takılır, ~%50-52'si 7. yılda tam ölçeğe ulaşır; 5. yıl medyan yerleşen 10,6 bin, 5 yıl net +1,5 mr TL; 10 yıl net medyan +11,1 mr (P10 +0,8, P90 +37,9). Anadolu: ~%34-36 takılır, ~%50 tam ölçek; 10 yıl net medyan +5,5 mr (P10 +0,3, P90 +23,5). Şok tablosu (İstanbul, 5. yıl medyan, 300 çekim): şoksuz 10,2 bin hane / +1,38 mr; ralli 370 hane; lüks tahsilat çöküşü 2,6 bin / +0,37 mr / %9 zarar; bedel iptali −0,27 mr / %60 zarar; kısmi iptal %33; ağır kriz 352 hane / %12 zarar. "Takılma"nın başlıca nedeni katılımın %15'in altında kalması; bu eşik benim kararımdır ve sonuçlara duyarlıdır (reel faiz sıfıra yaklaşınca baz katılım %20'den %14,8'e iner ve kapı hiç geçilmez).
 > **DÜZELTME (Monte Carlo hatası).** `horizon.draw` üçgen dağılımı yanlış parametre sırasıyla çekiyordu (`triangular(lo, mode, hi)` yerine `(low, high, mode)` beklenir); belirsiz değerli tüm çekimler çarpıktı. Düzeltildi. Aşağıdaki "kusursuz ölçüm" yolu ve kırılma noktaları etkilenmedi; **Monte Carlo (çekimli) sayıları geçersizdi, yenileri:**
 > - Dağılım artık iki kutuplu: İstanbul'da çekimlerin yaklaşık %40-43'ü pilotta takılır (çoğu katılımın %15'in altında kalması: katılım tavanı ve fiyat beklentisi belirsizliği), yaklaşık %50'si 7. yılda tam ölçeğe ulaşır, kalanı arada. Anadolu'da %38-40 takılır, %48-50 tam ölçek. Medyan bu iki küme arasında kararsızdır (200 vs 300 çekimde farklı çıkar); bu yüzden medyan yerine olasılık verilir.
 > - 5. yıl yerleşen medyanı yaklaşık 9,5 bin (İstanbul; eski 11,8 bin), 5 yıl net yaklaşık +0,9 mr TL (eski +2,0). 10 yıl net: İstanbul medyan +7,7 mr (P10 +0,7, P90 +37,9), Anadolu +4,7 mr (P10 +0,3, P90 +23,5).

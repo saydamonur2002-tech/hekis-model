@@ -26,11 +26,11 @@ Kusursuz ölçüm yolu:
 | 3 | 23.750 | 1.951 | %0,35 | 0,21 | 0,45 | 0,39 | −0,00003 | −0,008 | −0,24 | −0,016 |
 | 4 | 59.375 | 4.877 | %0,86 | 0,52 | 1,06 | 0,93 | −0,00009 | −0,021 | −0,59 | −0,040 |
 | 5 | 148.438 | 12.193 | %2,16 | 1,29 | 2,50 | 2,14 | −0,00022 | −0,053 | −1,48 | −0,100 |
-Belirsiz değerlerle (düzeltilmiş çekim; eski "neredeyse aynı" ifadesi hatalı çekimden geliyordu): sonuç iki kutuplu. İstanbul'da çekimlerin ~%40'ı pilotta takılır, ~%50'si 7. yılda tam ölçeğe ulaşır. 5. yıl medyan yerleşen ~9,5 bin, 5 yıl net ~+0,9 mr TL; 10 yıl net medyan +7,7 mr (P10 +0,7, P90 +37,9). Yıl bazlı etki tablosu (kusursuz ölçüm) etkilenmedi, ama gerçekleşme olasılığı yarı yarıya.
+Belirsiz değerlerle (düzeltilmiş çekim; eski "neredeyse aynı" ifadesi hatalı çekimden geliyordu): sonuç iki kutuplu. İstanbul'da çekimlerin ~%37'si pilotta takılır, ~%50'si 7. yılda tam ölçeğe ulaşır (kapı düzeltmesi sonrası). 5. yıl medyan yerleşen ~10,6 bin, 5 yıl net ~+1,5 mr TL; 10 yıl net medyan +11,1 mr (P10 +0,8, P90 +37,9). Yıl bazlı etki tablosu (kusursuz ölçüm) etkilenmedi, ama gerçekleşme olasılığı yarı yarıya.
 Okuma: 5 yılda etki yok denecek kadar küçük: Gini −0,0002, yoksulluk −0,05 puan, kira −%1,5, TÜFE −0,1 puan. Sistem ilk 5 yılda kendini finanse eder (kümülatif +2 mr TL) ama toplumsal etkisi 5. yıldan sonra tam ölçeğe (37 bin hane) ulaşıldığında belirginleşir (Gini −0,0007, TÜFE −0,18 ile −0,6 puan). TÜFE puanı tek seferlik düzey etkisidir, yıllık enflasyona eklenmez.
 
 ## 10 yıllık ufuk (`python -m hekis.social`)
 Düzeltme: tam ölçeğe (450 bin birim, 37 bin hane) 8-9. yılda değil **7. yılda** ulaşılır (×2,5: 148 bin → 371 bin → 450 bin); "8-9. yıl" ifadem yanlıştı.
 Kusursuz ölçüm: 6. yıl 30,5 bin hane (kapsam %5,4, ΔGini −0,0006, TÜFE −0,25); 7. yıldan itibaren sabit: 37 bin hane, kapsam %6,55, sub 3,92 mr, bedel 7,03 mr (erozyon bedeli 9,4'ten 7,0'a indirir; oran 1,79), ΔGini −0,00066, Δyoksulluk −0,16 puan, kira −%4,5, TÜFE −0,30 (arz dahil üst sınır −0,74). Kümülatif net 10. yılda +17,2 mr TL.
-Belirsiz değerlerle (düzeltilmiş): medyan 28 bin hane (7-10. yıl), yarısı tam ölçeğe (37 bin) ulaşır, ~%40 takılır; 10 yıl net medyan +7,7 mr.
+Belirsiz değerlerle (düzeltilmiş): medyan 29 bin hane (7-10. yıl), yarısı tam ölçeğe (37 bin) ulaşır, ~%37 takılır; 10 yıl net medyan +11,1 mr.
 Okuma: etki 5. yılda %2,2 kapsamla neredeyse yok; 6.-7. yılda oturur ve tam ölçekte bile küçük kalır: Gini −0,0007, yoksulluk −0,16 puan, TÜFE −0,3 puan. Sistem ayakta ve kâr eder, ama toplumsal etkisi kapsamın %6,6'sında sınırlı. Daha büyük etki için kapsam tavanının (katılım, boş stok) büyütülmesi gerekir; bu ayrı bir varsayım.
