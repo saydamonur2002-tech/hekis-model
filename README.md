@@ -233,3 +233,7 @@ Asil maliyet kazancin BORC ALINMIS olmasi: kirilmada 3 yil kum. +22 puan; kirilm
 
 ## Modelin amaci: ATALET / UCLU ACMAZ / DOVIZ yuzde ayrismasi (hekis/ayrisma.py)
 `python -m hekis.ayrisma`. 2026 enflasyonu (28 puan) uc kovaya: ATALET (saf, acmazin tasinan kismi cikarilmis) %41-68, DOVIZ (kur) %26-57, UCLU ACMAZ dogrudan ~%7 (MC %4-10), KALAN %-2/-5. Aralik indirgenmis formun spesifikasyonundan (2 terimli vs gecikmeli kurlu 3 terimli) gelir: tek bir yuzde verilemez. Katki ayristirmasidir, nedensellik degil; atalet ve beklenti ayni anda olusur.
+
+## Entegre uclu model (hekis/entegre.py): R atalet sifirlama + A uclu acmaz + F doviz akisi normalizasyonu
+`python -m hekis.entegre`. Sira R -> A -> F; 8 alt kume, sirali ve Shapley katki, etkilesim, kirilma riski ayarli yol (2027-2031, baz 2026=28).
+Bulgular (2029, medyan puan dusus): R tek ~20,7 (rho 0,68 -> 0,10-0,35 VARSAYIMI; veride karsiligi yok, %39'u %3 tabanina dokunuyor), A tek ~1,6, F tek ~-7,8 (enflasyonist: kur kaymasi/enflasyon 1'e giderken b+rho>1, cipa tek nominal capa), hepsi ~19,5. Sirali: +R -20,8, +A -0,4, +F +1,9. F yalniz R'den SONRA anlamli; F'nin tek faydasi kirilma olasiligini dusurmesi (olasilik bilinmiyor, pb0 hassasiyeti). R yari basariliysa hepsi 2029'da 14,6 (tam R'de 4,9). Kirilma gerceklesirse F'li yol daha kotu (10,9 vs 6,6).
