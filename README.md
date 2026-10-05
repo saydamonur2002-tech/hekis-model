@@ -111,3 +111,14 @@ Turev: KV turev yukumlulugu 2,3 (2022) -> 22,7 mlr $ (2026-07), turev varligi 13
 
 Ileri tampon yolu (KV net) baz senaryoda 2027'de negatife (P %66-86), cozumde gecikir. Testler 3/5: tampon kur sokunu onceden gostermedi (r=+0,60), eta ve TCMB payi rezerv verisi olmadan tanimlanamaz.
 
+### TCMB resmi rezerv, Eylul 2026 (rezerv.py)
+
+Veri: `data/urdl_20260925.json`, `data/URDL.md`. `python -m hekis.rezerv`.
+
+- Resmi rezerv Agustos 186,7 -> 25 Eylul 171,2 mlr $ (-15,5). Altin fiyat degerlemesi -7,9 (4602 -> 4291 $/ons), altin miktari +0,5, altin-disi (doviz+SDR+IMF) -8,0. Yani dususun yarisi degerleme. Hafta hafta altin-disi: -2,0, -5,6, -1,2.
+- Altin rezervin %64'u. Altin-disi 61,6.
+- Kesin cikislar 12 ay: kredi/mevduat -40,2, forward kisa pozisyon -17,2, diger giris +3,7 = -53,7. Altin-disi net likit 7,8 mlr $ (3 ay: 52,7).
+- Aylik 4-9 mlr $ net satisla altin-disi net likit 1-2 ayda biter (aritmetik, tahmin degil).
+- Sistem ters stresi (firma + resmi katman): f* %47 (yalniz firma), %53 (resmi altin-disi), %75-97 (altinin %25-50'si satilabilirse). Tarihin en kotu daralmasi %24.
+- eta ve cb'nin kur bacagi kur serisi olmadan hala tanimlanamaz.
+
