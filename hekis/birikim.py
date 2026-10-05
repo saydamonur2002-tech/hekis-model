@@ -2,9 +2,9 @@
 
     python -m hekis.birikim
 
-Net doviz acigi (NOP) 2014-2022 icin Drive'da bos. Baslangic stoku N0 bilinmeyen:
+Net doviz acigi (NOP) 2014-2022 icin Drive'da bos. Baslangic stoku N0 TCMB Mayis 2015 raporuna baglidir (177,8 mlr $):
   NOP_t = NOP_{t-1} + c_up * max(carry_t, 0) - c_dn * max(-carry_t, 0),   carry = politika faizi - kur artisi
-(N0, c_up, c_dn) 2023-25 gozlemlerine (70, 148, 188,6 mlr $, +-12) uydurulur: ABC, kabul-ret.
+N0 TCMB'ye (177,8 +-12), (c_up, c_dn) 2023-25 gozlemlerine (70, 148, 188,6 +-12) uydurulur: ABC, kabul-ret.
 Kabul edilen uclu, ayni cekilen diger parametrelerle tarihsel karsi-olgusal ve ileri kosuya girer.
 
 Kur 2014-2022: hafizadan, dogrulanmadi (hekis.kalibre). Faiz ve GSYH: Drive Secici_Kredi_Veri V22, V15.
@@ -29,6 +29,11 @@ DEP = {t: (KUR[t] / KUR[t - 1] - 1) * 100 for t in YILLAR}
 CARRY = {t: FAIZ[t] - DEP[t] for t in YILLAR}
 GSYH_USD = {t: GSYH_TL[t] / ((KUR[t - 1] + KUR[t]) / 2) for t in YILLAR}
 TOL = 12.0   # NOP gozlemleri yuvarlak aktarim, +-12 mlr $
+# 2014 CIPASI: TCMB Finansal Istikrar Raporu, Mayis 2015, s.18: reel sektor net doviz pozisyonu acigi
+# Subat 2015'te 177,8 mlr $; 2014 ortasindan beri belirgin bozulma yok -> 2014 sonu ~ ayni duzey.
+# (S.25'te ayri tanim, finansal hesaplar: 2009 63 -> 2014 150 mlr $. Kapsam farkli, kullanilmadi.)
+N0_TCMB = 177.8
+N0_ARALIK = (N0_TCMB - TOL, N0_TCMB + TOL)
 
 
 def akis(c_up, c_dn, carry):
@@ -48,7 +53,7 @@ def kalibre(n=200000, tohum=TOHUM, atla=None):
     rng = random.Random(tohum)
     kabul = []
     for _ in range(n):
-        c_up, c_dn, n0 = rng.uniform(1.5, 3.0), rng.uniform(0.0, 0.8), rng.uniform(0.0, 300.0)
+        c_up, c_dn, n0 = rng.uniform(1.5, 3.0), rng.uniform(0.0, 1.5), rng.uniform(*N0_ARALIK)
         h = hindcast(c_up, c_dn, n0)
         if all(abs(h[t] - NOP[t]) <= TOL for t in (2023, 2024, 2025) if t != atla):
             kabul.append((c_up, c_dn, n0, h))
@@ -173,8 +178,10 @@ def testler():
     neg = sum(1 for k in kab if min(k[3].values()) < 0) / max(len(kab), 1)
     out.append(("T-B4 ima edilen NOP yolunda negatif deger orani %{:.0f}".format(100 * neg), neg < 0.2, "negatif stok anlamsiz"))
     # T-B5: N0 makul mu (mutlak kistas yok, yalniz yorum)
-    out.append(("T-B5 N0 kalibrasyonun kistasi disarida: Drive'da 2014-22 NOP bos. Gercek seriyle (TCMB) karsilastir", False,
-                "bu test acik, veri bekliyor"))
+    cd = [k[1] for k in kab]
+    ok5 = bool(kab) and yuzdelik(cd, .9) < 1.4
+    out.append(("T-B5 N0 TCMB'ye bagli (177,8): model 2014'ten 2023'e 178->70 inisini yakaliyor mu. c_dn {} (prior 0-1,5), kabul %{:.2f}".format(
+        aralik(cd) if kab else "-", len(kab) / 2000), ok5, "c_dn prior siniria dayaniyorsa model gerilir"))
     return out
 
 

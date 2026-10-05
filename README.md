@@ -85,3 +85,7 @@ Tarihsel karsi-olgusal (A-C 2014'ten cozulseydi): 2025 enflasyonu medyan 4,6 pua
 
 Kanal sinirlari: carry modeli 2015-18'de borcun arttigi hafizayi (kuresel likidite) aciklamaz, o yillarda yanlis isaret verir. Kur 2014-22 hafizadan. Gercek TCMB NOP serisi 2014-22 gelirse N0 ve c_dn dogrulanir.
 
+#### 2014 cipasi (TCMB Finansal Istikrar Raporu, Mayis 2015)
+
+s.18: reel sektorun net doviz pozisyonu acigi Subat 2015'te 177,8 mlr $, 2014 ortasindan beri belirgin bozulma yok, kisa vadeli acik 10 mlr $. s.25 (ayri tanim, finansal hesaplar): 2009 63 -> 2014 150 mlr $, kapsam farkli, kullanilmadi. birikim.py N0'i 177,8 +-12'ye bagladi. Sonuc: c_dn 0,6-0,7 (prior siniria dayanmadi), 2014 NOP/GSYH ~%18-19, 2025'te %11,9. Yani dolar bazinda 2025 (189) 2014 (178) ile yakin. 2023'teki 70 cukuru gecici, 2024-25 yeniden insa. 'Kademeli artis' 2014'ten bakinca net birikim degil, derin bir cozulmeden sonra geri donustur.
+
