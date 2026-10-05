@@ -160,3 +160,7 @@ Tahmin cekirdegi TUFE_t = a + b*kur_t + rho*TUFE_t-1 + delta (kalibre.py, bootst
 - Tutmak icin gereken ek dezenflasyon (kalinti): OVP 2027 -3,7, 2028 -4,0, 2029 -1,3; TCMB 2027 -9,3 (tarihte en fazla -6,1 gorulmus). Cozum (A-C+doviz borcu) 2029'da ~1,5 puan ekler, OVP'ye yetmez. Kur sicramasi senaryosu 2027 40%.
 - OVP gecmis hatasi ~+12 puan (2024-25 hafizadan). Testler 0/2, 3 bilgi.
 
+### Resetleme: atalet kirilirsa (reset.py)
+
+`python -m hekis.reset`. Atalet (rho ~0,68) enflasyonun ~%75'ini tasiyor. Koordineli bir endeksleme sifirlamasi rho'yu dusururse? Senaryo, mekanik sonuc degil: rho'nun dususu varsayim (0,10-0,35), baz ve geri tepme yok. 'Reset basarili' yolu 2027'de %10, 2028'de tabana (%3) iner, bu varsayimin aritmetigidir. Gercek bilgi: OVP yolu rho'nun 0,68'den ~0,45'e (%34, 1,5 se) dusmesini istiyor (makul); TCMB 2027 %15 icin 0,24 (2,7 se, makul degil). Reset + 2028 kur kirilmasi: 2028 %22. Kurumsal endeksleme: kira artisi yasal olarak 12 aylik ortalama TUFE ile sinirli (dogrulandi). Uluslararasi vakalar hafizadan.
+
