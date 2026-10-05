@@ -199,3 +199,10 @@ Veri: `data/ito_alt_kalem.json` (ITO Fiyat Indeksleri Kitabi PDF: Istanbul Ucret
 - Gecikme sinamasi: konut yillik ile YKKE yillik(t-L) korelasyonu en iyi L=23 ay (r=0,45), L=12'de 0,16. kira.py'nin 12 ay hipotezi bu seride DESTEKLENMEDI. L=24 seviye olarak imkansiz (Ara 2025 kira %117 > konut %59). Makul L=12-18: kira kendiliginden dezenflasyonu 2026 1,2-1,6, 2027 0,6-1,2 puan.
 - Testler 3/4 (T-A3 ve T-A7 hipotez reddi). Kira alt kalemi ve agirliklari ITO tablosunda yok.
 
+### Atalet gercek mi? (atalet.py)
+
+`python -m hekis.atalet`. Uc soru:
+1. ISTATISTIKSEL: kalicilik var. Permutasyon p ~0,02 (10 gozlem); TUIK 0,69-0,70, ITO 0,73-0,74, ENAG 0,67; aylik ITO 0,38-0,45. Olcuye bagli degil, buyuklugu 0,4-0,7. (Newey-West n=10'da guvenilmez.)
+2. GOLGE: gecikmeli kur eklenince rho 0,68 -> 0,43 (se 0,15): ataletin ~%36'si gecmis kur soklarinin golgesi. Bir yili disarida birakinca 0,32-0,65. 3 terimli modelde pozitif parcalar icinde kur (bu yil + gecen yil) %54, saf atalet %46. Iki terimli modelde atalet %75 / kur %27 idi: AYRIM SPESIFIKASYONA BAGLI. Onceki 'atalet kurun 3 kati' ifadesi iki terimli modele ozgu, geri cekilmeli.
+3. MEKANIZMA: olculebilen endeksleme (kira sozlesmesi) saf ataletin ~%10'unu aciklar. Gerisi (ucret, beklenti, yonetilen fiyat) olculmedi.
+
