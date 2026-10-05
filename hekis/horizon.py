@@ -16,7 +16,7 @@ import statistics as st
 
 from hekis import evaluate as E
 from hekis import final
-from hekis.systems import ISTANBUL, System
+from hekis.systems import ANADOLU, ISTANBUL, System
 from hekis.zones import LIKELY, run_three_zone
 
 START, FULL = 3_800, 450_000
@@ -155,6 +155,16 @@ def breakpoints() -> dict:
     return {"lux_carpan": lux, "genel_carpan": gen, "g_e_artis": ge, "ratio_now": run()["ratio"]}
 
 
+def compare_systems(draws: int = 150) -> list[tuple[str, dict, dict]]:
+    """Ayni sok, iki sistem (ayri cekimler). Yurt capinda gecerli sok (hukuki iptal, kur) iki sistemi birden vurur."""
+    out = []
+    for name, sh in SHOCKS.items():
+        i = summarize(monte_carlo(draws, shock=sh, system=ISTANBUL), ISTANBUL.full)
+        a = summarize(monte_carlo(draws, shock=sh, system=ANADOLU), ANADOLU.full)
+        out.append((name, i, a))
+    return out
+
+
 def main() -> int:
     bn = lambda v: v / 1e9
     det = one_path({}, None, erosion=0.0, growth_cap=4.0)
@@ -181,6 +191,10 @@ def main() -> int:
     for name in SHOCKS:
         r = summarize(monte_carlo(shock=SHOCKS[name]))
         print(f"{name:<44}{bn(r['yuk20']):>9.1f}{bn(r['acik5']):>12.2f}")
+    print(f"\nIKI SISTEM, AYNI SOK (150 cekim, {SHOCK_YEAR}. yildan itibaren; 5. yil medyan):")
+    print(f"{'sok':<50}{'Ist. yerlesen':>14}{'net mr':>8}{'zarar':>7}{'Anad. yerlesen':>16}{'net mr':>8}{'zarar':>7}{'toplam net':>11}")
+    for name, i, a in compare_systems():
+        print(f"{name:<50}{i['N5']:>14,.0f}{bn(i['net']):>8.2f}{i['deficit']:>7.0%}{a['N5']:>16,.0f}{bn(a['net']):>8.2f}{a['deficit']:>7.0%}{bn(i['net'] + a['net']):>11.2f}".replace(",", "."))
     b = breakpoints()
     print(f"\nKirilma noktalari (tam olcek, oran {b['ratio_now']:.2f}):")
     print(f"  luks tahsilat en olasi degerin x{b['lux_carpan']:.2f}'ine inerse ({LIKELY['lux_coll'] * b['lux_carpan']:.0%}) oran 1'e iner")
