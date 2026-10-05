@@ -43,7 +43,7 @@ def cek_fx(rng):
     q = {
         "a": a_,                             # carry'den bagimsiz yillik doviz borc artisi, mlr $
         "c": c_,                             # mlr $ / puan carry
-        "faiz26": rng.uniform(30, 42),       # 2026 politika faizi, V22 2026 bos: VARSAYIM
+        "faiz26": rng.uniform(35, 40),       # 2026 politika faizi. PKA Eylul 2026: simdi %37, yil sonu %35,07 (Ag'ta gecelik %40)
         "decay": rng.uniform(0.60, 0.95),    # carry ve borc akisinin yillik sonmesi
         "gusd": rng.uniform(0.05, 0.09),     # GSYH dolar buyumesi
         "sA": rng.uniform(0.03, 0.15),       # doviz borc akisinin kira/konut kaynakli payi

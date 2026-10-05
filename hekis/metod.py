@@ -47,15 +47,24 @@ def rapor() -> str:
         L.append("  {:<11} {}".format(t, n))
         L.append("              etki: {}   [guven: {}]".format(e, g))
     L.append("")
-    L.append("2026 AGIRLIK DEGISIMI (yuzde)")
-    top = 0.0
-    for g, (a, b) in AGIRLIK_2025_2026.items():
-        L.append("  {:<28}{:>7.2f} -> {:>6.2f}  ({:+.2f})".format(g, a, b, b - a))
-        top += b
-    for g, w in AGIRLIK_2026_DIGER.items():
-        L.append("  {:<28}{:>7} -> {:>6.2f}".format(g, "?", w))
-        top += w
-    L.append("  bilinen 10 grubun toplami {:.2f}; geri kalan 3 grup (mobilya, eglence-kultur, kisisel bakim/diger) toplam {:.2f}".format(top, 100 - top))
+    import json as _json
+    import os as _os
+    T = _json.load(open(_os.path.join(_os.path.dirname(__file__), "..", "data", "tufe_agirlik_2016_2026.json")))
+    AG, KAP = T["agirlik"], T["kapsam"]
+    ADL = {"gida": "Gida ve alkolsuz icecek", "alkol_tutun": "Alkollu icecek ve tutun", "giyim": "Giyim ve ayakkabi",
+           "konut": "Konut, su, elektrik, gaz", "mobilya": "Mobilya ve ev bakimi", "saglik": "Saglik", "ulastirma": "Ulastirma",
+           "bilgi_iletisim": "Bilgi ve iletisim", "eglence_kultur": "Eglence, spor, kultur", "egitim": "Egitim",
+           "lokanta_konaklama": "Lokanta ve konaklama", "sigorta_finans": "Sigorta ve finansal hizmet", "kisisel_bakim_diger": "Kisisel bakim ve diger"}
+    L.append("AGIRLIK DEGISIMI 2025 -> 2026 (yuzde), BIRINCIL KAYNAK: TUIK ana grup agirliklari tablosu (COICOP 2018, 2025=100)")
+    for k, ad in ADL.items():
+        L.append("  {:<28}{:>7.2f} -> {:>6.2f}  ({:+.2f})".format(ad, AG[k]["2025"], AG[k]["2026"], AG[k]["2026"] - AG[k]["2025"]))
+    L.append("  Toplam 2025 {:.2f}, 2026 {:.2f}".format(sum(AG[k]["2025"] for k in AG), sum(AG[k]["2026"] for k in AG)))
+    hiz = sum(AG[k]["2026"] - AG[k]["2025"] for k in ("lokanta_konaklama", "eglence_kultur", "sigorta_finans"))
+    L.append("  Konut -3,86 puan; lokanta+konaklama +2,82, eglence-kultur +2,21, sigorta-finans +0,82: hizmet-agirlikli gruplar toplam +{:.2f} puan".format(hiz))
+    L.append("  Konut agirligi 2016-2025: " + ", ".join("{:.1f}".format(AG["konut"][str(y)]) for y in range(2016, 2026)) + " -> 2026 {:.1f} (uzun donem ort ~15, 2026 dusus kirilim)".format(AG["konut"]["2026"]))
+    L.append("  Kapsam 2025 -> 2026: madde {:.0f} -> {:.0f}, isyeri {:.0f} -> {:.0f}, fiyat {:.0f} -> {:.0f}, KIRA SAYISI {:.0f} -> {:.0f} (2023'ten beri 5.246, 2016-22: 4.274)".format(
+        KAP["madde"]["2025"], KAP["madde"]["2026"], KAP["isyeri"]["2025"], KAP["isyeri"]["2026"], KAP["fiyat"]["2025"], KAP["fiyat"]["2026"], KAP["kira_sayisi"]["2025"], KAP["kira_sayisi"]["2026"]))
+    L.append("  NOT: kira kaleminin kendi agirligi bu tabloda YOK (yalniz 2 haneli grup). Kira ornegi yalniz 5.246 sozlesme.")
     L.append("")
     L.append("TCMB DEGERLENDIRMESI (arama ozeti): agirlik yapisi Ocak enflasyonunu ~{:+.1f} puan etkiler; hizmet payi artisi yillik enflasyona ~{:+.1f} puan (mal-hizmet kaymasi {:.1f} puan)".format(
         TCMB_ETKI["agirlik yapisinin Ocak aylik etkisi"], TCMB_ETKI["hizmet payi artisinin yillik etkisi"], TCMB_ETKI["mal/hizmet kaymasi (puan)"]))
@@ -112,12 +121,19 @@ def rapor() -> str:
 
 def testler():
     out = []
-    bil = sum(v[1] for v in AGIRLIK_2025_2026.values()) + sum(AGIRLIK_2026_DIGER.values())
-    kalan = 100 - bil
-    out.append(("M1 agirlik kontrolu: bilinen 10 grup {:.2f}, kalan 3 grup {:.2f} (pozitif ve makul)".format(bil, kalan), 5 < kalan < 25, "kimlik/makullugu"))
+    import json as _json
+    import os as _os
+    T = _json.load(open(_os.path.join(_os.path.dirname(__file__), "..", "data", "tufe_agirlik_2016_2026.json")))["agirlik"]
+    top25 = sum(T[k]["2025"] for k in T)
+    top26 = sum(T[k]["2026"] for k in T)
+    out.append(("M1 birincil tablo: agirliklar 2025 {:.2f}, 2026 {:.2f} (100'e toplanmali)".format(top25, top26), abs(top25 - 100) < 0.05 and abs(top26 - 100) < 0.05, "kimlik"))
+    # arama ozeti ile birincil tablo uyumu
+    fark = max(abs(T["gida"]["2026"] - 24.44), abs(T["konut"]["2026"] - 11.40), abs(T["ulastirma"]["2026"] - 16.62), abs(T["lokanta_konaklama"]["2026"] - 11.13))
+    out.append(("M1b arama ozetindeki 2026 agirliklari (24,44 / 11,40 / 16,62 / 11,13) birincil tabloyla tutarli, en buyuk fark {:.2f}".format(fark), fark < 0.02, "onceki ikincil kaynaklar dogru cikti"))
     # efektif agirlik kimligi
     ef = {g: k / y for g, (y, k) in AGU26.items()}
-    sap = [abs(100 * ef[g] - AGIRLIK_2025_2026[g][1]) for g in ef]
+    _base = {"Gida ve alkolsuz icecek": T["gida"]["2026"], "Konut, su, elektrik, gaz": T["konut"]["2026"], "Ulastirma": T["ulastirma"]["2026"]}
+    sap = [abs(100 * ef[g] - _base[g]) for g in ef]
     out.append(("M2 katki/yillik = efektif agirlik, baz agirliktan en fazla {:.1f} puan sapti (fiyat kaymasi)".format(max(sap)), max(sap) < 2.5, "kimlik"))
     konut_y, konut_k = AGU26["Konut, su, elektrik, gaz"]
     fark = konut_k - konut_k / konut_y * 31.51
@@ -130,8 +146,8 @@ def testler():
             asma += 1
     out.append(("M3 A kanali dogrudan katkisi konut grubunun genel ustu fazlasini ({:.2f} puan) asmiyor: asma olasiligi %{:.1f}".format(fark, 100 * asma / 20000),
                 asma / 20000 < 0.01, "ust sinir testi"))
-    out.append(("M4 kira agirligi (TUFE'de) bu turda dogrulanamadi: w_kira 4,0-7,5% VARSAYIM, ust sinir konut grubu %11,4 eksi elektrik-gaz-su", None, "BILGI: TUIK 2026 agirlik tablosu gerek"))
-    out.append(("M5 birincil duyuru (30.10.2025) ilkeleri dogruluyor ama agirlik, madde ve grup SAYISI icermiyor; TUIK 2026 metodoloji dokumani ve TCMB analizi okunamadi, sayilar arama ozetinden", None, "BILGI: agirlik tablosu yuklenirse dogrulanir"))
+    out.append(("M4 kira kaleminin kendi agirligi TUIK tablosunda YOK (yalniz 2 haneli grup). w_kira 4,0-7,5% hala VARSAYIM, ust sinir konut grubu %11,4 eksi elektrik-gaz-su", None, "BILGI: 4 haneli (COICOP 04.1) agirlik gerek"))
+    out.append(("M5 agirlik, madde sayisi ve grup sayisi artik BIRINCIL tabloyla dogrulandi (arama ozetleri dogru cikti). TUIK 2026 metodoloji dokumani ve TCMB analizi hala okunamadi: TCMB'nin '+1 puan hizmet etkisi' ikincil", None, "BILGI"))
     out.append(("M6 alt endeks karsilastirilabilirligi: duyuruya gore alt endekslerde siniflama farki olabilir. Konut grubu 2025 'Konut' (%49,5 yillik, Drive) ile 2026 'Konut, su, elektrik, gaz ve diger yakitlar' (%39,8) ayni kapsam olmayabilir", None, "BILGI: grup duzeyinde 2025-26 kiyasi dikkatle okunmali, manset kiyasi guvenli"))
     return out
 

@@ -206,3 +206,13 @@ Veri: `data/ito_alt_kalem.json` (ITO Fiyat Indeksleri Kitabi PDF: Istanbul Ucret
 2. GOLGE: gecikmeli kur eklenince rho 0,68 -> 0,43 (se 0,15): ataletin ~%36'si gecmis kur soklarinin golgesi. Bir yili disarida birakinca 0,32-0,65. 3 terimli modelde pozitif parcalar icinde kur (bu yil + gecen yil) %54, saf atalet %46. Iki terimli modelde atalet %75 / kur %27 idi: AYRIM SPESIFIKASYONA BAGLI. Onceki 'atalet kurun 3 kati' ifadesi iki terimli modele ozgu, geri cekilmeli.
 3. MEKANIZMA: olculebilen endeksleme (kira sozlesmesi) saf ataletin ~%10'unu aciklar. Gerisi (ucret, beklenti, yonetilen fiyat) olculmedi.
 
+### Asgari ucret, PKA beklentileri, TUIK agirlik tablosu (ucret.py, beklenti.py, metod.py)
+
+Veri: `data/asgari_ucret.json` (arama sonuclari, resmi PDF okunamadi), `data/pka_2026_09.json` (TCMB PKA Eylul 2026), `data/tufe_agirlik_2016_2026.json` (TUIK Tablo4, birincil).
+
+**Asgari ucret** (`python -m hekis.ucret`): Ocak artisi = 11,0 + 0,61*onceki yil TUFE (n=11, R2 0,80; 2019-26: b 0,62, R2 0,88). Ocak artisi / onceki TUFE: 2024 0,76, 2025 0,68, 2026 0,87. Hedefin 11-16 puan ustunde (2024-25 hedef hafizadan). Reel asgari ucret 2015-25 x1,57. SAGLAMLIK: AR modeline ucret artisi eklenince rho 0,68 -> 0,32 gorunur ama yalniz Ocak kararinda anlamsiz, 2022-23 disarida etki yok (rho 0,72, c negatif). 'Ataletin yarisi ucret kanali' KANITLANMADI. Saglam: ucret davranisi gecmisi izliyor.
+
+**PKA Eylul 2026** (`python -m hekis.beklenti`): TUFE beklentisi 2026 sonu 29,61, 2027 sonu 22,69, 12 ay 23,70, 24 ay 18,32 (TCMB hedefi 5: 13 puan fark, capa yok). Beklenen kalicilik 0,75-0,77, gerceklesen 0,67-0,74. Kur 2026 sonu 51,57, 12 ay 58,60 (ima edilen oran kur/onceki TUFE ~0,63, modelin 0,5-0,9 araliginda). Politika faizi 37 -> 35,07 -> 29,22 -> 22,43. Cari acik beklentisi -50,1 / -44,4. Modelde faiz26 prior'i %30-42'den %35-40'a cekildi (T-B4 2026-07 NOP tahmini 203 -> 206, gercek 210,8).
+
+**TUIK agirlik tablosu**: 2026 agirliklari arama ozetleriyle birebir tutuyor. Konut 15,26 -> 11,40, lokanta 8,32 -> 11,13, eglence 2,13 -> 4,34, saglik 4,09 -> 2,79, bilgi 4,81 -> 3,10. Kira ornegi 5.246 sozlesme. Kira kaleminin kendi agirligi YOK, w_kira hala varsayim.
+
