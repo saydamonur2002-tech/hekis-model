@@ -374,3 +374,10 @@ class PilotTests(unittest.TestCase):
     def test_reality_checks_pass(self):
         from hekis import pilot
         self.assertTrue(all(ok for _, ok, _ in pilot.tests()))
+
+class AnchorTests(unittest.TestCase):
+    def test_anchor_scale(self):
+        from hekis import anchor
+        r = anchor.report()
+        self.assertTrue(0.001 < r["senet_mevduat"] < 0.01)
+        self.assertTrue(0.5 < r["senet_aktif"] < 2.0)
