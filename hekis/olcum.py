@@ -6,15 +6,17 @@ Ana cerceve: enflasyonun buyuk kismi atalet (okuma 1). Kontrol: TUFE'nin 'gercek
 (okuma 2) olasiligi. TUIK yaninda ENAG (ust) ve ITO (alt) olculeri. ENAG yontemi tartismali, dogru kabul
 edilmez; sinir degeri olarak kullanilir.
 
-Veri (arama ozetleri, Euronews/TUIK/ITO aktarimi): yil sonu 2024, 2025 ve 2026 Haziran/Agustos.
-Yalniz 2-3 nokta var: bu bir ISTATISTIK degil, TUTARLILIK testidir.
+Veri: ENAG ve TUIK arama ozetleri (Euronews aktarimi), ITO resmi tablo (hekis/ito.py). ENAG icin yalniz 2-3 nokta:
+bu bir ISTATISTIK degil, TUTARLILIK testidir. Daha ayrintili ITO analizi: python -m hekis.ito
 """
 
 import math
 
 TUIK = {"2024-12": 44.33, "2025-12": 30.89, "2026-06": 32.11, "2026-08": 31.51}
 ENAG = {"2024-12": 83.40, "2025-12": 56.14, "2026-06": 51.49, "2026-07": 50.49, "2026-08": 49.03}
-ITO = {"2025-12": 23.25}   # ITO yeni indeks (2023=100), arama ozeti
+# ITO tuketici = Istanbul Ucretliler Gecinme Indeksi, resmi tablo (data/ITO.md). DUZELTME: onceki surumde 23,25 yazmistim,
+# o ITO'nun TOPTAN endeksiydi, tuketici degil. Tuketici Ara 2025 = 40,12.
+ITO = {"2025-12": 40.12, "2026-08": 39.62}
 
 # model parcalari (kalibre.py, TUIK serisi): 2026 TUFE ~ sabit + kur + atalet
 PARCA_2026 = {"sabit": -2.5, "kur": 7.4, "atalet": 21.0, "kalinti": 2.0}
@@ -50,11 +52,11 @@ def rapor() -> str:
     L.append("  Yani kur payi en fazla %27 (TUIK), ENAG'a gore %17'ye iner. Atalet payi her halukarda en buyuk parca.")
     L.append("")
     k_enag = ENAG["2026-08"] / TUIK["2026-08"]
-    k_ito = ITO["2025-12"] / TUIK["2025-12"]
+    k_ito = ITO["2026-08"] / TUIK["2026-08"]
     L.append("Kanonik sonuc olcege duyarli mi? Uclu acmaz cozulurse 5 yilda {:.1f} puan (TUIK puani).".format(KANONIK_TUIK))
-    L.append("  ITO olcegi (x{:.2f}): {:.1f} puan;  TUIK: {:.1f};  ENAG olcegi (x{:.2f}, orantili): {:.1f} puan".format(
-        k_ito, KANONIK_TUIK * k_ito, KANONIK_TUIK, k_enag, KANONIK_TUIK * k_enag))
-    L.append("  Bant {:.1f}-{:.1f} puan. Sonuc kuculuk/buyukluk degil, ATALETIN BASKIN OLMASI olculerin hepsinde ayni.".format(KANONIK_TUIK * k_ito, KANONIK_TUIK * k_enag))
+    L.append("  TUIK: {:.1f};  ITO tuketici olcegi (x{:.2f}, orantili): {:.1f};  ENAG olcegi (x{:.2f}, orantili): {:.1f} puan".format(
+        KANONIK_TUIK, k_ito, KANONIK_TUIK * k_ito, k_enag, KANONIK_TUIK * k_enag))
+    L.append("  Bant {:.1f}-{:.1f} puan (TUIK alt sinir: ITO ve ENAG ikisi de TUIK'in ustunde). Etki kucuk ve atalete gore ikincil her olcuyle.".format(KANONIK_TUIK, KANONIK_TUIK * k_enag))
     L.append("")
     L.append("Fark zaman icinde kuculuyor: fark/TUIK {:.2f} (Ara 2024) -> {:.2f} (Ara 2025) -> {:.2f} (Haz 2026) -> {:.2f} (Agu 2026).".format(
         (ENAG["2024-12"] - TUIK["2024-12"]) / TUIK["2024-12"], (ENAG["2025-12"] - TUIK["2025-12"]) / TUIK["2025-12"],

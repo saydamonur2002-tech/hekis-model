@@ -166,7 +166,17 @@ Tahmin cekirdegi TUFE_t = a + b*kur_t + rho*TUFE_t-1 + delta (kalibre.py, bootst
 
 ### Olcum kontrolu: TUFE gercek enflasyonu olcuyor mu (olcum.py)
 
-`python -m hekis.olcum`. Ana cerceve atalet (okuma 1), olcum belirsizligi kontrol degiskeni (okuma 2). Veri arama ozetlerinden, yalniz 2-3 nokta: ENAG Ara 2024 83,4, Ara 2025 56,14, Haz 2026 51,49, Agu 2026 49,03; TUIK 44,33 / 30,89 / 32,11 / 31,51; ITO Ara 2025 23,25 (yeni indeks). ENAG yontemi tartismali, sinir degeri olarak kullanildi.
+`python -m hekis.olcum`. Ana cerceve atalet (okuma 1), olcum belirsizligi kontrol degiskeni (okuma 2). Veri arama ozetlerinden, yalniz 2-3 nokta: ENAG Ara 2024 83,4, Ara 2025 56,14, Haz 2026 51,49, Agu 2026 49,03; TUIK 44,33 / 30,89 / 32,11 / 31,51; [DUZELTILDI, bkz. Ito bolumu: 23,25 ITO'nun TOPTAN endeksiydi, tuketici Ara 2025 %40,12] ENAG yontemi tartismali, sinir degeri olarak kullanildi.
 
-Bulgu: bir yillik kalicilik TUIK x0,70, ENAG x0,67, yani atalet bulgusu olcuden bagimsiz (tek gecis, 2 nokta). Kur payi TUIK'te ~%26, ENAG'a gore ~%17; atalet her halukarda en buyuk. Kanonik sonuc 2,7 puan (TUIK puani), ITO olceginde 2,0, ENAG olceginde ~4,2 (orantili buyutme varsayimi). Olcu farki zamanla kuculuyor (fark/TUIK 0,88 -> 0,56), sabit carpan degil. ENAG 2020-23 serisi yok, rho ENAG ile yeniden tahmin edilemez.
+Bulgu: bir yillik kalicilik TUIK x0,70, ENAG x0,67, yani atalet bulgusu olcuden bagimsiz (tek gecis, 2 nokta). Kur payi TUIK'te ~%26, ENAG'a gore ~%17; atalet her halukarda en buyuk. Kanonik sonuc 2,7 puan (TUIK puani), ITO tuketici olceginde 3,4, ENAG olceginde ~4,2 (orantili buyutme varsayimi); bant 2,7-4,2. Olcu farki zamanla kuculuyor (fark/TUIK 0,88 -> 0,56), sabit carpan degil. ENAG 2020-23 serisi yok, rho ENAG ile yeniden tahmin edilemez.
+
+### ITO Enflasyon Indeksi, resmi tablo (ito.py)
+
+Veri: `data/ito_enflasyon_endeksi.json`, `data/ITO.md` (ITO PDF, Ocak 2023-Eylul 2026, 45 ay, Istanbul Ucretliler Gecinme ve Toptan Esya). `python -m hekis.ito`.
+
+- Yil sonu: ITO tuketici 74,88 / 55,27 / 40,12 (2023/24/25), TUIK 64,8 / 44,4 / 30,9, ENAG - / 83,4 / 56,14. ITO tuketici TUIK'in ~9-11 puan ustunde, ENAG'in altinda. Toptan 62,77 / 40,64 / 23,25.
+- Bir yillik kalicilik: tuketici olculerinde x0,67-0,74 (TUIK 0,69-0,70, ITO 0,73-0,74, ENAG 0,67), toptan x0,57-0,65. Model rho 0,68 bandin icinde.
+- Aylik yillik-yillik AR (ITO tuketici, n=33): rho 0,45 (se 0,19), R2 0,16. Yil sonu gecislerinden daha dusuk. Atalet 0,45-0,73 araligi; OVP'nin istedigi 0,45 bu aralikta (ust uste binen pencereler, tek rejim, dusuk R2).
+- Tuketici-toptan makasi +12 (2023), +15, +17 (2025), Agu 2026 +14,5, Eyl 2026 +10,4: enflasyon mal/kur tarafinda degil hizmet ve marj tarafinda.
+- Duzeltme: onceki surumde 'ITO Ara 2025 %23,25, TUIK'in altinda' demistim, bu toptan endeksiydi (arama ozeti karistirmisti).
 
