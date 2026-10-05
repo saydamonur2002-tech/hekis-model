@@ -46,4 +46,6 @@ Uc ikincil kanal (konut/kira, tedarik zinciri mahsubu, ic borclanma) cozulurse y
 
 Baz sonuc: tam cozumde yil 1 icin medyan 1,1 puan (aralik 0,7-1,5), ataletle 3. yilda 1,8 puan (1,2-2,6). Yarim uygulamada bunun yarisi. En belirsiz sayi, kilitli alacagin kapali dongu payi. Bu sayiyi e-fatura eslesme verisi olcer, model olcmez.
 
-Doviz kanali eklendi (D). Cekirdek: TCMB'nin yayimladigi %10 kur artisi basina ~2,5 puan, 1 yil, maliyet kaynakli. Ham kur serisi indirilemedi (TCMB/EVDS ag politikasiyla kapali), kur artisi yaklasik. Hepsi birlikte cozulurse medyan: yil 1 ~5 puan, yil 3 ~10 puan (aralik 7-13), yani %31,5 -> yaklasik %22 (%18-24).
+Doviz kanali (D) Drive'daki `Secici_Kredi_Veri_MOBIL.pdf` serisiyle kalibre edildi (`python -m hekis.kalibre`): TUFE ~ kur + onceki yil TUFE, 10 gozlem. Ayni yil geciskenlik 0,43 (se 0,16), atalet 0,68 (se 0,16). Kur 2023-25 dosyadan, 2014-22 hafizadan (dogrulanmadi). Indirgenmis bicim, ortak sok yukluyor, uzun donem 1,33 (>1) bunu gosterir.
+
+Hepsi birlikte cozulurse medyan: yil 1 ~6,9 puan, yil 3 ~12,3 puan (aralik 8-18), yani %31,5 -> yaklasik %19 (%14-23).

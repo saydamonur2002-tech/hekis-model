@@ -29,7 +29,9 @@ BUTCE_FAIZI = 2054.0         # milyar TL, 2025
 # ---- DISARIDAN (arama ile, ham seri indirilemedi: TCMB/EVDS ag politikasiyla kapali) ----
 # TCMB: sepet kuru %10 artarsa maliyet kaynakli 1 yillik TUFE etkisi ~2,5 puan.
 # Mekanik ithal icerik ~3,3 puan. Beklentiler dahil 6 ay kosullu manset ~6,6 puan.
-# Kur: 2025 ~%21, 2026 ~%24 yillik dolar/TL artisi YAKLASIK (JPM 2026 sonu 53,5 beklentisi). Seriyle degistirin.
+# Kur: Drive V21 notu yil sonu 2023 29,40 / 2024 35,22 / 2025 42,88 -> 2024 %19,8, 2025 %21,7.
+# 2026 artisi %20-28 VARSAYIM (JPM yil sonu 53,5 beklentisi ~%25). Kalibrasyon: hekis/kalibre.py
+# (TUFE ~ kur + onceki yil TUFE, 10 gozlem): ayni yil geciskenlik 0,43 (se 0,16), atalet 0,68 (se 0,16).
 
 # ---- TURETILMIS -----------------------------------------------------------
 R_EFEKTIF = FINANSMAN_GIDERI / TICARI_STOK      # ~%24,9 efektif firma faizi
@@ -61,14 +63,12 @@ def cek(rng):
         "acik_fazla": rng.triangular(0.3, 2.5, 1.2),  # esik ustu acik, GSYH yuzdesi (low, high, mode)
         "beta": rng.uniform(0.15, 0.50),          # %1 GSYH mali itis basina enflasyon puani (net, verimlilik dahil)
         # D doviz
-        "d_yil": rng.uniform(0.20, 0.28),         # dolar/TL yillik artis, bu yil (yaklasik)
-        "d_onceki": rng.uniform(0.18, 0.24),      # onceki yil (gecikmeli geciskenlik icin)
+        "d_yil": rng.uniform(0.20, 0.28),         # dolar/TL yillik artis, bu yil (2025 gozlem %21,7, 2026 varsayim)
         "d_cozum": rng.uniform(0.03, 0.12),       # doviz kisiti cozulunce kalacak yillik deger kaybi
-        "phi1": rng.uniform(0.18, 0.38),          # ayni yil geciskenlik (TCMB 1 yil toplam ~0,25; beklenti dahil ~0,45)
-        "phi2": rng.uniform(0.05, 0.15),          # gecikmeli geciskenlik
+        "phi1": rng.uniform(0.25, 0.55),          # ayni yil geciskenlik: TCMB maliyet 0,25 .. veri 0,43+-0,16
         "ortusme_fx": rng.uniform(0.0, 0.20),     # kurun bir kismi A-C kanallarinin sonucu, cift sayim
         # ortak
-        "atalet": rng.uniform(0.30, 0.60),        # gecmis enflasyona endekslenme
+        "atalet": rng.uniform(0.35, 0.70),        # gecmis enflasyona endekslenme, veri 0,68+-0,16 (kalibre.py)
         "ortusme": rng.uniform(0.05, 0.30),       # B ve C ayni faiz/kredi hattini sayar, cift sayim payi
     }
 
@@ -96,11 +96,11 @@ def kanallar(p, uygulama=1.0):
     toplam = (a + b + c) * (1.0 - p["ortusme"])
     k = p["ortusme"]
 
-    # D: doviz. Kur artisi cozum rejiminde d_cozum'a iner. Yil 1'de yalniz ayni yil
-    # geciskenligi kalkar, gecikmeli kisim gecmis kurdan gelir (yil 2'de kalkar).
+    # D: doviz. Kur artisi cozum rejiminde d_cozum'a iner. Ayni yil geciskenligi
+    # yil 1'de, gecikmeli etki atalet uzerinden yil 2-3'te gelir (A-C ile ayni yil3 kurali).
     fark = max(0.0, p["d_yil"] - p["d_cozum"])
     d1 = p["phi1"] * fark * 100
-    d3 = (p["phi1"] + p["phi2"]) * fark * 100 * (1 + p["atalet"])
+    d3 = yil3(p, d1)
     cift = 1.0 - p["ortusme_fx"]
     return {
         "D doviz": d1 * cift * uygulama,
