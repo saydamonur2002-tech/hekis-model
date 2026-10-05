@@ -14,9 +14,9 @@ import math
 from hekis import anadolu, cities, evaluate as E, final, politics, zones
 from hekis.bind import load_obs
 
-INC = (0.5, 0.7, 0.85, 1.0, 1.2, 1.5)
-ALPHA = (0.4, 0.6, 0.8, 1.0, 1.2)
-COST = (1.0, 1.3)
+INC = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.35, 1.5)
+ALPHA = (0.4, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2)
+COST = (1.0, 1.15, 1.3)
 LIKELY = zones.LIKELY
 
 
@@ -31,11 +31,14 @@ def city_block(name: str, stok: float, g_base: float, s: float, q_h: float | Non
     cap, fee = {**E.BASE, **LIKELY, **tariff}["cap"], {**E.BASE, **LIKELY, **tariff}["fee"]
     logit = lambda p: math.log(p / (1 - p))
     holds = []
-    for cm in COST:
+    for cm in (1.0, 1.3):
         zz = run(util_scale=cm, aidat_scale=cm)
         holds.append(logit(zz["p"] / cap) / 25.0 - fee + g_base)
-    B = [[[run(inc_scale=s * m, alpha=E.BASE["alpha"] * a, util_scale=c, aidat_scale=c)["sub1"] / run(inc_scale=s * m, alpha=E.BASE["alpha"] * a, util_scale=c, aidat_scale=c)["N"]
-           for c in COST] for a in ALPHA] for m in INC]
+    def unit(m, a, c):
+        zz = run(inc_scale=s * m, alpha=E.BASE["alpha"] * a, util_scale=c, aidat_scale=c)
+        return zz["sub1"] / zz["N"]
+
+    B = [[[unit(m, a, c) for c in COST] for a in ALPHA] for m in INC]
     return {"ad": name, "stok": stok, "g_base": g_base, "fS": [x / stok for x in z["S"]], "V": list(z["V"]), "hold": holds, "B": B,
             "households": households, "q_h": z["q_h"]}
 
