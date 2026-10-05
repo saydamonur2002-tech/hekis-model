@@ -30,12 +30,15 @@ def band_factor(a: float, b: float, sigma: float) -> float:
 
 def run_three_zone(P: dict | None = None, q_h: float | None = None, cut: float = 0.20, sigma: float = 0.6,
                    fee_buffer: float | None = None, lux_vac: float | None = None, premium: float = 0.0,
-                   pool_rent_mult: float = 1.0, senet_coupling: bool = True) -> dict:
+                   pool_rent_mult: float = 1.0, senet_coupling: bool = True, obs_mut=None,
+                   households: float | None = None, tenant_share: float | None = None) -> dict:
     """fee_buffer: tampon bedeli (varsayilan genel bedel). lux_vac: luks bandinin bos stoktaki payi (varsayilan cut: bosluk
     deger sirasina esit dagilmis). Daha buyukse bosluk luks bandina kaymistir, kalan havuz ve tampon arasinda
     q_h : (1 - q_h - cut) oraninda bolunur."""
     P = {**E.BASE, **LIKELY, **(P or {})}
     obs = E.make_obs(P)
+    if obs_mut is not None:
+        obs_mut(obs)
     q_h = union.quantile_of_income(union.MEMUR_FLAT) if q_h is None else q_h
     stok = P["stok"]
     fee_b = P["fee"] if fee_buffer is None else fee_buffer

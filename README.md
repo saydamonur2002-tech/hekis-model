@@ -151,6 +151,12 @@ Orta durum (kalan %20, 26.000 TL/m2, 100 m2): daire basina 520.000 TL, Esenyurt 
 
 Baz (30 bin duran konut, %50 tamamlanabilir, %41 HEKIS bandi): 6.112 daire, 3,2 mr TL sermaye, 0,64 mr TL/yil sub. Mevcut bos stokla (36.963 daire, 3,92 mr sub.) toplam 43.076 daire, 4,56 mr TL/yil sub., uygun kiracinin %7,7'si (mevcut stok tek basina %6,6). Duyarlilik: tum 30 bin tamamlanir ve hepsi HEKIS bandina girerse 30 bin daire, 15,6 mr sermaye, 3,2 mr/yil sub. (mevcut stok sonucunun 0,8 kati). Sektor iddiasi 100 bin cikarsa her sey 3,3 katina cikar. Yasal sahiplik, yapi guvenligi, tapu ve kentsel donusum projeleriyle cakisma hesapta yok.
 
+### 7b-6. Anadolu buyuksehirleri tarifesi
+
+`data/ANADOLU.md`, `data/ANADOLU_TARIFE.md`, `python -m hekis.anadolu`. Ankara, Izmir, Bursa, Antalya, Konya, Adana, Kocaeli; fiyat ve kira carpani Istanbul'a gore, HEKIS gelir esigi duz memur maasi (ulusal sabit; sehir gelirine gore alt %39-54). Istanbul tarifesi (genel %1, luks %5) yedi sehirde oran 2,8-3,3 verir: subvansiyon kucuk (sosyal kira yerel kiraya yakin, abonelik payi %39). Secilen tarife genel %0,5 / luks %3: 67 bin HEKIS dairesi, oran 2,1, 107 bin bosluktan cikan (Istanbul tarifesi 143 bin). HEKIS daire sayisi tarifeden bagimsiz (66-68 bin), katilim tavani belirliyor. Gelir yalniz Ankara ve Izmir icin teyitli, bos stok ve kiraci payi il bazinda yok (Istanbul/ulusal varsayim).
+
+Kanun taslagi guncellendi (`data/KANUN_TASLAGI.md`): bolge ayrimi, luks tarife, elektrik tuketimine dayali tespit, duran insaat tamamlama maddesi, bedel gelirinin kullanimi, havuz teklifi alt siniri.
+
 ## 7c. Istanbul ve 7 buyuksehir (simdilik kapsam disi, ayri calisma)
 
 `python -m hekis.cities`. Sehirler: Istanbul, Ankara, Izmir, Bursa, Antalya, Konya, Adana, Kocaeli (TUIK 2025 konut satisi siralamasi; Gaziantep, Mersin, Sanliurfa bu aramada gorulmedi, siralama tam dogrulanmadi). Nufus TUIK ADNKS 2025: 39,0 mn, Turkiye'nin %45'i. Fiyat ve kira carpani Istanbul'a gore ortalama satis ve kira orani (Emlakjet-Endeksa Agustos 2026): Ankara 0,70 / 0,76, Izmir 0,89 / 0,73, Antalya 0,83 / 0,64, Bursa 0,64 / 0,53. Kocaeli, Konya, Adana icin veri yok, Bursa degerleri yer tutucu. Bos stok kisi basi Istanbul ile ayni (450 bin / 15,75 mn), hane buyuklugu 3,08, kiraci payi %27, gelir dagilimi ulusal: hepsi varsayim. Beklenen reel artis sehir bazinda KFE'ye Endeksa'nin sehir-Turkiye reel farki eklenir (Istanbul -%3,7, Ankara -%2,8, Kocaeli -%3,2, Antalya -%5,3, digerleri -%6,5).

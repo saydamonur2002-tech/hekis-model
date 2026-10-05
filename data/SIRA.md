@@ -4,7 +4,7 @@ Durum, 2026-10-05. Kapsam Istanbul.
 
 1. Model. TAMAM. Havuz, oturan, senet, elde tutma karari, uc bolge, luks tarife, abonelik, dereceli kira, duran insaat, havuz kirasi carpani. 46 test, 15 gerceklik kontrolu, Monte Carlo. Ozet `SONUC.md`, ayrinti `README.md`, varsayimlar `data/VARSAYIM.md`.
 2. Finansal sistem. ACILABILIR, ama model sonucuyla senet tasarimi cakisiyor (asagida).
-3. Yaptirim kanun taslagi. ACILABILIR, ama taslaktaki oranlar eski modelden, guncellenmeli (asagida).
+3. Yaptirim kanun taslagi. GUNCELLENDI (`KANUN_TASLAGI.md`, 2026-10-05): bolge ayrimi, luks tarife, tespit, tamamlama maddesi, model bagi. Anadolu buyuksehirleri icin ayri tarife yazildi (`ANADOLU_TARIFE.md`, %0,5 genel / %3 luks, veri `ANADOLU.md`).
 
 ## 2. Finansal sistem: modelden gelen girdiler ve cakismalar
 
@@ -18,7 +18,7 @@ Model verdi: reel kupon sifir, anapara TUFE ile yurur, geri odeme %83 (luks ayri
 | Katilim primi | Yok | Prim katilimi %16-28 artirir, tavana carpar | Prim yerine tavani artiran tadilat/duran insaat |
 | Kupon | Reel sifir | Katilim reel faize bagli (esik ~ -%0,4) | Kupon sifir kalirsa pencere reel faize bagimli |
 
-## 3. Yaptirim kanun taslagi: modelle uyumsuz maddeler
+## 3. Yaptirim kanun taslagi: guncelleme oncesi uyumsuz maddeler (hepsi KANUN_TASLAGI.md'de giderildi)
 
 Taslak "ucuncu ve sonrasi duran birim %4" diyor (Esenyurt, havuz %80 teklif, 5 yilda satis karari). Guncel model bedeli ayri kullanir.
 
@@ -35,6 +35,5 @@ Taslak "ucuncu ve sonrasi duran birim %4" diyor (Esenyurt, havuz %80 teklif, 5 y
 Taslaktaki "Anayasa madde 35 ve 73" siniri hala ayri sinav, modellenmedi.
 
 ## Sirada
-1. Taslagi guncel orana cek: bolge ayrimi, luks tarife, tespit (tuketim verisi), duran insaat tamamlama maddesi.
-2. Senet tasarimini guncel havuz buyuklugu ve odenmeyen kalan anapara icin yeniden yaz.
-3. TOKI-HEKIS is bolumu (`TOKI_HEKIS_IS_BOLUMU.md`) taslak maddelere baglanir.
+1. Senet tasarimini guncel havuz buyuklugu ve odenmeyen kalan anapara icin yeniden yaz.
+2. TOKI-HEKIS is bolumu (`TOKI_HEKIS_IS_BOLUMU.md`) taslak maddelere baglanir.

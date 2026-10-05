@@ -331,5 +331,33 @@ class PoolRentTests(unittest.TestCase):
         self.assertAlmostEqual(scaled[0].tenant_pay, base[0].tenant_pay)  # oturan payi ayri
 
 
+class AnadoluTests(unittest.TestCase):
+    def test_all_cities_run_and_finite(self):
+        from hekis import anadolu
+        for c in anadolu.ANADOLU:
+            o = anadolu.run(OBS, c)
+            for k in ("N", "sub1", "rev", "yuk", "ratio", "coverage"):
+                self.assertTrue(math.isfinite(o[k]), (c, k))
+            self.assertGreater(o["N"], 0)
+
+    def test_lower_tariff_lower_revenue_and_freed_units(self):
+        from hekis import anadolu
+        hi = anadolu.run(OBS, "ankara", fee=0.01, lux_fee=0.05)
+        lo = anadolu.run(OBS, "ankara", fee=0.005, lux_fee=0.03)
+        self.assertLess(lo["rev"], hi["rev"])
+        self.assertLess(lo["freed_buf"] + lo["freed_lux"], hi["freed_buf"] + hi["freed_lux"])
+
+    def test_poorer_city_has_wider_hekis_band(self):
+        from hekis import anadolu
+        # memur maasi ulusal sabit: geliri dusuk sehirde ayni maas daha yuksek yuzdelige denk gelir
+        self.assertGreater(anadolu.city_setup(OBS, "konya")["q_h"], anadolu.city_setup(OBS, "ankara")["q_h"])
+
+    def test_data_complete(self):
+        for c in ("ankara", "izmir", "bursa", "antalya", "konya", "adana", "kocaeli"):
+            d = OBS["sehirler"][c]
+            for k in ("nufus", "satis", "kira", "hane_buyuklugu", "gelir_orani"):
+                self.assertIn(k, d)
+
+
 if __name__ == "__main__":
     unittest.main()
