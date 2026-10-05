@@ -103,6 +103,8 @@ def rapor() -> str:
     L.append("  Kira disenflasyonunun TUFE'ye katkisi (kira agirligi 4,0-7,5% VARSAYIM): 2026 {:.1f} puan dusus x agirlik = {} puan; 2027 {:.1f} puan x agirlik = {} puan".format(
         d26, f(c26), d27, f(c27)))
     L.append("  Yani politika olmadan, kira kalemi 2026'da ~1,2, 2027'de ~0,6 puan dezenflasyon uretir. Bu OVP'nin istedigi ek dezenflasyonun (-3,7) ~%15'i.")
+    L.append("  DIKKAT: ITO konut serisiyle sinama (hekis/ito_alt.py) 12 ay gecikmeyi DESTEKLEMEDI (r=0,16, en iyi ~23 ay r=0,45); seviye kontrolu L=24'u reddetti.")
+    L.append("  Makul gecikme 12-18 ay: 2026 katki 1,2-1,6, 2027 katki 0,6-1,2 puan. Bu satirdaki 12 ay tahmini alt uc sayilmali.")
     L.append("")
 
     L.append("5. A (KIRA/KONUT) KANALINA ETKISI")

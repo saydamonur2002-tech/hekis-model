@@ -189,3 +189,13 @@ Veri: `data/ykke_2026_08.json` (TCMB EVDS TP.YKKE.*, 2018-01..2026-08, 19 bolge)
 - HIPOTEZ (tek nokta): TUFE kira (mevcut sozlesme) ~ YKKE yillik 12 ay once. Subat 2026'da mevcut kiraci %53,9 = YKKE Subat 2025 %53,9 (6 ay: 45,4, 18 ay: 61,7 tutmuyor). Konut grubu Agu 2026 %39,77 ile tutarli (elektrik-gaz-su artisi 29-37%).
 - Dogruysa TUFE kirasi kendiliginden duser: Ara 2025 57,7 -> Agu 2026 45,4 -> Ara 2026 36,0 -> Agu 2027 ~26,4. Kira agirligi 4,0-7,5% varsayimiyla TUFE'ye katki: 2026 ~1,2 puan [0,9-1,6], 2027 ~0,6 puan. OVP'nin istedigi ek dezenflasyonun (-3,7) ~%15'i. A kanalinin dogrudan etkisi (0,2) bunun yaninda ikincil.
 
+### ITO alt kalemler: konut, hizmet, gecikme sinamasi (ito_alt.py)
+
+Veri: `data/ito_alt_kalem.json` (ITO Fiyat Indeksleri Kitabi PDF: Istanbul Ucretliler Geckinme, 9 alt grup yillik % degisim Oca 2021-Ara 2025, seviye 1996-2025, 1995=100). `python -m hekis.ito_alt`. Genel Aralik yillik degerleri onceki ITO tablosuyla birebir ayni (capraz dogrulama).
+
+- Aralik 2025 yillik: genel 40,1; KONUT 59,2 (+19,1); ulastirma+haberlesme 56,3 (+16,2); gida 36,0; saglik 32,8; kultur-egitim 31,1; ev esyasi 29,1; giyim 24,0.
+- Konut - genel (puan): 2021 +6,4, 2022 -13,0, 2023 -28,7, 2024 +27,4, 2025 +19,1. Sozlesmelerin gecikmeli yetismesi (2022-23 yasal kira tavani %25 hafizadan, dogrulanmadi).
+- Konutun goreli fiyati (konut/genel): 1996-2020 ort 1,306 (sd 0,090), 2023 dip 0,874, Aralik 2025 1,169: tarihsel ortalamanin 1,5 sd altinda. YKKE'deki reel x2,5'e ters gorunur; konut endeksi kira+enerji+bakim bilesimi, mevcut sozlesmeler.
+- Gecikme sinamasi: konut yillik ile YKKE yillik(t-L) korelasyonu en iyi L=23 ay (r=0,45), L=12'de 0,16. kira.py'nin 12 ay hipotezi bu seride DESTEKLENMEDI. L=24 seviye olarak imkansiz (Ara 2025 kira %117 > konut %59). Makul L=12-18: kira kendiliginden dezenflasyonu 2026 1,2-1,6, 2027 0,6-1,2 puan.
+- Testler 3/4 (T-A3 ve T-A7 hipotez reddi). Kira alt kalemi ve agirliklari ITO tablosunda yok.
+
