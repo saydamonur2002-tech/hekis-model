@@ -216,3 +216,10 @@ Veri: `data/asgari_ucret.json` (arama sonuclari, resmi PDF okunamadi), `data/pka
 
 **TUIK agirlik tablosu**: 2026 agirliklari arama ozetleriyle birebir tutuyor. Konut 15,26 -> 11,40, lokanta 8,32 -> 11,13, eglence 2,13 -> 4,34, saglik 4,09 -> 2,79, bilgi 4,81 -> 3,10. Kira ornegi 5.246 sozlesme. Kira kaleminin kendi agirligi YOK, w_kira hala varsayim.
 
+
+## Kamu zamlari ve PKA beklenti zaman serisi (hekis/kamu.py)
+`python -m hekis.kamu`. Veri: data/kamu_zamlari.json (arama ozeti, guven bayrakli), data/pka_zaman_serisi.json (EVDS PKA 2014-04..2026-09).
+- Emekli artisi mekanik geriye endeksleme: 2026 iki artisin bilesigi 32,11 = TUIK Haz 2026 yillik TUFE (tutarli; 2025: 35,0 vs 35,05 hafizadan). 2024 Ocak 49,25 dusuk guven.
+- Memur zammi / onceki yil TUFE: 2025 0,26, 2026 0,60; asgari ucret 0,68 ve 0,87 (toplu sozlesme asgariden dusuk).
+- PKA: Ocak yil-sonu beklentisi onceki yil gerceklesmesiyle korelasyon 0,97 (beklenti = a + 0,54*onceki yil), gerceklesmeyi ort. +10,4 puan dusuk tahmin etmis; gerceklesme ~ beklenti (b 1,38) ama onceki yil eklenince ayrisamiyor (n=11). 24 ay beklentisi 18,3 (hedef 5): capa yok.
+- Sonuc: atalet **beklenti ve yasal/idari endeksleme kanallarindan geriye bakisla tasiniyor**; hangisinin NEDEN oldugu bu veriyle ayrilamaz. Kamu zam verisi resmi tabloyla dogrulanmali.
