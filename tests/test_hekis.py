@@ -411,3 +411,12 @@ class HorizonTests(unittest.TestCase):
         self.assertGreater(s["N5"], 0)
         shocked = horizon.summarize(horizon.monte_carlo(60, shock=horizon.SHOCKS["fiyat rallisi (g_e +10 puan)"]))
         self.assertLessEqual(shocked["N5"], s["N5"])
+
+
+class ShockExtraTests(unittest.TestCase):
+    def test_annulment_hurts_and_freezes(self):
+        from hekis import horizon
+        base = horizon.summarize(horizon.monte_carlo(60))
+        ann = horizon.summarize(horizon.monte_carlo(60, shock=horizon.SHOCKS["bedel iptali (hukuki)"]))
+        self.assertLess(ann["net"], base["net"])
+        self.assertLess(ann["size5"], base["size5"])

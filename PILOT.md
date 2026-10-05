@@ -61,6 +61,14 @@ Erozyon duyarlılığı (0/25/50): 5. yıl yerleşen 11,9 / 11,7 / 11,0 bin, net
 | kombine (ralli + lüks ×0,5) | 23,7 bin | 430 | 1,0 | 0% | 0% |
 
 Okuma: sistem finansal olarak şoka dirençli (kapı büyümeyi durdurur, zarar sınırlı) ama küçülerek: fiyat rallisinde katılım %15'in altına iner (+4,1 puan yeter), program 430 haneye kalır. Yani zayıflık finansal değil, ölçek: beklenen fiyat artışı dönerse sistem boşalır. Finansal kırılma noktası lüks tahsilat (en olası değerin ×0,17'si, yani %7); genel tahsilat tek başına kırmaz, lüks yerindeyse sıfıra inse bile.
-Ölçülmeyenler: enflasyon şoku (yıl-1 oranına yansımıyor; indeksli akış 20 yılda işler), hukuki iptal (bedelin tamamen düşmesi), kur şoku.
+Eklenen şoklar (3. yıldan itibaren):
+| şok | ölçek | yerleşen | 5y net mr | zarar | 20y yük (5. yıl ölçeğinde, mr) |
+|---|---|---|---|---|---|
+| enflasyon +10 puan | 148 bin | 11,7 bin | 2,2 | 0% | 25,7 (şoksuz 26,6) |
+| kur şoku (enf +10, maliyet ×1,3) | 148 bin | 11,8 bin | 2,1 | 0% | 27,2 |
+| bedel iptali (hukuki, gelir 0) | 23,7 bin | 1,9 bin | −0,4 | %78 | 4,3 (yıllık açık +0,2 mr) |
+
+Okuma: enflasyon sistemi bozmuyor, hatta yükü hafif düşürüyor: kira ve anapara TÜFE endeksli, tasarım nötr. Bu iyi haber olmayabilir: modelde oturanın geliri endekslenmiyor, ödeme gücü erimesi (kiracı tahsilatı) ölçülmedi. Kur şoku yalnız enflasyon + maliyet vekiliyle modellendi (yük +%2); sermaye çıkışı, dolarizasyon, senet etkisi yok. Bedel iptali en sert şok: %78'de 5 yıl net negatif; ama kapı iptalden sonra büyümeyi durdurduğu için kayıp küçük (medyan −0,4 mr, 20 yıl yük 4,3 mr). Aynı iptal tam ölçekte (450 bin) gelseydi bedel geliri (9,4 mr/yıl) kaybolur, 20 yıl sübvansiyon yükü ≈84 mr TL reel olurdu: kademeli büyümenin asıl değeri bu risk farkı (≈20 kat). Yerleşmiş hanelerin çıkarılamayacağı varsayıldı.
+Ölçülmeyenler: oturan gelirinin enflasyonla erimesi, sermaye çıkışı/dolarizasyon, kısmi (örn. yalnız lüks) iptal.
 Sınırlar: erozyon oranı varsayım; şokta geri çekilme/küçülme kuralı yok (yalnız dondurma); ölçüm başına tam yıl; gerçek değerler doğrulanmamış aralıklardan.
 

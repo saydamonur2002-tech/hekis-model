@@ -35,6 +35,8 @@ SHOCKS = {
     "enflasyon sokunu (+10 puan)": {"infl_shift": 0.10},
     "hane geliri -%30": {"inc_mult": 0.7},
     "kombine (rally + luks x0,5)": {"g_e_add": 0.10, "lux_mult": 0.5},
+    "bedel iptali (hukuki)": {"lux_mult": 0.0, "coll_mult": 0.0},
+    "kur sokunu (enf +10; maliyet x1.3)": {"infl_shift": 0.10, "cost_mult": 1.3},
 }
 
 
@@ -49,6 +51,9 @@ def apply_shock(P: dict, shock: dict) -> dict:
     out["coll"] = P["coll"] * shock.get("coll_mult", 1.0)
     if "infl_shift" in shock:
         out["infl_shift"] = shock["infl_shift"]
+    if "cost_mult" in shock:
+        out["util_scale"] = E.BASE["util_scale"] * shock["cost_mult"]
+        out["aidat_scale"] = E.BASE["aidat_scale"] * shock["cost_mult"]
     if "inc_mult" in shock:
         out["inc_scale"] = E.BASE["inc_scale"] * shock["inc_mult"]
     return out
@@ -79,7 +84,7 @@ def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, eros
         z = run_three_zone(P={**LIKELY, **Pt, "stok": size})
         n_lux = z["S"][2] * (1 - final.lux_response(0.05))
         n_gen = z["S"][0] * (1 - z["p"]) + z["S"][1] * (1 - final.lux_response(0.01))
-        rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"]})
+        rows.append({"yil": year, "stok": size, "N": z["N"], "sub": z["sub1"], "rev": z["rev"], "ratio": z["ratio"], "p": z["p"], "yuk": z["yuk"]})
         if rng is None:
             o_g, o_l, o_p = Pt["coll"], Pt["lux_coll"], z["p"]
         else:
@@ -105,6 +110,8 @@ def summarize(paths: list[list[dict]]) -> dict:
         "N5": st.median(p[4]["N"] for p in paths),
         "net": st.median(net),
         "deficit": sum(x < 0 for x in net) / n,
+        "yuk20": st.median(p[4]["yuk"] for p in paths),
+        "acik5": st.median(p[4]["sub"] - p[4]["rev"] for p in paths),
         "ratio_lt1": sum(p[4]["ratio"] < 1.0 for p in paths) / n,
         "full5": sum(p[4]["stok"] >= FULL for p in paths) / n,
         "stuck": sum(p[4]["stok"] <= START for p in paths) / n,
@@ -153,12 +160,16 @@ def main() -> int:
     for name, sh in SHOCKS.items():
         r = summarize(monte_carlo(shock=sh))
         print(f"{name:<34}{r['size5']:>13,.0f}{r['N5']:>10,.0f}{bn(r['net']):>11.2f}{r['deficit']:>9.0%}{r['ratio_lt1']:>10.0%}".replace(",", "."))
+    print("\n20 yillik yuk (5. yildaki olcekte, reel mr TL) ve 5. yil yillik acik (sub - bedel; negatif = fazla):")
+    print(f"{'sok':<44}{'20y yuk':>9}{'5.yil acik':>12}")
+    for name in ("yok", "enflasyon sokunu (+10 puan)", "kur sokunu (enf +10; maliyet x1.3)", "bedel iptali (hukuki)"):
+        r = summarize(monte_carlo(shock=SHOCKS[name]))
+        print(f"{name:<44}{bn(r['yuk20']):>9.1f}{bn(r['acik5']):>12.2f}")
     b = breakpoints()
     print(f"\nKirilma noktalari (tam olcek, oran {b['ratio_now']:.2f}):")
     print(f"  luks tahsilat en olasi degerin x{b['lux_carpan']:.2f}'ine inerse (%{LIKELY['lux_coll'] * b['lux_carpan']:.0%}) oran 1'e iner")
     print(f"  genel tahsilat x{b['genel_carpan']:.2f}'ine inerse oran 1'e iner (luks yerindeyken)")
     print(f"  beklenen reel konut artisi +{b['g_e_artis']:.1%} puan yukselirse katilim %15'in altina iner (finansal degil, olcek sorunu)")
-    print("Not: enflasyon sokunun etkisi yil-1 oranina yansimaz (indeksli kira/anapara 20 yilda isler); bu tabloda olculmedi.")
     return 0
 
 
