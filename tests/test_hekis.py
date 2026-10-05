@@ -405,6 +405,9 @@ class HorizonTests(unittest.TestCase):
         from hekis import horizon
         det = horizon.one_path({}, None)
         sizes = [r["stok"] for r in det]
-        self.assertEqual(sizes, [3800, 20000, 100000, 450000, 450000])
+        self.assertEqual(sizes[0], 3800)
+        self.assertTrue(all(b <= a * horizon.GROWTH_CAP + 1e-6 for a, b in zip(sizes, sizes[1:])))
         s = horizon.summarize(horizon.monte_carlo(60))
-        self.assertGreaterEqual(s["p_full_y5"], s["p_full_y4"])
+        self.assertGreater(s["N5"], 0)
+        shocked = horizon.summarize(horizon.monte_carlo(60, shock=horizon.SHOCKS["fiyat rallisi (g_e +10 puan)"]))
+        self.assertLessEqual(shocked["N5"], s["N5"])

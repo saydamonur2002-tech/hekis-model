@@ -44,10 +44,23 @@ Lüks tahsilatı mahalle pilotunda ölçülemediği için pilot ≈3.800 birime 
 Geçiş kuralı (okunan değer): genel tahsilat %30 ise lüks ≥%18 (13+4,6); %20 ise ≥%23; %10 ise ≥%29. Eşiğin altında kalırsa K3'e (hedef primi) geçilmez; ilk iş lüks bedel tahsilat yolu (tespit, yaptırım) düzeltilir.
 Not: hata hesabı bağımsız birim varsayar; aynı sahibin birden fazla birimi, aynı mahallede kümelenme hatayı büyütür.
 
-## 5 yıllık kademeli genişleme (`python -m hekis.horizon`)
-Kademeler: 3.800 → 20.000 → 100.000 → 450.000 boş birim; her yıl ölçüm, eşik tutarsa ertesi yıl bir kademe. Eşik: ölçülen tahsilatlarla oran ≥1,25 ve ölçülen katılım %15-38. Tutmazsa aynı kademede kalınır, düzeltme etkisi yok (muhafazakâr).
+## 5 yıllık kademeli genişleme, ölçek erozyonu, şok direnci (`python -m hekis.horizon`)
+Kurgu: 3.800 birimle başlar; her yıl ölçüm, eşik tutarsa ertesi yıl ölçek ×2,5 (tavan 450.000). Eşik: ölçülen tahsilatlarla oran ≥1,25, ölçülen katılım %15-38; tutmazsa dondurulur. Ölçek erozyonu (VARSAYIM, veri yok): tahsilat 3.800→450.000 arasında log ölçekte %25 düşer. Şok 3. yıldan itibaren. 300 çekim.
 
-Kusursuz ölçüm, en olası senaryo: yerleşen 312 → 1.643 → 8.214 → 36.963 → 36.963; 5 yıl toplam net (bedel − sub.) +12,4 mr TL.
-Belirsiz gerçek değerler + ölçüm hatası (400 çekim): tüm İstanbul'a 4. yılda %71, 5. yılda %74 ulaşır; %18 pilotta takılır; 5. yıl medyan yerleşen 35,8 bin; yanlış geçiş %0; yanlış ret %26 (gerçek oran ≥1,25 iken takılan).
+Önceki varsayımla (erozyon yok, büyüme sınırı yok) yerleşen: 312 / 1.249 / 4.994 / 19.977 / 36.963. Erozyon ve ×2,5 tavanıyla: 312 / 780 / 1.951 / 4.877 / 12.193; 5. yılda ölçek 148 bin (tüm İstanbul'a ulaşılmaz), 5 yıl net +2,1 mr TL (öncekinin +12,4'ü şişkindi). Oran 2,39'dan 1,93'e iner.
+Erozyon duyarlılığı (0/25/50): 5. yıl yerleşen 11,9 / 11,7 / 11,0 bin, net 3,1 / 2,2 / 1,3 mr; %17 pilotta takılır.
 
-Sınırlar: (1) 4. yılda 8 binden 37 bine sıçrama idari kapasite ve tadilat varsaymıyor; gerçekte daha yavaş olur. (2) Ölçek büyüdükçe tahsilat erozyonu yok; fiili sonuç kötü olabilir. (3) Tahsilat ölçümü için tam bir yıl varsayıldı. (4) Eşik kapısı tutucu: yanlış geçiş yok ama dörtte biri haksız yere bekler. (5) Gerçek değerler aynı belirsiz aralıklardan çekildi; aralıkların kendisi doğrulanmış değil.
+Şok direnci (5. yıl medyan; zarar % = 5 yıl net negatif):
+| şok | ölçek | yerleşen | net mr | zarar | oran<1 |
+|---|---|---|---|---|---|
+| yok | 148 bin | 11,7 bin | 2,2 | 0% | 0% |
+| fiyat rallisi (g_e +10 puan) | 23,7 bin | 430 | 1,5 | 0% | 0% |
+| lüks tahsilat çöküşü (×0,4) | 23,7 bin | 3,3 bin | 0,4 | 5% | 11% |
+| genel tahsilat çöküşü (×0,5) | 148 bin | 11,1 bin | 1,5 | 0% | 0% |
+| hane geliri −%30 | 148 bin | 10,5 bin | 1,5 | 0% | 2% |
+| kombine (ralli + lüks ×0,5) | 23,7 bin | 430 | 1,0 | 0% | 0% |
+
+Okuma: sistem finansal olarak şoka dirençli (kapı büyümeyi durdurur, zarar sınırlı) ama küçülerek: fiyat rallisinde katılım %15'in altına iner (+4,1 puan yeter), program 430 haneye kalır. Yani zayıflık finansal değil, ölçek: beklenen fiyat artışı dönerse sistem boşalır. Finansal kırılma noktası lüks tahsilat (en olası değerin ×0,17'si, yani %7); genel tahsilat tek başına kırmaz, lüks yerindeyse sıfıra inse bile.
+Ölçülmeyenler: enflasyon şoku (yıl-1 oranına yansımıyor; indeksli akış 20 yılda işler), hukuki iptal (bedelin tamamen düşmesi), kur şoku.
+Sınırlar: erozyon oranı varsayım; şokta geri çekilme/küçülme kuralı yok (yalnız dondurma); ölçüm başına tam yıl; gerçek değerler doğrulanmamış aralıklardan.
+
