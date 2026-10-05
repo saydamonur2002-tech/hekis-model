@@ -17,7 +17,7 @@ kappa veriden tanimlanamaz: elde 3 stok gozlemi var. Sonuc kappa'ya duyarlilik o
 import random
 import statistics
 
-from hekis.enflasyon import TUFE_YILLIK, cek, yuzdelik, TOHUM, N
+from hekis.enflasyon import BUTCE_FAIZI, GSYH, TICARI_STOK, TUFE_YILLIK, cek, yuzdelik, TOHUM, N
 from hekis.acmaz import degerler, yol
 
 # ---- GOZLEM (Drive Secici_Kredi_Veri_MOBIL.pdf) ---------------------------------
@@ -47,6 +47,9 @@ def cek_fx(rng):
         "kappa_f": rng.uniform(0.2, 1.0),    # gecis: kesilen doviz akisinin kur destegi kaybi
         "ca_uyum": rng.uniform(0.3, 0.9),    # kesilen doviz finansmaninin TL ile ikamesi
         "rho_bs": rng.uniform(0.2, 0.5),     # bilanco maliyetinin fiyata gecisi
+        "taylor": rng.uniform(0.3, 1.0),     # TCMB'nin dusen enflasyona faiz indirimi tepkisi (2025: 0,41; ortodoks donem duzey 1,04)
+        "tl_pay": rng.uniform(0.55, 0.75),   # ticari kredi stokunda TL payi (faiz maliyeti ayagi icin)
+        "reprice": rng.uniform(0.4, 0.7),    # kamu borcunun yilda yeniden fiyatlanan payi
     }
     s = q["sA"] + q["sB"] + q["sC"]
     if s > 0.7:
@@ -164,6 +167,92 @@ def rapor() -> str:
     return "\n".join(L)
 
 
+def simule(p, q, pay, rampa, dongu=True, kappa=None, taylor=None):
+    """Yil yil, bir yil gecikmeli faiz-carry-doviz borcu dongusu.
+
+    dongu=False: onceki fx_etki ile ayni sonuc (A-C dogrudan + borc yolu).
+    dongu=True : enflasyon dususu e_t-1 -> politika faizi duser (taylor*e) ->
+      carry azalir; kur artisi yavaslarsa carry geri artar (kappa*oran) ->
+      net carry degisimi doviz borc akisini c*dcarry kadar degistirir ->
+      ayrica faiz dusuk oldugu icin firma finansman maliyeti ve butce faizi azalir.
+    """
+    kappa = q["kappa"] if kappa is None else kappa
+    taylor = q["taylor"] if taylor is None else taylor
+    v = degerler(p)
+    toplam_pay = sum(pay.values())
+    carry26 = max(0.0, q["faiz26"] - p["d_yil"] * 100)
+    e_dir = e_fx = 0.0
+    kum = 0.0
+    e_onceki = 0.0
+    dd_onceki = 0.0   # onceki yil kur artisinda kacinilan puan
+    out = {"toplam": [], "e_fx": [], "e_dir": [], "carry_fark": [], "ek_akis": [], "faiz_maliyet": [], "mali": []}
+    for t in range(5):
+        g = rampa[t]
+        carry0 = carry26 * q["decay"] ** t
+        f0 = q["c"] * carry0
+        di = taylor * e_onceki if dongu else 0.0                      # faiz indirimi, puan
+        carry = max(0.0, carry0 - di + dd_onceki) if dongu else carry0
+        dcarry = carry0 - carry                                       # + ise carry daraldi
+        ek = q["c"] * dcarry if dongu else 0.0                        # dongu kaynakli ek kacinilan akis
+        kac = f0 * toplam_pay * g + ek
+        kum += kac
+        gusd = GSYH_USD_2025 * (1 + q["gusd"]) ** (t + 1)
+        oran = kum / gusd * 100
+        dd = kappa * oran                                              # kur artisinda kacinilan puan
+        a_risk = p["phi1"] * dd
+        a_bs = q["rho_bs"] * (oran / 100) * p["d_yil"] / p["maliyet_tabani"] * 100
+        a_gecis = -p["phi1"] * q["kappa_f"] * (kac / gusd * 100) * (1 - q["ca_uyum"])
+        # dongu: faiz maliyeti ve butce ayagi
+        maliyet = q["rho_bs"] * (di / 100) * TICARI_STOK * q["tl_pay"] / (GSYH * p["maliyet_tabani"]) * 100
+        mali = (BUTCE_FAIZI * q["reprice"] * di / max(q["faiz26"], 1.0)) / GSYH * 100 * p["beta"]
+        y_fx = a_risk + a_bs + a_gecis + maliyet + mali
+        e_fx = p["atalet"] * e_fx + y_fx
+        e_dir = p["atalet"] * e_dir + (v["A"] + v["B"] + v["C"]) * g
+        e = e_dir + e_fx
+        out["toplam"].append(e); out["e_fx"].append(e_fx); out["e_dir"].append(e_dir)
+        out["carry_fark"].append(dcarry); out["ek_akis"].append(ek)
+        out["faiz_maliyet"].append(maliyet); out["mali"].append(mali)
+        e_onceki = e
+        dd_onceki = dd
+    return out
+
+
+def dongu_blogu(n=None):
+    s = kos()
+    r = RAMPA["yavas"]
+    pay = lambda q: {"A": q["sA"], "B": q["sB"], "C": q["sC"]}
+    kapali = [simule(p, q, pay(q), r, dongu=False) for p, q in s]
+    acik = [simule(p, q, pay(q), r, dongu=True) for p, q in s]
+    L = ["DONGU: faiz - carry - doviz borcu (yil yil, bir yil gecikmeli)"]
+    L.append("  yil                     " + "".join("{:>9}".format(2026 + t) for t in range(5)))
+    L.append("  dongusuz enflasyon %    " + "".join("{:>9.1f}".format(TUFE_YILLIK * 100 - med([k["toplam"][t] for k in kapali])) for t in range(5)))
+    L.append("  dongulu enflasyon %     " + "".join("{:>9.1f}".format(TUFE_YILLIK * 100 - med([a["toplam"][t] for a in acik])) for t in range(5)))
+    L.append("  dongulu p10-p90         " + "".join("{:>9}".format("{:.0f}-{:.0f}".format(
+        TUFE_YILLIK * 100 - yuzdelik([a["toplam"][t] for a in acik], .9), TUFE_YILLIK * 100 - yuzdelik([a["toplam"][t] for a in acik], .1))) for t in range(5)))
+    fark = [a["toplam"][4] - k["toplam"][4] for a, k in zip(acik, kapali)]
+    L.append("")
+    L.append("  Dongunun 5. yil katkisi: medyan {:.2f} puan [{}], negatif olma olasiligi %{:.0f}".format(
+        med(fark), aralik(fark), 100 * sum(x < 0 for x in fark) / len(fark)))
+    ek = [sum(a["ek_akis"]) for a in acik]
+    L.append("  Dongu kaynakli ek kacinilan doviz borcu (5 yil toplam): medyan {:.0f} mlr $ [{}]".format(med(ek), aralik(ek)))
+    fm = [sum(a["faiz_maliyet"]) for a in acik]
+    mm = [sum(a["mali"]) for a in acik]
+    L.append("  Dongunun faiz maliyeti ayagi (5 yil toplam puan): {:.2f}, butce ayagi: {:.2f}".format(med(fm), med(mm)))
+    pozitif = [a["carry_fark"][4] for a in acik]
+    L.append("  5. yil carry degisimi (puan, + = daraldi): medyan {:.1f} [{}]".format(med(pozitif), aralik(pozitif)))
+    L.append("")
+    L.append("  Faiz tepkisi (taylor) duyarliligi, 5. yil enflasyon dususu medyan:")
+    for tk in (0.0, 0.3, 0.6, 1.0):
+        v = [simule(p, q, pay(q), r, dongu=True, taylor=tk)["toplam"][4] for p, q in s]
+        L.append("    taylor={:<4}{:>6.2f} puan".format(tk, med(v)))
+    L.append("")
+    L.append("  Kappa x taylor (5. yil toplam dusus, puan):")
+    L.append("    kappa\\taylor  " + "".join("{:>8}".format(tk) for tk in (0.3, 0.6, 1.0)))
+    for k in (0.25, 0.5, 1.0, 1.5):
+        L.append("    {:<13}".format(k) + "".join("{:>8.2f}".format(med([simule(p, q, pay(q), r, kappa=k, taylor=tk)["toplam"][4] for p, q in s[:3000]])) for tk in (0.3, 0.6, 1.0)))
+    return "\n".join(L)
+
+
 def testler():
     out = []
     # R1: doviz borcu artisi cari acigi asiyor mu? Asiyorsa 'acik finansmani' tek aciklama olamaz.
@@ -184,6 +273,7 @@ def testler():
                 abs(err) / (NOP[2025] - NOP[2024]) < 0.25, "hata %{:.0f}".format(100 * abs(err) / (NOP[2025] - NOP[2024]))))
     # R4: baz yorungeyi makul mu
     s = kos()
+    r = RAMPA["yavas"]
     asiri = sum(1 for p, q in s if NOP[2025] + sum(baz_akis(p, q)) > 0.15 * GSYH_USD_2025 * (1 + q["gusd"]) ** 5) / len(s)
     out.append(("R4 baz: 2030'da NOP/GSYH > %15 olma olasiligi %{:.0f}".format(100 * asiri), asiri < 0.5, "kademeli artis varsayimi decay'e bagli"))
     # R5: kappa tanimlanabilir mi
@@ -197,6 +287,27 @@ def testler():
     egim = med(sl)   # kappa=1 icin medyan etki (yaklasik dogrusal, kucuk bilanco terimi var)
     out.append(("R6 dissal D (yil 5 ~10 puan) tutarli olsaydi kappa ~{:.0f}: 1 puan GSYH kacinilan doviz borcu {:.0f} puan kur artisini kaldirmali".format(10 / egim, 10 / egim * 1.0),
                 10 / egim <= 2.0, "makul aralik disinda, dissal D'yi reddeder"))
+    # R7: dongusuz hal onceki fx_etki ile ayni mi (kod butunlugu)
+    fark = 0.0
+    for p, q in s[:500]:
+        pay = {"A": q["sA"], "B": q["sB"], "C": q["sC"]}
+        a = simule(p, q, pay, r, dongu=False)["e_fx"]
+        b = fx_etki(p, q, pay, r)[0]
+        fark = max(fark, max(abs(x - y) for x, y in zip(a, b)))
+    out.append(("R7 kod butunlugu: dongusuz simule = eski fx_etki, max fark {:.1e}".format(fark), fark < 1e-9, "regresyon testi"))
+    # R8: dongu kazanci patlamiyor mu
+    oran = []
+    for p, q in s[:3000]:
+        pay = {"A": q["sA"], "B": q["sB"], "C": q["sC"]}
+        k = simule(p, q, pay, r, dongu=False)["toplam"][4]
+        a = simule(p, q, pay, r, dongu=True)["toplam"][4]
+        if k > 1e-6:
+            oran.append(a / k)
+    out.append(("R8 dongu carpani (dongulu/dongusuz, 5. yil): medyan {:.2f}, p90 {:.2f}, max {:.2f}".format(med(oran), yuzdelik(oran, .9), max(oran)),
+                max(oran) < 1.5, "1'e yakin = dongu zayif, kararli"))
+    # R9: faiz tepkisi veride tanimlanabilir mi (2025 gozlem 0,41)
+    out.append(("R9 taylor: 10 yil faiz degisimi ~ enflasyon degisimi katsayisi -0,30 (se 0,24), rejim kirilmali; 2025 gozlemi 0,41, ortodoks duzey 1,04 (n=4). Aralik 0,3-1,0 kabul",
+                False, "tam tanimlanamaz, duyarlilik tablosuna bak"))
     return out
 
 
@@ -212,6 +323,8 @@ def test_blogu():
 
 def main() -> int:
     print(rapor())
+    print()
+    print(dongu_blogu())
     print()
     print(test_blogu())
     return 0

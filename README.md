@@ -71,3 +71,9 @@ Doviz dissal kisit degil, A (konut/varlik enflasyonu), B (mahsup), C (ic borclan
 
 Sonuc: doviz borcu uzerinden etki 5. yilda 0,5 puan (0,1-1,5). Onceki dissal D (yil 5 ~10 puan) bu yapida kappa ~12 gerektirir, makul degil, bu yuzden `acmaz.py` icindeki D dissal okuma olarak ust sinirdir ve reddedilir. kappa veriden tanimlanamaz (3 stok gozlemi). Gerceklik testleri 4/7.
 
+### Dongu: faiz - carry - doviz borcu
+
+`python -m hekis.borc_doviz` dongulu yolu da basar. Enflasyon dusunce TCMB faizi indirir (taylor 0,3-1,0), carry daralir, doviz borclanmasi azalir. Kur artisi yavaslarsa carry geri artar (ters ayak). Ayrica dusen faiz firma maliyetini ve butce faizini azaltir. Bir yil gecikmeli, yil yil simulasyon.
+
+Sonuc: dongu 5. yilda +0,13 puan (0-0,3), carpan medyan 1,06 (max 1,23), yani zayif ve kararli. Toplam 5. yil dusus 2,5-2,9 puan (taylor 0 -> 1). Gerceklik testleri 6/10.
+
