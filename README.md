@@ -230,3 +230,6 @@ Asil maliyet kazancin BORC ALINMIS olmasi: kirilmada 3 yil kum. +22 puan; kirilm
 
 ### Aylik beklenti testi (kamu.py bolum 5; data/tufe_yillik_aylik.json EVDS TP.TUKFIY2025.GENEL_3)
 12 ay beklentisi (n=138, 2014-04..2025-09, Newey-West): MAE 12,5 vs 'bugunku yillik TUFE devam' 13,1; ort. hata +11,7 (2021-23 +34; 2014-20 +3,5; 2024-26 +5,0). bek = 4,5 + 0,47*bugun, R2 0,92: beklenti buyuk olcude geriye bakis. gerc ~ 0,79(0,51)*bek + 0,20(0,21)*bugun: ikisi ayrisamiyor. 2024-26'da beklenti saf kurali belirgin geciyor (MAE 5,0 vs 16,3, n=21): beklenti 2024'ten sonra daha bilgilendirici. 24 ay beklentisi saf kurali gecemiyor (19,2 vs 17,7). Bu bir NEDENSELLIK testi degil.
+
+## Modelin amaci: ATALET / UCLU ACMAZ / DOVIZ yuzde ayrismasi (hekis/ayrisma.py)
+`python -m hekis.ayrisma`. 2026 enflasyonu (28 puan) uc kovaya: ATALET (saf, acmazin tasinan kismi cikarilmis) %41-68, DOVIZ (kur) %26-57, UCLU ACMAZ dogrudan ~%7 (MC %4-10), KALAN %-2/-5. Aralik indirgenmis formun spesifikasyonundan (2 terimli vs gecikmeli kurlu 3 terimli) gelir: tek bir yuzde verilemez. Katki ayristirmasidir, nedensellik degil; atalet ve beklenti ayni anda olusur.
