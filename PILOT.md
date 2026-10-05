@@ -29,7 +29,7 @@ Eski eşikler (%15 / %25 / %30 / %30 / %90) dayanaksızdı; model çıktısını
 
 Bulgular:
 - Genel ve lüks tahsilat birbirinin yerine geçiyor; tek tek eşik yerine eğri. Lüksün yüksek olması genelin düşüklüğünü kapatır. Genel bedel tek başına (lüks yok) ancak %42 tahsilatla yeter: gerçekçi değil.
-- Modelde %10 tahsilat tabanı vardı (AVOID_FLOOR): tahsilat 0'da bile oran >1 görünüyordu, yani kendi kendini finanse etme sonucu varsayımla korunuyordu. Eşikler tabansız hesaplandı. Ana modeldeki taban hâlâ duruyor; sonuçları (oran 2,39) hafifçe iyimser olabilir.
+- Modelde %10 tahsilat tabanı vardı (AVOID_FLOOR, artık 0): tahsilat 0'da bile oran >1 görünüyordu, yani kendi kendini finanse etme sonucu varsayımla korunuyordu. Eşikler tabansız hesaplandı. Ana modelden de kaldırıldı (onay üzerine); hiçbir sonucu değiştirmedi.
 - Mikro pilot lüks tahsilatını ölçemez: 1.000 birimde ~77 lüks vergilendirilen birim var, hata ±9 puan. ±5 puan için ~4.000 birim gerekir. Katılım (407 uygun birim, ±3,9) ölçülür.
 
 ## Dış çapa: 2024 tasarruf finansman (benzetme yok)

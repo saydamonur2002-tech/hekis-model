@@ -103,7 +103,7 @@ def lux_response(fee: float, cap: float = LUX_CAP, fs_pct: float = LUX_FS) -> fl
 
 AVOID_START = 0.05  # bu bedelin ustunde kacinma baslar
 AVOID_SLOPE = 0.05  # asan her yuzde puan icin tahsilat mutlak puan kaybi (varsayim)
-AVOID_FLOOR = 0.10
+AVOID_FLOOR = 0.0
 
 
 def effective_collection(fee: float, collection: float, start: float = AVOID_START, slope: float = AVOID_SLOPE) -> float:

@@ -89,7 +89,7 @@ Subvansiyon bos stoku kullandirmanin maliyeti degil, sosyal kira kararinin maliy
 
 Orta tipteki bos stogun en pahali %20'si (45 bin daire, ortalama 9,5 mn TL) havuz disi, bos olsa bile, bedelden muaf degil, ayri tarife. Deger dagilimi lognormal (sigma 0,6, varsayim). Orta tipin kirasi degerle orantili olceklenir (yapisal secim): sabit politika kirasi tutulursa gelir/sub. orani 0,65 yerine 0,82 ve geri odeme %83 yerine %99 cikar.
 
-Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yuksek bedelde kacinma (%5 ustu her puan icin tahsilat 5 puan duser, taban %10). Toplam bedel geliri / yil 1 subvansiyon, luks bedel %1/3/5/8/12: karma sistem 0,55/0,70/0,82/0,87/0,79, Vancouver benzeri 0,74/0,84/0,92/0,96/0,90. Kacinma dahil luks gelirinin tepesi bedel %8,2 civari, yilda 5,5 mr TL: luks tek basina sistemi finanse edemez. %5 bedelde luks bos dairenin %62'si bosluktan cikar (yaklasik 28 bin daire, havuz disi).
+Luks tepkisi Vancouver ankorlu (bedel %3'te bosluk %54 azalir, tavan %65), yuksek bedelde kacinma (%5 ustu her puan icin tahsilat 5 puan duser, taban yok; eski %10 tabanı kaldırıldı, hiçbir sonucu değiştirmedi). Toplam bedel geliri / yil 1 subvansiyon, luks bedel %1/3/5/8/12: karma sistem 0,55/0,70/0,82/0,87/0,79, Vancouver benzeri 0,74/0,84/0,92/0,96/0,90. Kacinma dahil luks gelirinin tepesi bedel %8,2 civari, yilda 5,5 mr TL: luks tek basina sistemi finanse edemez. %5 bedelde luks bos dairenin %62'si bosluktan cikar (yaklasik 28 bin daire, havuz disi).
 
 ## 5. Uc sistem (luks ayrilmis, bugunku TL)
 
