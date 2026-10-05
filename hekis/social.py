@@ -53,12 +53,12 @@ def cost_of_living(z: dict | None = None, N: float | None = None, freed: float |
     return out
 
 
-def by_year(paths: list[list[dict]] | None = None, shock: dict | None = None) -> list[dict]:
+def by_year(paths: list[list[dict]] | None = None, shock: dict | None = None, years: int = horizon.YEARS) -> list[dict]:
     """Yil bazli etki. paths None: kusursuz olcum yolu; verilirse yil basina medyan (yerlesen, sub, bedel, serbest kalan)."""
     if paths is None:
-        paths = [horizon.one_path({}, None, shock)]
+        paths = [horizon.one_path({}, None, shock, years=years)]
     out = []
-    for t in range(horizon.YEARS):
+    for t in range(len(paths[0])):
         med = lambda k: sorted(p[t][k] for p in paths)[len(paths) // 2]
         N, sub, rev, freed = med("N"), med("sub"), med("rev"), med("freed")
         B = sub / max(N, 1)
@@ -106,6 +106,11 @@ def main() -> int:
     print()
     mc = horizon.monte_carlo(200)
     print_by_year(by_year(mc), "YIL BAZLI ETKI (belirsiz degerler + olcum hatasi, 200 cekim medyan)")
+    print()
+    print_by_year(by_year(years=10), "10 YILLIK UFUK (kusursuz olcum)")
+    mc10 = horizon.monte_carlo(200, years=10)
+    print()
+    print_by_year(by_year(mc10), "10 YILLIK UFUK (belirsiz degerler + olcum hatasi, 200 cekim medyan)")
     print("(TUFE puani tek seferlik duzey etkisi, yillik enflasyona eklenmez; birikimli degil.) dGini/dYoks. puan; TUFE(+arz) ust sinir.")
     return 0
 

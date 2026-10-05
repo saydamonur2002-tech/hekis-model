@@ -81,11 +81,11 @@ def _binom(rng: random.Random, p: float, n: float) -> float:
 
 
 def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, erosion: float = EROSION,
-             growth_cap: float = GROWTH_CAP) -> list[dict]:
+             growth_cap: float = GROWTH_CAP, years: int = YEARS) -> list[dict]:
     """rng None: kusursuz olcum."""
     P = {**{k: LIKELY[k] for k in UNCERTAIN}, **P}
     rows, size = [], float(START)
-    for year in range(1, YEARS + 1):
+    for year in range(1, years + 1):
         Pt = apply_shock(P, shock) if shock and year >= SHOCK_YEAR else dict(P)
         f = erosion_factor(size, erosion)
         Pt["coll"], Pt["lux_coll"] = Pt["coll"] * f, Pt["lux_coll"] * f
@@ -111,9 +111,9 @@ def one_path(P: dict, rng: random.Random | None, shock: dict | None = None, eros
     return rows
 
 
-def monte_carlo(draws: int = 300, seed: int = 11, shock: dict | None = None, erosion: float = EROSION) -> list[list[dict]]:
+def monte_carlo(draws: int = 300, seed: int = 11, shock: dict | None = None, erosion: float = EROSION, years: int = YEARS) -> list[list[dict]]:
     rng = random.Random(seed)
-    return [one_path(draw(rng), rng, shock, erosion) for _ in range(draws)]
+    return [one_path(draw(rng), rng, shock, erosion, years=years) for _ in range(draws)]
 
 
 def summarize(paths: list[list[dict]]) -> dict:

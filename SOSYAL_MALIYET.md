@@ -28,3 +28,9 @@ Kusursuz ölçüm yolu:
 | 5 | 148.438 | 12.193 | %2,16 | 1,29 | 2,50 | 2,14 | −0,00022 | −0,053 | −1,48 | −0,100 |
 Belirsiz değerler + ölçüm hatası (200 çekim medyanı) neredeyse aynı: 5. yıl 11,8 bin hane, kümülatif net +2,0 mr TL, TÜFE −0,10 (serbest kalan birim arzı dahil üst sınır −0,24).
 Okuma: 5 yılda etki yok denecek kadar küçük: Gini −0,0002, yoksulluk −0,05 puan, kira −%1,5, TÜFE −0,1 puan. Sistem ilk 5 yılda kendini finanse eder (kümülatif +2 mr TL) ama toplumsal etkisi 5. yıldan sonra tam ölçeğe (37 bin hane) ulaşıldığında belirginleşir (Gini −0,0007, TÜFE −0,18 ile −0,6 puan). TÜFE puanı tek seferlik düzey etkisidir, yıllık enflasyona eklenmez.
+
+## 10 yıllık ufuk (`python -m hekis.social`)
+Düzeltme: tam ölçeğe (450 bin birim, 37 bin hane) 8-9. yılda değil **7. yılda** ulaşılır (×2,5: 148 bin → 371 bin → 450 bin); "8-9. yıl" ifadem yanlıştı.
+Kusursuz ölçüm: 6. yıl 30,5 bin hane (kapsam %5,4, ΔGini −0,0006, TÜFE −0,25); 7. yıldan itibaren sabit: 37 bin hane, kapsam %6,55, sub 3,92 mr, bedel 7,03 mr (erozyon bedeli 9,4'ten 7,0'a indirir; oran 1,79), ΔGini −0,00066, Δyoksulluk −0,16 puan, kira −%4,5, TÜFE −0,30 (arz dahil üst sınır −0,74). Kümülatif net 10. yılda +17,2 mr TL.
+Belirsiz değerler + ölçüm hatası (medyan): 7. yıldan itibaren 34,5 bin hane, kapsam %6,1, kümülatif net +17,3 mr, TÜFE −0,28 (üst −0,72).
+Okuma: etki 5. yılda %2,2 kapsamla neredeyse yok; 6.-7. yılda oturur ve tam ölçekte bile küçük kalır: Gini −0,0007, yoksulluk −0,16 puan, TÜFE −0,3 puan. Sistem ayakta ve kâr eder, ama toplumsal etkisi kapsamın %6,6'sında sınırlı. Daha büyük etki için kapsam tavanının (katılım, boş stok) büyütülmesi gerekir; bu ayrı bir varsayım.
