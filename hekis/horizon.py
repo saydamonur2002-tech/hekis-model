@@ -37,6 +37,10 @@ SHOCKS = {
     "kombine (rally + luks x0,5)": {"g_e_add": 0.10, "lux_mult": 0.5},
     "bedel iptali (hukuki)": {"lux_mult": 0.0, "coll_mult": 0.0},
     "kur sokunu (enf +10; maliyet x1.3)": {"infl_shift": 0.10, "cost_mult": 1.3},
+    "kismi iptal (yalniz luks bedel)": {"lux_mult": 0.0},
+    "gelir erimesi (hane -%20, kiraci tahsilat x0.8)": {"inc_mult": 0.8, "alpha_mult": 0.8},
+    "kur krizi + sermaye cikisi": {"infl_shift": 0.10, "cost_mult": 1.3, "g_e_add": 0.10, "lux_mult": 0.7},
+    "agir kriz (ralli + luks iptali + gelir erimesi)": {"g_e_add": 0.10, "lux_mult": 0.0, "inc_mult": 0.8, "alpha_mult": 0.8},
 }
 
 
@@ -54,6 +58,8 @@ def apply_shock(P: dict, shock: dict) -> dict:
     if "cost_mult" in shock:
         out["util_scale"] = E.BASE["util_scale"] * shock["cost_mult"]
         out["aidat_scale"] = E.BASE["aidat_scale"] * shock["cost_mult"]
+    if "alpha_mult" in shock:
+        out["alpha"] = E.BASE["alpha"] * shock["alpha_mult"]
     if "inc_mult" in shock:
         out["inc_scale"] = E.BASE["inc_scale"] * shock["inc_mult"]
     return out
@@ -162,7 +168,7 @@ def main() -> int:
         print(f"{name:<34}{r['size5']:>13,.0f}{r['N5']:>10,.0f}{bn(r['net']):>11.2f}{r['deficit']:>9.0%}{r['ratio_lt1']:>10.0%}".replace(",", "."))
     print("\n20 yillik yuk (5. yildaki olcekte, reel mr TL) ve 5. yil yillik acik (sub - bedel; negatif = fazla):")
     print(f"{'sok':<44}{'20y yuk':>9}{'5.yil acik':>12}")
-    for name in ("yok", "enflasyon sokunu (+10 puan)", "kur sokunu (enf +10; maliyet x1.3)", "bedel iptali (hukuki)"):
+    for name in SHOCKS:
         r = summarize(monte_carlo(shock=SHOCKS[name]))
         print(f"{name:<44}{bn(r['yuk20']):>9.1f}{bn(r['acik5']):>12.2f}")
     b = breakpoints()

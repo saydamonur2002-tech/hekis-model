@@ -69,6 +69,15 @@ Eklenen şoklar (3. yıldan itibaren):
 | bedel iptali (hukuki, gelir 0) | 23,7 bin | 1,9 bin | −0,4 | %78 | 4,3 (yıllık açık +0,2 mr) |
 
 Okuma: enflasyon sistemi bozmuyor, hatta yükü hafif düşürüyor: kira ve anapara TÜFE endeksli, tasarım nötr. Bu iyi haber olmayabilir: modelde oturanın geliri endekslenmiyor, ödeme gücü erimesi (kiracı tahsilatı) ölçülmedi. Kur şoku yalnız enflasyon + maliyet vekiliyle modellendi (yük +%2); sermaye çıkışı, dolarizasyon, senet etkisi yok. Bedel iptali en sert şok: %78'de 5 yıl net negatif; ama kapı iptalden sonra büyümeyi durdurduğu için kayıp küçük (medyan −0,4 mr, 20 yıl yük 4,3 mr). Aynı iptal tam ölçekte (450 bin) gelseydi bedel geliri (9,4 mr/yıl) kaybolur, 20 yıl sübvansiyon yükü ≈84 mr TL reel olurdu: kademeli büyümenin asıl değeri bu risk farkı (≈20 kat). Yerleşmiş hanelerin çıkarılamayacağı varsayıldı.
-Ölçülmeyenler: oturan gelirinin enflasyonla erimesi, sermaye çıkışı/dolarizasyon, kısmi (örn. yalnız lüks) iptal.
+Eklenen şoklar (hepsi 3. yıldan itibaren; 5. yıl medyan):
+| şok | ölçek | yerleşen | 5y net mr | zarar | 20y yük mr |
+|---|---|---|---|---|---|
+| kısmi iptal (yalnız lüks bedel) | 23,7 bin | 1,9 bin | +0,1 | %37 | 4,4 |
+| gelir erimesi (hane −%20, kiracı tahsilat ×0,8) | 148 bin | 10,2 bin | 1,3 | %2 | 32,4 |
+| kur krizi + sermaye çıkışı (enf +10, maliyet ×1,3, g_e +10, lüks ×0,7) | 23,7 bin | 446 | 1,2 | %0 | 1,0 |
+| ağır kriz (ralli + lüks iptali + gelir erimesi) | 23,7 bin | 430 | 0,3 | %12 | 1,4 |
+
+Okuma: (1) Yalnız lüks bedelin iptali neredeyse tüm bedelin iptali kadar zararlı (%37 vs %78 çekimde zarar): sistemin finansmanı lüks bedele dayanıyor, hukuki risk de orada yoğun. (2) Gelir erimesi kapıyı geçiyor ve büyümeye devam ediyor, çünkü kapı kiracı tahsilatını ölçmüyor; 20 yıl yükü %22 artıyor (26,6 → 32,4). Bu bir tasarım açığı: kapıya kiracı tahsilat/gelir ölçümü eklenmeli. (3) Kur krizi + sermaye çıkışı finansal zarar vermez (program küçülür, 446 haneye iner): ralli katılımı çökertir. (4) Ağır kriz tek başına en kötü durum: %12 zarar, program 430 hane; kapı sayesinde yük 1,4 mr ile sınırlı.
+Varsayımlar: kur krizi ve sermaye çıkışı kurulmuş bir model değil, parametre vekili (g_e +10 puan = TL'de konutun reel savunma değeri). Kısmi iptal binary (lüks ×0). Gelir erimesi tek seferlik düzey şoku, yıllık erime değil.
 Sınırlar: erozyon oranı varsayım; şokta geri çekilme/küçülme kuralı yok (yalnız dondurma); ölçüm başına tam yıl; gerçek değerler doğrulanmamış aralıklardan.
 
