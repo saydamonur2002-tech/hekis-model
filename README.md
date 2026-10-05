@@ -164,3 +164,9 @@ Tahmin cekirdegi TUFE_t = a + b*kur_t + rho*TUFE_t-1 + delta (kalibre.py, bootst
 
 `python -m hekis.reset`. Atalet (rho ~0,68) enflasyonun ~%75'ini tasiyor. Koordineli bir endeksleme sifirlamasi rho'yu dusururse? Senaryo, mekanik sonuc degil: rho'nun dususu varsayim (0,10-0,35), baz ve geri tepme yok. 'Reset basarili' yolu 2027'de %10, 2028'de tabana (%3) iner, bu varsayimin aritmetigidir. Gercek bilgi: OVP yolu rho'nun 0,68'den ~0,45'e (%34, 1,5 se) dusmesini istiyor (makul); TCMB 2027 %15 icin 0,24 (2,7 se, makul degil). Reset + 2028 kur kirilmasi: 2028 %22. Kurumsal endeksleme: kira artisi yasal olarak 12 aylik ortalama TUFE ile sinirli (dogrulandi). Uluslararasi vakalar hafizadan.
 
+### Olcum kontrolu: TUFE gercek enflasyonu olcuyor mu (olcum.py)
+
+`python -m hekis.olcum`. Ana cerceve atalet (okuma 1), olcum belirsizligi kontrol degiskeni (okuma 2). Veri arama ozetlerinden, yalniz 2-3 nokta: ENAG Ara 2024 83,4, Ara 2025 56,14, Haz 2026 51,49, Agu 2026 49,03; TUIK 44,33 / 30,89 / 32,11 / 31,51; ITO Ara 2025 23,25 (yeni indeks). ENAG yontemi tartismali, sinir degeri olarak kullanildi.
+
+Bulgu: bir yillik kalicilik TUIK x0,70, ENAG x0,67, yani atalet bulgusu olcuden bagimsiz (tek gecis, 2 nokta). Kur payi TUIK'te ~%26, ENAG'a gore ~%17; atalet her halukarda en buyuk. Kanonik sonuc 2,7 puan (TUIK puani), ITO olceginde 2,0, ENAG olceginde ~4,2 (orantili buyutme varsayimi). Olcu farki zamanla kuculuyor (fark/TUIK 0,88 -> 0,56), sabit carpan degil. ENAG 2020-23 serisi yok, rho ENAG ile yeniden tahmin edilemez.
+
