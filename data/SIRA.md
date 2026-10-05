@@ -35,5 +35,5 @@ Taslak "ucuncu ve sonrasi duran birim %4" diyor (Esenyurt, havuz %80 teklif, 5 y
 Taslaktaki "Anayasa madde 35 ve 73" siniri hala ayri sinav, modellenmedi.
 
 ## Sirada
-1. Senet tasarimini guncel havuz buyuklugu ve odenmeyen kalan anapara icin yeniden yaz.
+1. Senet tasarimi yeniden yazildi (`SENET.md`): hedef odakli ic senet, ihrac 89,2 mr TL, prim mevduatla yaris edemiyor. Acik: fiziki endeks, odenmeyen anapara garantisi, banka kanali.
 2. TOKI-HEKIS is bolumu (`TOKI_HEKIS_IS_BOLUMU.md`) taslak maddelere baglanir.
