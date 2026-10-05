@@ -43,3 +43,11 @@ Bulgular:
 Lüks tahsilatı mahalle pilotunda ölçülemediği için pilot ≈3.800 birime çıkarılır (`pilot.lux_pilot_size()`): lüks ölçüm hatası ±4,6 puan (1.000 birimde ±9), genel ±1,6, katılım ±2,0. Lüks bölgede ≈290 vergilendirilen birim.
 Geçiş kuralı (okunan değer): genel tahsilat %30 ise lüks ≥%18 (13+4,6); %20 ise ≥%23; %10 ise ≥%29. Eşiğin altında kalırsa K3'e (hedef primi) geçilmez; ilk iş lüks bedel tahsilat yolu (tespit, yaptırım) düzeltilir.
 Not: hata hesabı bağımsız birim varsayar; aynı sahibin birden fazla birimi, aynı mahallede kümelenme hatayı büyütür.
+
+## 5 yıllık kademeli genişleme (`python -m hekis.horizon`)
+Kademeler: 3.800 → 20.000 → 100.000 → 450.000 boş birim; her yıl ölçüm, eşik tutarsa ertesi yıl bir kademe. Eşik: ölçülen tahsilatlarla oran ≥1,25 ve ölçülen katılım %15-38. Tutmazsa aynı kademede kalınır, düzeltme etkisi yok (muhafazakâr).
+
+Kusursuz ölçüm, en olası senaryo: yerleşen 312 → 1.643 → 8.214 → 36.963 → 36.963; 5 yıl toplam net (bedel − sub.) +12,4 mr TL.
+Belirsiz gerçek değerler + ölçüm hatası (400 çekim): tüm İstanbul'a 4. yılda %71, 5. yılda %74 ulaşır; %18 pilotta takılır; 5. yıl medyan yerleşen 35,8 bin; yanlış geçiş %0; yanlış ret %26 (gerçek oran ≥1,25 iken takılan).
+
+Sınırlar: (1) 4. yılda 8 binden 37 bine sıçrama idari kapasite ve tadilat varsaymıyor; gerçekte daha yavaş olur. (2) Ölçek büyüdükçe tahsilat erozyonu yok; fiili sonuç kötü olabilir. (3) Tahsilat ölçümü için tam bir yıl varsayıldı. (4) Eşik kapısı tutucu: yanlış geçiş yok ama dörtte biri haksız yere bekler. (5) Gerçek değerler aynı belirsiz aralıklardan çekildi; aralıkların kendisi doğrulanmış değil.

@@ -399,3 +399,12 @@ class LuxPilotTests(unittest.TestCase):
         n = pilot.lux_pilot_size(0.05)
         self.assertGreater(n, pilot.PILOT_STOK)
         self.assertLessEqual(pilot.gates(n)["se_lux"], 0.05 + 1e-9)
+
+class HorizonTests(unittest.TestCase):
+    def test_perfect_path_expands_and_mc_reasonable(self):
+        from hekis import horizon
+        det = horizon.one_path({}, None)
+        sizes = [r["stok"] for r in det]
+        self.assertEqual(sizes, [3800, 20000, 100000, 450000, 450000])
+        s = horizon.summarize(horizon.monte_carlo(60))
+        self.assertGreaterEqual(s["p_full_y5"], s["p_full_y4"])
