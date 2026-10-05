@@ -11,7 +11,7 @@ Kanallar:
   B  tedarik zinciri kilidi (alacak/verecek) -> mahsup
   C  asiri ic borclanma, dusuk kamusal verimlilik -> talep ve faiz
 
-Doviz kisiti burada YOK. Ana neden olarak kabul edilir, kalan olarak raporlanir.
+Doviz burada YOK. Doviz, bu uc kanalin sonucu olarak icsel kurulur: hekis/borc_doviz.py. Kanonik sonuc: hekis/sonuc.py.
 """
 
 import random
@@ -62,11 +62,9 @@ def cek(rng):
         # C ic borclanma
         "acik_fazla": rng.triangular(0.3, 2.5, 1.2),  # esik ustu acik, GSYH yuzdesi (low, high, mode)
         "beta": rng.uniform(0.15, 0.50),          # %1 GSYH mali itis basina enflasyon puani (net, verimlilik dahil)
-        # D doviz
+        # doviz borcu kanali (borc_doviz.py) icin girdiler. Disaridan verilen kur kanali KALDIRILDI.
         "d_yil": rng.uniform(0.16, 0.20),         # dolar/TL yillik artis 2026. GOZLEM: 2 Oca-6 Eki +%14,5, aylik %1,1-2,0, yil sonu tempoyla %17-19 (data/usdtry_2026.json)
-        "d_cozum": rng.uniform(0.03, 0.12),       # doviz kisiti cozulunce kalacak yillik deger kaybi
         "phi1": rng.uniform(0.25, 0.55),          # ayni yil geciskenlik: TCMB maliyet 0,25 .. veri 0,43+-0,16
-        "ortusme_fx": rng.uniform(0.0, 0.20),     # kurun bir kismi A-C kanallarinin sonucu, cift sayim
         # ortak
         "atalet": rng.uniform(0.35, 0.70),        # gecmis enflasyona endekslenme, veri 0,68+-0,16 (kalibre.py)
         "ortusme": rng.uniform(0.05, 0.30),       # B ve C ayni faiz/kredi hattini sayar, cift sayim payi
@@ -96,16 +94,7 @@ def kanallar(p, uygulama=1.0):
     toplam = (a + b + c) * (1.0 - p["ortusme"])
     k = p["ortusme"]
 
-    # D: doviz. Kur artisi cozum rejiminde d_cozum'a iner. Ayni yil geciskenligi
-    # yil 1'de, gecikmeli etki atalet uzerinden yil 2-3'te gelir (A-C ile ayni yil3 kurali).
-    fark = max(0.0, p["d_yil"] - p["d_cozum"])
-    d1 = p["phi1"] * fark * 100
-    d3 = yil3(p, d1)
-    cift = 1.0 - p["ortusme_fx"]
     return {
-        "D doviz": d1 * cift * uygulama,
-        "D doviz y3": d3 * cift * uygulama,
-        "hepsi": (toplam + d1 * cift) * uygulama,
         "A kira": a * uygulama,
         "B mahsup": b * uygulama,
         "C ic borc": c * uygulama,
@@ -181,32 +170,8 @@ def rapor() -> str:
         satir.append("  {:<16}{:>7.2f}".format(a, r))
     satir.append("")
 
-    satir.extend(_doviz_blogu(draws, sonuc))
+    satir.append("Doviz borcu uzerinden etki ve kanonik toplam: python -m hekis.sonuc")
     return "\n".join(satir)
-
-
-def _doviz_blogu(draws, sonuc):
-    """Doviz kanali ve butun resim. Yil 3 = ikincil y3 + doviz y3, cift sayim dusulmus."""
-    satir = ["== DOVIZ KANALI EKLENIRSE (hepsi birlikte cozulurse) =="]
-    d1 = [s["D doviz"] for s in sonuc]
-    d3 = [s["D doviz y3"] for s in sonuc]
-    h1 = [s["hepsi"] for s in sonuc]
-    h3 = [yil3(p, s["toplam"]) + s["D doviz y3"] for p, s in zip(draws, sonuc)]
-    for ad, v in (("D doviz, yil 1", d1), ("D doviz, yil 3", d3),
-                  ("HEPSI, yil 1", h1), ("HEPSI, yil 3", h3)):
-        satir.append("  {:<18}{:>6.2f}  [{:.2f} - {:.2f}]".format(
-            ad, statistics.median(v), yuzdelik(v, 0.10), yuzdelik(v, 0.90)))
-    satir.append("")
-    for ad, v in (("yil 1", h1), ("yil 3", h3)):
-        satir.append("  Baslangic %{:.1f}, {} sonrasi: %{:.1f}  [%{:.1f} - %{:.1f}]".format(
-            TUFE_YILLIK * 100, ad, TUFE_YILLIK * 100 - statistics.median(v),
-            TUFE_YILLIK * 100 - yuzdelik(v, 0.90), TUFE_YILLIK * 100 - yuzdelik(v, 0.10)))
-    satir.append("")
-    satir.append("Hepsini surukleyen:")
-    skor = sorted(((spearman([p[a] for p in draws], h3), a) for a in draws[0]), key=lambda t: -abs(t[0]))
-    for r, a in skor[:6]:
-        satir.append("  {:<16}{:>7.2f}".format(a, r))
-    return satir
 
 
 def main() -> int:

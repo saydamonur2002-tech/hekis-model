@@ -38,6 +38,14 @@ Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiy
 
 ## Enflasyon katki modeli
 
+### KANONIK SONUC: `python -m hekis.sonuc`
+
+Uclu acmaz (kira/konut, mahsup, ic borclanma) cozulurse enflasyon, yavas uygulamayla, baz %31,5'e gore: 1. yil ~0,3, 3. yil ~1,5, **5 yilda ~2,7 puan** (carry rejimi 'tam ornek'; 2024-25 rejiminde ~3,0). Bunun ~1,9'u dogrudan etki, ~0,6'si doviz borcu uzerinden (kappa'ya bagli, 0-1,2). Doviz bu kanallarin sonucu olarak icsel kurulur (`borc_doviz.py`), dissal degil. Katki ayristirmasidir, tahmin degil. Tahmin ve OVP kiyasi: `ovp.py`.
+
+**KALDIRILDI:** eski dissal doviz kanali (D) ve ondan gelen "hepsi cozulurse %19 / yil 3 ~12 puan / 'hepsi %4,7'" sonuclari. Neden: ayni etki kappa ~12 gerektiriyordu, makul degil. Asagidaki tarihsel bolumlerde gecen o rakamlar gecersizdir.
+
+(Tarihsel notlar, eski sirayla:)
+
 ```bash
 python -m hekis.enflasyon
 ```
@@ -46,7 +54,7 @@ Uc ikincil kanal (konut/kira, tedarik zinciri mahsubu, ic borclanma) cozulurse y
 
 Baz sonuc: tam cozumde yil 1 icin medyan 1,1 puan (aralik 0,7-1,5), ataletle 3. yilda 1,8 puan (1,2-2,6). Yarim uygulamada bunun yarisi. En belirsiz sayi, kilitli alacagin kapali dongu payi. Bu sayiyi e-fatura eslesme verisi olcer, model olcmez.
 
-Doviz kanali (D) Drive'daki `Secici_Kredi_Veri_MOBIL.pdf` serisiyle kalibre edildi (`python -m hekis.kalibre`): TUFE ~ kur + onceki yil TUFE, 10 gozlem. Ayni yil geciskenlik 0,43 (se 0,16), atalet 0,68 (se 0,16). Kur 2023-25 dosyadan, 2014-22 hafizadan (dogrulanmadi). Indirgenmis bicim, ortak sok yukluyor, uzun donem 1,33 (>1) bunu gosterir.
+[KALDIRILDI] Doviz kanali (D) Drive'daki `Secici_Kredi_Veri_MOBIL.pdf` serisiyle kalibre edildi (`python -m hekis.kalibre`): TUFE ~ kur + onceki yil TUFE, 10 gozlem. Ayni yil geciskenlik 0,43 (se 0,16), atalet 0,68 (se 0,16). Kur 2023-25 dosyadan, 2014-22 hafizadan (dogrulanmadi). Indirgenmis bicim, ortak sok yukluyor, uzun donem 1,33 (>1) bunu gosterir.
 
 Hepsi birlikte cozulurse medyan: yil 1 ~6,9 puan, yil 3 ~12,3 puan (aralik 8-18), yani %31,5 -> yaklasik %19 (%14-23).
 
@@ -57,7 +65,7 @@ python -m hekis.acmaz       # altkume etkileri + 5 yillik enflasyon yolu
 python -m hekis.gerceklik   # 8 test, gecmeyeni gizlemez
 ```
 
-`acmaz`: kira (A), mahsup (B), ic borclanma (C) ve doviz (D) tek tek ve birlikte cozulur. Tek basina cozumde sizinti varsayimi vardir (0-%40, veriden tanimlanamaz). Dinamik yol e_t = atalet*e_{t-1} + y1*g_t, baz %31,5 dondurulmustur.
+`acmaz`: kira (A), mahsup (B), ic borclanma (C) tek tek ve birlikte cozulur (D kaldirildi). Tek basina cozumde sizinti varsayimi vardir (0-%40, veriden tanimlanamaz). Dinamik yol e_t = atalet*e_{t-1} + y1*g_t, baz %31,5 dondurulmustur.
 
 `gerceklik`: 6/8 gecti. Kalan iki test ornek disi: kur-TUFE iliskisi 2023-25'i 7-44 puan yanlis tahmin ediyor (RMSE 28, naif 19). Eksik degisken para politikasi gorunuyor. Reel faiz eklenince 2024-25 duzelir ama 2022-23 kotulesir, genel hata 33,5. Bu yuzden modele eklenmedi. Doviz kanali sonuclari bu nedenle ust sinir okunmali.
 

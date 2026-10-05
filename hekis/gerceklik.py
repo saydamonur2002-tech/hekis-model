@@ -107,7 +107,7 @@ def t6_kirilma():
 
 def t7_buyukluk(n=4000):
     rng = random.Random(11)
-    kont = {"B faiz tasarrufu > finansman gideri": 0, "toplam ikincil > 3 puan": 0, "toplam > TUFE": 0, "d_cozum >= d_yil": 0}
+    kont = {"B faiz tasarrufu > finansman gideri": 0, "toplam ikincil > 3 puan": 0, "toplam > TUFE": 0}
     ikinci = []
     for _ in range(n):
         p = cek(rng)
@@ -119,10 +119,8 @@ def t7_buyukluk(n=4000):
         ikinci.append(k["toplam"])
         if k["toplam"] > 3:
             kont["toplam ikincil > 3 puan"] += 1
-        if k["hepsi"] > TUFE_YILLIK * 100:
+        if k["toplam"] > TUFE_YILLIK * 100:
             kont["toplam > TUFE"] += 1
-        if p["d_cozum"] >= p["d_yil"]:
-            kont["d_cozum >= d_yil"] += 1
     s = "; ".join("{} {:.1f}%".format(a, 100 * v / n) for a, v in kont.items())
     ok = kont["toplam > TUFE"] == 0 and kont["B faiz tasarrufu > finansman gideri"] / n < 0.05
     return "T7 buyukluk/sinir (4000 cekim): " + s, ok
