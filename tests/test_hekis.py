@@ -361,3 +361,16 @@ class AnadoluTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PilotTests(unittest.TestCase):
+    def test_scale_invariance_and_stages(self):
+        from hekis import pilot
+        rows = dict(pilot.ladder())
+        self.assertEqual(rows["K0 yalniz havuz"]["oran"], 0.0)
+        self.assertGreater(rows["K2 + luks %5 (uc bolge)"]["oran"], rows["K1 + genel bedel %1"]["oran"])
+        self.assertGreaterEqual(rows["K3 + hedef primi"]["daire"], rows["K2 + luks %5 (uc bolge)"]["daire"])
+
+    def test_reality_checks_pass(self):
+        from hekis import pilot
+        self.assertTrue(all(ok for _, ok, _ in pilot.tests()))
