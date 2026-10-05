@@ -1,6 +1,6 @@
 # Yaptirim kanun taslagi (guncel model orani)
 
-Bu metin yururluk taslagi degil. Modeldeki karar kuralinin madde iskeleti. Oranlar gozlem degil, esik; model sonucuna ve varsayimlara bagli. Finansal sistem ve senet bu metne girmez. Surum: 2026-10-05, Istanbul. Anadolu buyuksehirleri icin ayri tarife: `data/ANADOLU_TARIFE.md`. Onceki surum git gecmisinde (%4 tek oranli ucuncu konut rejimi); model onu desteklemedi.
+Bu metin yururluk taslagi degil. Modeldeki karar kuralinin madde iskeleti. Oranlar gozlem degil, esik; model sonucuna ve varsayimlara bagli. Finansal sistem ve senet bu metne girmez. Surum: 2026-10-05 (ikinci duzeltme: kademeli yururluk, kapi esikleri, ayrilabilirlik, sok hukumleri), Istanbul. Anadolu buyuksehirleri icin ayri tarife: `data/ANADOLU_TARIFE.md`. Onceki surum git gecmisinde (%4 tek oranli ucuncu konut rejimi); model onu desteklemedi.
 
 ## Amac
 
@@ -37,9 +37,26 @@ Hasilat donusu: satis bedelinin sistem senedine yazilmasi. Daire, doviz, altin v
 
 Malik, es ve kontrol edilen sirketlerdeki bolumleri tek bildirimde sayar. Bos konut tespiti beyana birakilmaz: elektrik abonelik tuketim verisi ve adres kayit sistemi belediye ve dagitim sirketince capraz kontrol edilir. Deger, belediye rayicinden az olamaz. Rayic ile ilan ortalamasi arasinda sistem ilan ortalamasini esas alir. Bedel emlak vergisiyle birlikte belediyece tahsil edilir, odenmeyen bedel icin tapuya serh ve haciz.
 
-## Gecis
+## Kademeli yururluk ve kapi
 
-Ilk yil oranin yarisi. Ikinci yildan itibaren tam oran. Bitmemis stok icin on sekiz ay tamamlama suresi. Sure dolunca teminat yasagi dogrudan uygulanir.
+Kanun bir anda tum sehre degil, olcum kapisiyla kademeli uygulanir. Model bunu gerektiriyor: sistemin finansmani luks bedel tahsilatina dayanir ve bu tahsilat hicbir yerde olculmedi.
+
+1. Birinci yil pilot: secilen mahallelerde toplam yaklasik 3.800 bos birim (luks bolgede yaklasik 290 vergilendirilen birim; luks tahsilati olcmek icin gerekli en kucuk buyukluk, +-4,6 puan hassasiyet). Ilk yil bedel oranin yarisi.
+2. Her yil sonunda olcum. Esikler tutarsa bir sonraki yil kapsam en fazla 2,5 kati buyur (3.800, 9.500, 23.750, 59.375, 148.000, 371.000, tum Istanbul 450.000; model: tam olcege 7. yilda ulasilir).
+3. Kapi esikleri (tamami tutmalidir, olculen deger kullanilir; olcum hatasi payi eklenmistir):
+   a. Katilim: uygun birimin yuzde 15 ile yuzde 38'i arasi (alt: amac; ust: ustunde sub. bedel gelirini asar).
+   b. Genel bedel tahsilati en az yuzde 20; luks bedel tahsilati genel tahsilata bagli: genel yuzde 30 ise en az yuzde 18, yuzde 20 ise en az yuzde 23, yuzde 10 ise en az yuzde 29.
+   c. Oturan odeme tahsilati en az yuzde 80; olculen hane geliri varsayilan gelir olcegi yuzde 85'inin altina dusmemeli.
+   d. Bedel geliri / yillik subvansiyon, olculen degerlerle, en az 1,25.
+4. Kapi tutmazsa kapsam genisletilmez, yeni yerlestirme durdurulur. Yerlesmis haneler korunur (cikarilmaz), bunun maliyeti mevcut hane kadardir.
+5. Kapi verisi bagimsiz kurumca yayimlanir. Esikleri ve ayrintiyi yonetmelik belirler; bu taslak rakamlari baslangic degeri olarak verir, kanunlastirmaz.
+6. Bitmemis stok icin on sekiz ay tamamlama suresi. Sure dolunca teminat yasagi dogrudan uygulanir.
+
+## Ayrilabilirlik ve sok hukumleri
+
+- Luks bedel ayri madde, ayri hukum. Luks bedelin iptali halinde genel bedel, katilim ve yerlestirme hukumleri yururlukte kalir (model: yalniz luks bedel iptali, tum bedelin iptali kadar zararlidir; zarar eden varyant %41 ile %74).
+- Bedelin tamamen iptali halinde (en kotu hukuki sok): yeni yerlestirme otomatik durur, yerlesmis haneler korunur, mevcut sozlesmeler kira artis kuralina baglidir. Kademeli yururluk bu riski azaltir: 3. yilda iptal olursa yuk yaklasik 4 mr TL (20 yil), tam olcekte ise yaklasik 84 mr TL.
+- Katilim guvencesi yok: beklenen reel konut artisi bugunkunden yaklasik 4 puan yukselirse katilim yuzde 15'in altina duser ve kapi genislemeyi durdurur. Bu hata degil, tasarimdir.
 
 ## Sinir
 
@@ -47,4 +64,7 @@ Bu metin mubadele, el koyma veya kamulastirma degil. Teklif reddedilebilir. Anay
 
 ## Model bagi
 
-En olasi senaryo, Istanbul: bos stok 450 bin (225 bin ile 750 bin arasi tahmin), HEKIS bandi 183 bin, tampon 177 bin, luks 90 bin. Katilim tavani %25. Yerlesen yaklasik 37 bin daire (bos stok) ve duran insaattan yaklasik 6 bin; yillik sub. 3,9 + 0,64 mr TL; bedel geliri 9,4 mr TL; ayrica yaklasik 107 bin bos daire bedel baskisiyla piyasaya doner. Gelirin 6,5 mr TL'si luks bedelden, bu yuzden luks tahsilati kritik. Bu oranlar `hekis/zones.py` ve `hekis/final.py` ile uyumlu.
+En olasi senaryo, Istanbul (`hekis/zones.py`, `hekis/final.py`, `hekis/horizon.py`, `hekis/social.py`): bos stok 450 bin (225-750 bin arasi tahmin), HEKIS bandi 183 bin, tampon 177 bin, luks 90 bin. Katilim tavani %25. Erozyonsuz tam olcek: yerlesen 37 bin (bos stok) ve duran insaattan yaklasik 6 bin; sub. 3,9 + 0,64 mr TL; bedel 9,4 mr TL. Olcek erozyonu varsayimiyla (tahsilat tam olcekte %25 azalir; veri yok) bedel 7,0 mr TL, oran 1,79. Kademeli yoldan tam olcege 7. yilda ulasilir; 10 yilda kumulatif net yaklasik +17 mr TL.
+Etki kucuk: tam olcekte Gini -0,0007, goreli yoksulluk -0,16 puan, Istanbul kirasi yaklasik -%4,5 (esneklik 0,6; dogrulanmadi), yerel TUFE -0,3 puan, ulusal TUFE yaklasik -0,05 puan.
+Sistemin finansmani luks bedele dayanir (gelirin yaklasik 6,5 mr TL'si), bu yuzden luks tahsilati kritik ve kademeli kapi onu olcmek icin tasarlandi. Sok testleri (150-300 cekim): bedel iptali yilinda %74 cekimde 5 yil net negatif; agir krizde %13; ralli ve gelir sokunda kapi genislemeyi durdurur.
+Dogrulanmayan: etkin tahsilat (%30/%40), erozyon (%25), kira esnekligi, duran insaat sayisi (30 bin), bos stok. Pilot verisi gelmeden bu metin hipotez.

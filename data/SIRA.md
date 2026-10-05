@@ -1,6 +1,8 @@
 # Sira
 
-Durum, 2026-10-05. Kapsam Istanbul.
+Durum, 2026-10-05. Kapsam Istanbul. **ISTANBUL KISMI KAPANDI (kagit uzerinde).** Anadolu ayri sistem olarak ilerler (`SISTEMLER.md`).
+
+Kapanis olcutu: model, kademeli pilot, kapi esikleri, 10 yillik ufuk, sok testleri, sosyal etki ve yasam maliyeti tamam (60 test); kanun taslagi kademeli yururluk ve kapiyla guncel. Acik kalanlar model degil, veri ve karar: luks tahsilatini ancak pilot olcer; bos stok, duran insaat sayisi, erozyon, kira esnekligi varsayim; senet acik noktalari (fiziki endeks, anapara garantisi, banka kanali, geri odemenin uretime yonlendirilmesi); mekansal yogunlasma; sokta geri cekilme kurali. `HEKIS_Sistem_Anlatimi.docx` eski (uc bolge oncesi), yeniden uretilmedi.
 
 1. Model. TAMAM. Havuz, oturan, senet, elde tutma karari, uc bolge, luks tarife, abonelik, dereceli kira, duran insaat, havuz kirasi carpani. 46 test, 15 gerceklik kontrolu, Monte Carlo. Ozet `SONUC.md`, ayrinti `README.md`, varsayimlar `data/VARSAYIM.md`.
 2. Finansal sistem. ACILABILIR, ama model sonucuyla senet tasarimi cakisiyor (asagida).
