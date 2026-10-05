@@ -72,7 +72,7 @@ def draw(rng: random.Random) -> dict:
     out = {}
     for k in UNCERTAIN:
         lo, _, hi = E.SPACE[k]
-        out[k] = rng.triangular(lo, LIKELY[k], hi)
+        out[k] = rng.triangular(lo, hi, LIKELY[k])
     return out
 
 
