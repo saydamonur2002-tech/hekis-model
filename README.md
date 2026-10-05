@@ -103,3 +103,11 @@ Bulgular:
 - Ileri enflasyon iki rejimde de ~%28,8 (2030). Tarihsel karsi-olgusal: 2025'te 4,8 puan dusuk, kacinilan NOP 85 mlr $.
 - Testler 2/5: carry anlamli ama 2015-17 isareti ve ornek disi 2024-25 tahmini tutmuyor, likidite tamponu modelde yok.
 
+### Likidite tamponu ve stres (tampon.py)
+
+`python -m hekis.tampon`: kisa vadeli net pozisyon (KV net) 2022 70 -> 2026-07 4,4 mlr $. Tersten stres: butun kisa vadeli kalemlerde (banka kredisi, ithalat borcu, net turev) yeniden finansman kaybi kac olunca likit varlik (mevduat+menkul) ve ihracat alacagi yetmez. Kirilma orani f*: 2020 %84, 2022 %79, 2023 %74, 2024 %49, 2026-07 %47. Tarihin en kotu yillik daralmasi %24 (ithalat borcu 2018), yani tolerans 3,3x'ten 2,0x'e dustu ama hala 2 kati. Tarihsel siddette stres talep dogurmuyor (P=%2, 2026-07). Yani KV net 'tampon bitti' gostergesi olarak yaniltici, f* dogru olcu.
+
+Turev: KV turev yukumlulugu 2,3 (2022) -> 22,7 mlr $ (2026-07), turev varligi 13,6 -> 16,1. Net turev pozisyonu uzun taraftan +11 mlr $'dan kisa tarafa -6,6'ya gecti.
+
+Ileri tampon yolu (KV net) baz senaryoda 2027'de negatife (P %66-86), cozumde gecikir. Testler 3/5: tampon kur sokunu onceden gostermedi (r=+0,60), eta ve TCMB payi rezerv verisi olmadan tanimlanamaz.
+
