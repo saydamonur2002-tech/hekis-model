@@ -140,3 +140,5 @@ Veri: `data/usdtry_2026.json`, `data/USDTRY.md` (TCMB EVDS gunluk, 2 Oca-6 Eki 2
 - Model 2026 aciginin (~5,5 puan) ~1 puani kirilimla aciklanir, ~4,5 puan baska surucu.
 - TCMB YKKE (Sub 2026): yeni kiraci %34,2, mevcut kiraci %53,9. TUFE kirasi mevcut sozlesmeleri izler: yuksek olcum kismen eski sozlesmelerin yetismesi, guncel kitlik degil.
 
+Guncelleme: birincil kaynak eklendi, `data/TUIK_DUYURU_30102025.md` (TUIK Kamuoyu Duyurusu 30.10.2025). Dogruladigi: baz 2025=100, ECOICOP v2, grup agirliklari Ulusal Hesaplar HHNTH'den (AB tarafindan zorunlu), alt duzey agirliklar HBA'dan, mevcut seri zincir yapiyla yeniden gruplanir, 2003=100 donemi manset gostergelerinde degisiklik yok, yalniz bazi alt endekslerde siniflama farki olabilir. Icermedigi: agirlik, madde ve grup sayisi (arama ozetinden). Sonuc: manset 2015-25 TUFE serisi kirilmamis, Drive'daki konut grubu serisi ile 2026 konut grubu ayni kapsam olmayabilir.
+

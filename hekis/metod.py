@@ -2,8 +2,9 @@
 
     python -m hekis.metod
 
-Kaynak: arama ozetleri (TUIK ve TCMB siteleri bu ortamdan acilamadi, metodoloji dokumani okunamadi).
-Guven duzeyi her satirda yazili. Hicbir sayi TUIK metodoloji belgesinden dogrudan okunmadi.
+Kaynak: (1) BIRINCIL: TUIK Kamuoyu Duyurusu 30.10.2025 (data/TUIK_DUYURU_30102025.md), ilke duzeyi: baz, siniflama,
+agirlik kaynagi, "manset seri degismiyor". (2) Agirlik, madde ve grup sayilari arama ozetlerinden (TUIK/TCMB siteleri
+bu ortamdan acilamadi). Guven duzeyi her satirda yazili.
 """
 
 import random
@@ -18,7 +19,9 @@ KIRILIMLAR = [
     ("Nisan 2022", "TUIK urun bazli fiyatlari yayimlamayi birakti", "olcum degil dogrulanabilirlik kirilimi", "orta (arama ozeti)"),
     ("2024 bulteni", "2014-2023 bulten tablolari Eurostat metodolojisine gore revize", "yayin tablolari, endeks degil", "orta"),
     ("Ocak 2026", "baz 2003=100 -> 2025=100; COICOP -> ECOICOP v2; 12 -> 13 ana grup; 407 -> 428 madde; "
-                  "grup agirliklari HBA -> Ulusal Hesaplar HHNTH", "bkz. asagi", "orta-yuksek (cok kaynak)"),
+                  "grup agirliklari HBA -> Ulusal Hesaplar HHNTH", "bkz. asagi", "YUKSEK ilke (birincil duyuru), orta sayilar (arama ozeti)"),
+    ("Ocak 2026", "TUIK beyani: 2003=100 donemi manset gostergelerde DEGISIKLIK YOK, zincir yapi korunur; yalniz bazi ALT endekslerde "
+                  "siniflama kaynakli farklar. Agirlik kaynagi AB tarafindan zorunlu (HICP), takdire bagli degil", "manset seri surekli; alt endeks karsilastirilamaz", "YUKSEK (birincil)"),
 ]
 
 AGIRLIK_2025_2026 = {   # grup: (2025, 2026), yuzde. 2025 yalniz arama ozetinde verilenler.
@@ -39,7 +42,7 @@ ENAG_HAZ26 = {"TUIK": 32.11, "ENAG": 51.49}   # Haziran 2026 yillik, Euronews ak
 
 def rapor() -> str:
     L = ["TUIK TUFE METOD KIRILIMLARI", ""]
-    L.append("KIRILIM KATALOGU (kaynak: arama ozetleri; TUIK/TCMB siteleri acilamadi)")
+    L.append("KIRILIM KATALOGU (ilke: birincil TUIK duyurusu 30.10.2025; sayilar: arama ozetleri)")
     for t, n, e, g in KIRILIMLAR:
         L.append("  {:<11} {}".format(t, n))
         L.append("              etki: {}   [guven: {}]".format(e, g))
@@ -128,7 +131,8 @@ def testler():
     out.append(("M3 A kanali dogrudan katkisi konut grubunun genel ustu fazlasini ({:.2f} puan) asmiyor: asma olasiligi %{:.1f}".format(fark, 100 * asma / 20000),
                 asma / 20000 < 0.01, "ust sinir testi"))
     out.append(("M4 kira agirligi (TUFE'de) bu turda dogrulanamadi: w_kira 4,0-7,5% VARSAYIM, ust sinir konut grubu %11,4 eksi elektrik-gaz-su", None, "BILGI: TUIK 2026 agirlik tablosu gerek"))
-    out.append(("M5 TUIK metodoloji dokumani ve TCMB analizi dogrudan okunamadi (ag politikasi); rakamlar arama ozetinden", None, "BILGI: dokumanlar yuklenirse dogrulanir"))
+    out.append(("M5 birincil duyuru (30.10.2025) ilkeleri dogruluyor ama agirlik, madde ve grup SAYISI icermiyor; TUIK 2026 metodoloji dokumani ve TCMB analizi okunamadi, sayilar arama ozetinden", None, "BILGI: agirlik tablosu yuklenirse dogrulanir"))
+    out.append(("M6 alt endeks karsilastirilabilirligi: duyuruya gore alt endekslerde siniflama farki olabilir. Konut grubu 2025 'Konut' (%49,5 yillik, Drive) ile 2026 'Konut, su, elektrik, gaz ve diger yakitlar' (%39,8) ayni kapsam olmayabilir", None, "BILGI: grup duzeyinde 2025-26 kiyasi dikkatle okunmali, manset kiyasi guvenli"))
     return out
 
 
