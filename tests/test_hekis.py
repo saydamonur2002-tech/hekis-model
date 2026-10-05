@@ -392,3 +392,10 @@ class GateTests(unittest.TestCase):
         lux = [l for _, l in g["frontier"]]
         self.assertEqual(lux, sorted(lux))  # genel tahsilat dustukce luks esigi yukselir
         self.assertLess(g["p_max"], 0.5)
+
+class LuxPilotTests(unittest.TestCase):
+    def test_lux_pilot_size_precision(self):
+        from hekis import pilot
+        n = pilot.lux_pilot_size(0.05)
+        self.assertGreater(n, pilot.PILOT_STOK)
+        self.assertLessEqual(pilot.gates(n)["se_lux"], 0.05 + 1e-9)

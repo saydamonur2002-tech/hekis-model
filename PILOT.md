@@ -38,3 +38,8 @@ Bulgular:
 - HEKİS 36,9 bin hane = sistemin müşterisinin %5,9'u.
 - Sistem aktifi mevduatın %0,29'u, senet %0,28'i (senet/aktif 0,97). En hızlı büyüyen 2024 kanalı bile mevduatın ~%0,3'ünü çekti: dolarizasyon kapasitesi ≈0 sonucuyla uyumlu.
 - Sınır: müşteri tasarruf eden orta gelir, HEKİS'in uygun kiracısı (düz memur maaşı altı) başka nüfus. Talep kanıtı değil. Pilotun "kapsam" sütunu havuz stokunun katılımı; anchor'daki kapsam uygun kiracıya oranı (%6,6), ikisi aynı şey değil.
+
+## Genişletilmiş lüks pilotu (karar)
+Lüks tahsilatı mahalle pilotunda ölçülemediği için pilot ≈3.800 birime çıkarılır (`pilot.lux_pilot_size()`): lüks ölçüm hatası ±4,6 puan (1.000 birimde ±9), genel ±1,6, katılım ±2,0. Lüks bölgede ≈290 vergilendirilen birim.
+Geçiş kuralı (okunan değer): genel tahsilat %30 ise lüks ≥%18 (13+4,6); %20 ise ≥%23; %10 ise ≥%29. Eşiğin altında kalırsa K3'e (hedef primi) geçilmez; ilk iş lüks bedel tahsilat yolu (tespit, yaptırım) düzeltilir.
+Not: hata hesabı bağımsız birim varsayar; aynı sahibin birden fazla birimi, aynı mahallede kümelenme hatayı büyütür.

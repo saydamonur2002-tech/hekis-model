@@ -73,13 +73,13 @@ def _smallest(key: str, target: float, **extra) -> float:
     return hi
 
 
-def gates() -> dict:
+def gates(stok: float = PILOT_STOK) -> dict:
     """Esikler modelden turetilir: orani SAFETY'ye tasiyan en kucuk tahsilat; olcum hatasi (95% GA) ayrica eklenir.
     Modelin %10 tahsilat tabani (AVOID_FLOOR) kaldirilir: yoksa tahsilat 0'da bile kendini finanse ediyor gorunur."""
     old = final.AVOID_FLOOR
     final.AVOID_FLOOR = 0.0
     try:
-        b = run_three_zone(P={"stok": PILOT_STOK})
+        b = run_three_zone(P={"stok": stok})
         n_lux = b["S"][2] * (1 - final.lux_response(0.05))
         n_gen = b["S"][0] * (1 - b["p"]) + b["S"][1] * (1 - final.lux_response(0.01))
         se = lambda n, p: 1.96 * math.sqrt(p * (1 - p) / n)
@@ -90,6 +90,13 @@ def gates() -> dict:
                 "tenant_min": c_ten, "se_p": se(b["S"][0], b["p"])}
     finally:
         final.AVOID_FLOOR = old
+
+
+def lux_pilot_size(target: float = 0.05, p: float = 0.25) -> int:
+    """Luks tahsilatini +-target (95% GA) olcmek icin gereken pilot stoku (birim)."""
+    per_unit_lux = run_three_zone(P={"stok": 1000})["S"][2] * (1 - final.lux_response(0.05)) / 1000
+    need = (1.96 ** 2) * p * (1 - p) / target ** 2
+    return int(math.ceil(need / per_unit_lux / 100) * 100)
 
 
 def _smallest_cap_max(target: float) -> float:
@@ -146,6 +153,10 @@ def main() -> int:
         print(f"  genel tahsilat %{gen:.0%} ise luks tahsilat >= %{lux:.0%} (olcum hatasi ±{g['se_lux']:.0%} eklenir)")
     print(f"  katilim: en fazla %{g['p_max']:.0%} (ustunde sub. bedeli asar), alt sinir amaca bagli (karar), olcum ±{g['se_p']:.1%}")
     print(f"  kiraci odeme tahsilati: finansal taban %{g['tenant_min']:.0%}")
+    big = lux_pilot_size()
+    gb = gates(big)
+    print(f"\nGenisletilmis luks pilotu: {big:,} birim -> luks tahsilat olcum hatasi ±{gb['se_lux']:.1%}, genel ±{gb['se_gen']:.1%}, katilim ±{gb['se_p']:.1%}".replace(",", "."))
+    print("  (mahalle pilotu 1.000 birim: luks ±%.0f%%)" % (100 * g["se_lux"]))
     print("\nGerceklik testleri (model tutarliligi; gercek dogrulama pilot verisiyle):")
     fails = 0
     for name, ok, note in tests():
