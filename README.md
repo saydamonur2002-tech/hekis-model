@@ -142,3 +142,13 @@ Veri: `data/usdtry_2026.json`, `data/USDTRY.md` (TCMB EVDS gunluk, 2 Oca-6 Eki 2
 
 Guncelleme: birincil kaynak eklendi, `data/TUIK_DUYURU_30102025.md` (TUIK Kamuoyu Duyurusu 30.10.2025). Dogruladigi: baz 2025=100, ECOICOP v2, grup agirliklari Ulusal Hesaplar HHNTH'den (AB tarafindan zorunlu), alt duzey agirliklar HBA'dan, mevcut seri zincir yapiyla yeniden gruplanir, 2003=100 donemi manset gostergelerinde degisiklik yok, yalniz bazi alt endekslerde siniflama farki olabilir. Icermedigi: agirlik, madde ve grup sayisi (arama ozetinden). Sonuc: manset 2015-25 TUFE serisi kirilmamis, Drive'daki konut grubu serisi ile 2026 konut grubu ayni kapsam olmayabilir.
 
+### OVP 2027-2029 simulasyonu ve tahmin (ovp.py)
+
+`python -m hekis.ovp`. Resmi rakamlar arama ozetlerinden (OVP belgesi okunamadi). OVP yil sonu TUFE: 2026 28,4 (onceki OVP'de 16), 2027 21, 2028 13,5, 2029 9. TCMB (Ag 2026): 2026 28, 2027 15, 2028 9. OVP buyume 3,3/4,2/4,6/5,0; acik/GSYH 3,1/3,5/3,1/2,8; cari acik mlr $ 47,5/38,5/37/35,5.
+
+Tahmin cekirdegi TUFE_t = a + b*kur_t + rho*TUFE_t-1 + delta (kalibre.py, bootstrap), kayma kurali kur = oran*TUFE_t-1. delta onceligine cok duyarli:
+- cipali (2026 sonu TCMB'nin 28'ine baglanir, delta sonraki yillara tasinir): 28,0 / 26,7 / 25,4 / 24,1. OVP'yi tutturma olasiligi 2027 %2, 2028 %1, 2029 %2.
+- tarihsel kalinti U(-4,2): 24,6 / 20,2 / 16,1 / 12,1 (p10-p90 2029: 3-34).
+- Tutmak icin gereken ek dezenflasyon (kalinti): OVP 2027 -3,7, 2028 -4,0, 2029 -1,3; TCMB 2027 -9,3 (tarihte en fazla -6,1 gorulmus). Cozum (A-C+doviz borcu) 2029'da ~1,5 puan ekler, OVP'ye yetmez. Kur sicramasi senaryosu 2027 40%.
+- OVP gecmis hatasi ~+12 puan (2024-25 hafizadan). Testler 0/2, 3 bilgi.
+
