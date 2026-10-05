@@ -131,8 +131,8 @@ def t7_buyukluk(n=4000):
 def t8_2026():
     """2026 icin kor tahmin. d_2026 varsayim (%20-28). Gozlem TUFE Agustos 2026 yillik %31,5, Aralik degil."""
     b, _, _, _ = fit(2025)
-    lo, hi = tahmin(b, 20, TUFE[2025]), tahmin(b, 28, TUFE[2025])
-    return ("T8 2026 kor tahmin (kur %20-28 varsayim): {:.1f}-{:.1f}. Gozlem Agustos yillik %31,5 (Aralik degil, tam kiyas degil)".format(lo, hi),
+    lo, hi = tahmin(b, 16, TUFE[2025]), tahmin(b, 20, TUFE[2025])
+    return ("T8 2026 kor tahmin (kur %16-20, gozlem tempo): {:.1f}-{:.1f}. Gozlem Agustos yillik %31,5 (Aralik degil, tam kiyas degil)".format(lo, hi),
             lo - 3 <= TUFE_YILLIK * 100 <= hi + 3)
 
 

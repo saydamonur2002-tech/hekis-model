@@ -122,3 +122,11 @@ Veri: `data/urdl_20260925.json`, `data/URDL.md`. `python -m hekis.rezerv`.
 - Sistem ters stresi (firma + resmi katman): f* %47 (yalniz firma), %53 (resmi altin-disi), %75-97 (altinin %25-50'si satilabilirse). Tarihin en kotu daralmasi %24.
 - eta ve cb'nin kur bacagi kur serisi olmadan hala tanimlanamaz.
 
+### Kur 2026 ve kirilma senaryosu (kirilma.py)
+
+Veri: `data/usdtry_2026.json`, `data/USDTRY.md` (TCMB EVDS gunluk, 2 Oca-6 Eki 2026). `python -m hekis.kirilma`.
+
+- Kur 42,88 -> 49,12, YTD +%14,5, yillik tempo %19,4. Aylik %1,1-2,0 (sd 0,28), haftalik %0,31-0,38. Altin-disi rezerv -5,6 mlr $ oynarken kur 0,37'de kaldi: baski rezervde, kurda. Bu rejimde eta ~ 0, cb ~ 1, net likit bitene kadar.
+- `enflasyon.cek` d_yil'i gozleme cekildi (%16-20, onceki %20-28 varsayimdi). Model bu kur hiziyla 2026 TUFE'yi ~26 veriyor, gozlem 31,5: ~5 puan eksik (T8 ve T-K3 kaldi).
+- Kirilma senaryosu: J = kayma ustu sicrama, tarihte +20 (2018), +62 (2021), +20 (2022), +37 (2023) puan. TUFE'ye yil 1 12,3 puan, 3 yilda kumulatif 22. Cozumun (A+B+C+dongu) 3 yillik kazanci 2,7 puan. Maliyet/kazanc 8x; cozum kirilma olasiligini mutlak ~12 puan dusurse esitlenir. Olasilik bilinmiyor.
+

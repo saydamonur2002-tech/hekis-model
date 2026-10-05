@@ -63,7 +63,7 @@ def cek(rng):
         "acik_fazla": rng.triangular(0.3, 2.5, 1.2),  # esik ustu acik, GSYH yuzdesi (low, high, mode)
         "beta": rng.uniform(0.15, 0.50),          # %1 GSYH mali itis basina enflasyon puani (net, verimlilik dahil)
         # D doviz
-        "d_yil": rng.uniform(0.20, 0.28),         # dolar/TL yillik artis, bu yil (2025 gozlem %21,7, 2026 varsayim)
+        "d_yil": rng.uniform(0.16, 0.20),         # dolar/TL yillik artis 2026. GOZLEM: 2 Oca-6 Eki +%14,5, aylik %1,1-2,0, yil sonu tempoyla %17-19 (data/usdtry_2026.json)
         "d_cozum": rng.uniform(0.03, 0.12),       # doviz kisiti cozulunce kalacak yillik deger kaybi
         "phi1": rng.uniform(0.25, 0.55),          # ayni yil geciskenlik: TCMB maliyet 0,25 .. veri 0,43+-0,16
         "ortusme_fx": rng.uniform(0.0, 0.20),     # kurun bir kismi A-C kanallarinin sonucu, cift sayim
