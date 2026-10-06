@@ -13,3 +13,5 @@ Esenyurt ortalama 3.619.875 TL. Havuz piyasanin yuzde 80'ini verirse fark 723.97
 | Ucuncu ve sonrasi, yuzde 2 | 72.398 TL | hayir, 10 yil |
 
 Yuzde 2 yetmez. Bes yilda gelmesi icin ucuncu ve sonrasinda yillik oran en az yuzde 4 olmali. Bu oran gozlem degil, esik. Havuz tam piyasa verirse stok gelir ama sermaye konutta kalir.
+
+Alt model: `hekis/blokaj.py`. `owner.py` kuralinin uygulama ayagi. Hizip baglantili dosyalarin kalici kapanmasi, uc kapi (yasal bosluk, siyasi hat, ele gecirilmis organ), onlem x okuma matrisi. Sonuc `KANUN_TASLAGI.md` icinde "Uygulama blokaji" blogu.

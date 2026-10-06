@@ -1,4 +1,6 @@
-"""Yaptirim blokaji: kanun yazili, bedel kesilmiyor. Kim durduruyor?
+"""ALT MODEL: yaptirim blokaji. owner.py karar kuralinin uygulama ayagi.
+
+Kanun yazili, bedel kesilmiyor. Kim durduruyor?
 
     python -m hekis.blokaj
 
@@ -24,6 +26,8 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, replace
+
+from hekis.owner import years_to_sell
 
 PIYASA = 3_619_875      # Esenyurt ortalama, owner.py ile ayni
 HAVUZ = 0.80
@@ -136,9 +140,10 @@ def rapor() -> str:
     out = []
     out.append(f"Esenyurt ortalama {PIYASA:,} TL, havuz {HAVUZ:.0%}, bedel {ORAN:.0%}, gecis ilk yil yari.".replace(",", "."))
     out.append(f"Hizip baglantili pay f={f:.0%}, yillik tespit d={d:.0%}. Hepsi varsayim.")
+    y_owner = years_to_sell(PIYASA, PIYASA * HAVUZ, PIYASA * ORAN)   # owner.py: gecissiz, sizintisiz
     y0 = yil_sayisi(1.0)
     y1 = yil_sayisi(d)
-    out.append(f"Sifir sizinti: {y0:.1f} yil (gecis dahil, owner.py 5,0'di). Tespit {d:.0%} ise ortalama yolda {y1:.1f} yil.")
+    out.append(f"Sifir sizinti: {y0:.1f} yil (gecis dahil, owner.py {y_owner:.1f}). Tespit {d:.0%} ise ortalama yolda {y1:.1f} yil.")
     out.append("Yani yuzde 4 esigi zaten sifir payla kurulmus. Kucuk bir sizinti bile bes yil hedefini kacirir.")
     out.append("")
     base = kos(f, d, Okuma("sizintisiz"))

@@ -32,13 +32,13 @@ Istanbul satis m2 66.905 TL. Kira m2 479 TL. Enflasyon ileri patikada son gozlen
 
 Piyasa kirasi endekslenirse havuz anaparayi reel olarak 15 yilda bitirir. Endekslenmezse enflasyon havuzu yer, 20 yilda anaparanin ancak dortte biri erir. HEKIS kirasi piyasanin altindadir. Oturan resmi sosyal kirayi oderse fark butcedir. Bu fark da endekslenirse reel yillik transfer yaklasik 162 milyon TL'dir. Nominal toplam 161 milyar yaziyorsa bu enflasyonun toplamidir, bugunku yuk degil.
 
-## Yaptirim blokaji
+## Alt model: yaptirim blokaji
 
 ```bash
 python -m hekis.blokaj
 ```
 
-Kanun yazili, bedel kesilmiyor: kim durduruyor? Yasal bosluk, siyasi hat, ele gecirilmis organ uc kapi olarak modellenir. Ayni toplam kapanma ayni sonucu verir, fark onlemde. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji"). Parametreler gozlem degil.
+`owner.py` karar kuralinin (elde tutma bedeli, havuz teklifi) uygulama ayagi. Kanun yazili, bedel kesilmiyor: kim durduruyor? Yasal bosluk, siyasi hat, ele gecirilmis organ uc kapi olarak modellenir. Ayni toplam kapanma ayni sonucu verir, fark onlemde. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji"). Parametreler gozlem degil.
 
 ## Sinir
 
