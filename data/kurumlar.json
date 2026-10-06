@@ -1,0 +1,11 @@
+{
+  "_not": "ORNEK PARAMETRELER. Hicbiri olculmedi. Kurum sinifi adlari genel, gercek bir kurum veya kurulus hakkinda iddia degildir. Kendi dosya verinle degistir.",
+  "C": 0.6,
+  "kurumlar": [
+    {"ad": "belediye_hatti",   "I": 0.80, "B0": 0.50, "delta": 0.30, "alpha0": 0.50, "beta": 0.50, "omega": 0.40, "N0": 20, "g": 1.0, "tau": 0.60, "r": 0.70, "p_pat": 0.25, "a": 0.60, "q_rival": 0.15, "phi": 1.0},
+    {"ad": "vakif_dernek",     "I": 0.50, "B0": 0.30, "delta": 0.10, "alpha0": 0.40, "beta": 0.50, "omega": 0.40, "N0": 20, "g": 0.6, "tau": 0.50, "r": 0.60, "p_pat": 0.20, "a": 0.50, "q_rival": 0.10, "phi": 1.0},
+    {"ad": "yuklenici",        "I": 0.70, "B0": 0.40, "delta": 0.25, "alpha0": 0.55, "beta": 0.50, "omega": 0.40, "N0": 20, "g": 1.5, "tau": 0.55, "r": 0.65, "p_pat": 0.20, "a": 0.55, "q_rival": 0.12, "phi": 1.0},
+    {"ad": "bagis_kanali",     "I": 0.40, "B0": 0.35, "delta": 0.15, "alpha0": 0.40, "beta": 0.50, "omega": 0.40, "N0": 20, "g": 0.5, "tau": 0.40, "r": 0.50, "p_pat": 0.30, "a": 0.40, "q_rival": 0.10, "phi": 1.0},
+    {"ad": "merkezi_birim",    "I": 0.90, "B0": 0.15, "delta": 0.00, "alpha0": 0.30, "beta": 0.50, "omega": 0.40, "N0": 20, "g": 1.0, "tau": 0.30, "r": 0.50, "p_pat": 0.15, "a": 0.50, "q_rival": 0.05, "phi": 1.0}
+  ]
+}

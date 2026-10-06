@@ -37,11 +37,11 @@ Malik, es ve kontrol edilen sirketlerdeki bolumleri tek bildirimde sayar. Bildir
 
 ## Gecis
 
-Ilk yil oranin yarisi. Ikinci yildan itibaren tam oran. Yarim ilk yil satis suresini 5,0'dan 5,5 yila uzatir (`hekis/blokaj.py`). Bitmemis stok icin on sekiz ay tamamlama suresi. Sure dolunca teminat yasagi dogrudan uygulanir.
+Ilk yil oranin yarisi. Ikinci yildan itibaren tam oran. Yarim ilk yil satis suresini 5,0'dan 5,5 yila uzatir (`hekis/blokaj_konut.py`). Bitmemis stok icin on sekiz ay tamamlama suresi. Sure dolunca teminat yasagi dogrudan uygulanir.
 
 ## Uygulama blokaji
 
-Bu blok yururluk maddesi degil. `hekis/blokaj.py` modelinin bulgusundan cikan madde iskeleti. Tez: merkez resmen toplanir, fiilen dagilir. Yetki ve imza yukaridadir, tahakkuk kararini hizip konumundaki aktorlerin sahasi belirler. Denetim kaydi olayi bilir, yaptirima cevrilemez. Suc ust baglantiyla kapanir, mevzuat gerekcesi uretilir, fatura alt kademeye ve devlet bilancosuna yazilir. Oranlar gozlem degil, esik. Hizip payi, tespit orani ve kapanma orani veriden olculmedi.
+Bu blok yururluk maddesi degil. `hekis/blokaj_konut.py` modelinin bulgusundan cikan madde iskeleti. Tez: merkez resmen toplanir, fiilen dagilir. Yetki ve imza yukaridadir, tahakkuk kararini hizip konumundaki aktorlerin sahasi belirler. Denetim kaydi olayi bilir, yaptirima cevrilemez. Suc ust baglantiyla kapanir, mevzuat gerekcesi uretilir, fatura alt kademeye ve devlet bilancosuna yazilir. Oranlar gozlem degil, esik. Hizip payi, tespit orani ve kapanma orani veriden olculmedi.
 
 Modelin bulgulari:
 

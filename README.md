@@ -32,13 +32,14 @@ Istanbul satis m2 66.905 TL. Kira m2 479 TL. Enflasyon ileri patikada son gozlen
 
 Piyasa kirasi endekslenirse havuz anaparayi reel olarak 15 yilda bitirir. Endekslenmezse enflasyon havuzu yer, 20 yilda anaparanin ancak dortte biri erir. HEKIS kirasi piyasanin altindadir. Oturan resmi sosyal kirayi oderse fark butcedir. Bu fark da endekslenirse reel yillik transfer yaklasik 162 milyon TL'dir. Nominal toplam 161 milyar yaziyorsa bu enflasyonun toplamidir, bugunku yuk degil.
 
-## Alt model: yaptirim blokaji
+## Alt model: secici yaptirim tekeli altinda sembolik merkezilesme
 
 ```bash
-python -m hekis.blokaj
+python -m hekis.blokaj          # genel model, kurum bazli, birim dosya
+python -m hekis.blokaj_konut    # konut kanununa ozel dar uygulama (owner.py baglantili)
 ```
 
-`owner.py` karar kuralinin (elde tutma bedeli, havuz teklifi) uygulama ayagi. Kanun yazili, bedel kesilmiyor: kim durduruyor? Yasal bosluk, siyasi hat, ele gecirilmis organ uc kapi olarak modellenir. Ayni toplam kapanma ayni sonucu verir, fark onlemde. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji"). Parametreler gozlem degil.
+Bes oyuncu (merkez M, hizip H, denetim D, alt kademe A, kamu bilancosu K), yedi durumlu dosya dongusu, kurum bazli parametreler (`data/kurumlar.json`, ornek, olculmedi). Cekirdek: `E = I(1-B)`, `B = B0 + delta C`, `alpha* = a0 + C(beta B - omega(1-B))`, `K = tau G_H`. Formul duzeltmesi: ilk yazimda Weber daralmasi yoktu, omega eklendi. Kritik blokaj `B* = omega/(beta+omega)`. Dongu simulasyonu ile formul yalniz yonde kiyaslanir; ikisi her kurumda uyusmaz, omega dongude uretilmez. Model E'yi B'den urettigi icin tezi kendi icinde test edemez, test dosya verisindedir. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji", konut uygulamasi).
 
 ## Sinir
 
