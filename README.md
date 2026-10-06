@@ -39,7 +39,7 @@ python -m hekis.blokaj          # genel model, kurum bazli, birim dosya
 python -m hekis.blokaj_konut    # konut kanununa ozel dar uygulama (owner.py baglantili)
 ```
 
-Bes oyuncu (merkez M, hizip H, denetim D, alt kademe A, kamu bilancosu K), yedi durumlu dosya dongusu, kurum bazli parametreler (`data/kurumlar.json`, ornek, olculmedi). Cekirdek: `E = I(1-B)`, `B = B0 + delta C`, `alpha* = a0 + C(beta B - omega(1-B))`, `K = tau G_H`. Formul duzeltmesi: ilk yazimda Weber daralmasi yoktu, omega eklendi. Kritik blokaj `B* = omega/(beta+omega)`. Dongu simulasyonu ile formul yalniz yonde kiyaslanir; ikisi her kurumda uyusmaz, omega dongude uretilmez. Model E'yi B'den urettigi icin tezi kendi icinde test edemez, test dosya verisindedir. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji", konut uygulamasi).
+Bes oyuncu (merkez M, hizip H, denetim D, alt kademe A, kamu bilancosu K), yedi durumlu dosya dongusu, kurum bazli parametreler (`data/kurumlar.json`, ornek, olculmedi). Cekirdek: `E = I(1-B)`, `B = B0 + delta C`, `alpha* = a0 + C(beta B - omega(1-B))`, `K = tau G_H`. Formul duzeltmesi: ilk yazimda Weber daralmasi yoktu, omega eklendi. Kritik blokaj `B* = omega/(beta+omega)`. Dongu simulasyonu ile formul yalniz yonde kiyaslanir; ikisi her kurumda uyusmaz, omega dongude uretilmez. Model E'yi B'den urettigi icin tezi kendi icinde test edemez, test dosya verisindedir. Parametreleri gercek dosya sayimindan kestirme araci: `python -m hekis.blokaj_veri` (yakalama-yeniden yakalama, bootstrap), sablon `data/dosya_sayim_sablon.csv`, sinirlar `data/OLCUM.md`. Bulgular ve madde iskeleti `data/KANUN_TASLAGI.md` icinde ("Uygulama blokaji", konut uygulamasi).
 
 ## Sinir
 

@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import json
 import random
+import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
 
@@ -77,8 +78,8 @@ class Kurum:
         return self.I * (1 - self.B(C))
 
 
-def yukle(yol: Path = VERI) -> tuple[float, list[Kurum]]:
-    d = json.loads(yol.read_text())
+def yukle(yol: Path | None = None) -> tuple[float, list[Kurum]]:
+    d = json.loads((yol or VERI).read_text())
     ks = [Kurum(**{k: v for k, v in x.items()}) for x in d["kurumlar"]]
     return d["C"], ks
 
@@ -228,4 +229,8 @@ def rapor() -> str:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        _YOL = Path(sys.argv[1])
+        yukle_orj = yukle
+        yukle = lambda yol=None: yukle_orj(_YOL)   # noqa: E731
     print(rapor())
