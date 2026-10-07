@@ -11,8 +11,8 @@ Calisma taslagidir, dogrulanmis bir kamu maliyesi modeli degildir. Not kopyasi: 
 Python 3 yeter. Ek paket yok.
 
 ```bash
-python -m hekis.simulate
-python -m hekis.bind_cli
+python -m hekis.bind_cli    # gercek kosu: data/ altindaki gozlemlerle
+python -m hekis.simulate    # ESKI, uydurma fiyatli scenarios/ kosusu (uyari basar)
 ```
 
 `bind_cli` fiyati, kirayi ve enflasyonu `data/istanbul_2026.json` dosyasindan okur. Kaynaklar `data/OKUMA.md` icindedir. Eski `scenarios/` uydurma fiyatla duruyor. Gercek kosu o degil.
@@ -35,6 +35,29 @@ Piyasa kirasi endekslenirse havuz anaparayi reel olarak 15 yilda bitirir. Endeks
 ## Sinir
 
 Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Model yeni konut istahini kapatmaz.
+
+## Durum
+
+| Alan | Durum |
+| --- | --- |
+| Havuz / oturan / senet hesabi (`model`, `bind`, `owner`, `senet`) | Tamam, gercek veriyle kosuyor (`bind_cli`) |
+| Enflasyon katki ayristirmasi (`sonuc`, `acmaz`, `borc_doviz`, `entegre`) | Calisiyor, ust sinir okunmali. Gerceklik 4/7 |
+| Kanun taslagi (`data/KANUN_TASLAGI.md`) | Iskelet. Oranlar esik, gozlem degil |
+| Finansal sistem (kupon, uretim hedefi) | Acilmadi. Model kapanmadan acilmaz kurali duruyor |
+| `scenarios/` | Eski, uydurma fiyat. Silinmedi, simulate uyari basar |
+
+Acik, veri gerektirenler: fiziki uretim endeksi, ITO kira alt kalemi, kira agirligi (`w_kira`), kur 2014-22 resmi serisi, kamu zam resmi tablosu, e-fatura eslesmesi (kilitli alacagin kapali dongu payi). Acik, olculemeyenler: kirilma olasiligi, kappa. Bunlar kodla degil veriyle kapanir, tahminle doldurulmadi.
+
+## Modeller reposuyla yaklasik eslesme
+
+`saydamonur2002-tech/modeller` belgeleri Drive aktarimi. Eslesme baslik okumasindan, yazar teyidi yok.
+
+| Kod | Ilgili belge |
+| --- | --- |
+| `model`, `bind`, `senet` | `HEKIS_Kapali_Kira_Uretim_Devresi.md` (stok-akim formulleri) |
+| `borc_doviz`, `birikim`, `tampon`, `rezerv`, `kirilma` | `Thirlwall_Minsky_SFC_Entegre_Model.md` (dis kisit, borc, bilanço) |
+| `acmaz`, `enflasyon`, `entegre` | `Ampirik_Verilerle_Model_Sinamasi.md` (zarar aktarimi tau, dis kisit kappa) |
+| `ovp`, makro yol | `Turkiye_Ekonomisi_Model_Analizi.md` (2026-2030 patikasi; o belge tek senaryo anlatisi, bu repo olasiligi bilinmiyor diye birakir) |
 
 ## Enflasyon katki modeli
 
@@ -67,7 +90,7 @@ python -m hekis.gerceklik   # 8 test, gecmeyeni gizlemez
 
 `acmaz`: kira (A), mahsup (B), ic borclanma (C) tek tek ve birlikte cozulur (D kaldirildi). Tek basina cozumde sizinti varsayimi vardir (0-%40, veriden tanimlanamaz). Dinamik yol e_t = atalet*e_{t-1} + y1*g_t, baz %31,5 dondurulmustur.
 
-`gerceklik`: 6/8 gecti. Kalan iki test ornek disi: kur-TUFE iliskisi 2023-25'i 7-44 puan yanlis tahmin ediyor (RMSE 28, naif 19). Eksik degisken para politikasi gorunuyor. Reel faiz eklenince 2024-25 duzelir ama 2022-23 kotulesir, genel hata 33,5. Bu yuzden modele eklenmedi. Doviz kanali sonuclari bu nedenle ust sinir okunmali.
+`gerceklik`: 4/7 gecti (T1 numpy/statsmodels yoksa atlanir ve sayilmaz; eskiden atlanan test gecmis sayiliyordu, skor sisikti). Kalan uc test (T2, T3, T8) ornek disi: kur-TUFE iliskisi 2023-25'i 7-44 puan yanlis tahmin ediyor (RMSE 28, naif 19). Eksik degisken para politikasi gorunuyor. Reel faiz eklenince 2024-25 duzelir ama 2022-23 kotulesir, genel hata 33,5. Bu yuzden modele eklenmedi. Doviz kanali sonuclari bu nedenle ust sinir okunmali.
 
 ## Doviz dorduncu etki, ic olusan (borc_doviz)
 

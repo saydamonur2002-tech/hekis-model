@@ -19,6 +19,8 @@ def main(argv: list[str] | None = None) -> int:
         root = Path(__file__).resolve().parents[1] / "scenarios"
         args = [str(root / "baseline.json"), str(root / "nakit_kacis.json")]
 
+    print("UYARI: scenarios/ eski ve uydurma fiyatli. Gercek kosu: python -m hekis.bind_cli\n")
+
     out_dir = Path("outputs")
     out_dir.mkdir(exist_ok=True)
     for path in args:

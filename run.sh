@@ -1,2 +1,2 @@
-python -m hekis.simulate
-python -m hekis.simulate scenarios/kota_havuzdan.json
+python -m hekis.bind_cli
+python -m hekis.gerceklik

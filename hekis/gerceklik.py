@@ -32,7 +32,7 @@ def t1_capraz():
         import numpy as np
         import statsmodels.api as sm
     except ImportError:
-        return "T1 atlandi (numpy/statsmodels yok)", True
+        return "T1 atlandi (numpy/statsmodels yok)", None
     ys = list(range(2016, 2026))
     X = np.array([[1, D[t], TUFE[t - 1]] for t in ys], float)
     y = np.array([TUFE[t] for t in ys], float)
@@ -136,13 +136,18 @@ def t8_2026():
 
 def main() -> int:
     testler = [t1_capraz, t2_ornek_disi, t3_yeniden_oynatma, t4_permutasyon, t5_jackknife, t6_kirilma, t7_buyukluk, t8_2026]
-    gecen = 0
+    gecen = atlanan = 0
     for t in testler:
         msg, ok = t()
-        gecen += bool(ok)
-        print(("[GECTI] " if ok else "[KALDI] ") + msg)
+        if ok is None:
+            atlanan += 1
+            print("[ATLANDI] " + msg)
+        else:
+            gecen += bool(ok)
+            print(("[GECTI] " if ok else "[KALDI] ") + msg)
         print()
-    print("{}/{} test gecti".format(gecen, len(testler)))
+    print("{}/{} test gecti{}".format(gecen, len(testler) - atlanan,
+                                     " ({} atlandi, sayilmadi)".format(atlanan) if atlanan else ""))
     return 0
 
 
