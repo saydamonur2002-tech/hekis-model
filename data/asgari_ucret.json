@@ -1,0 +1,7 @@
+{"kaynak": "Arama sonuclari: aile.gov.tr 'Yillar itibariyle net-brut asgari ucretler', alomaliye, pluxee, ING; 2026 icin Bakan Isikhan aciklamasi aktarimlari. Resmi PDF dogrudan okunamadi.",
+ "kararlar": [
+  ["2015-01", 1201.50, 949.07], ["2015-07", 1273.50, 1000.54], ["2016-01", 1647.00, 1300.99], ["2017-01", 1777.50, 1404.06],
+  ["2018-01", 2029.50, 1603.12], ["2019-01", 2558.40, 2020.90], ["2020-01", 2943.00, 2324.71], ["2021-01", 3577.50, 2825.90],
+  ["2022-01", 5004.00, 4253.40], ["2022-07", 6471.00, 5500.35], ["2023-01", 10008.00, 8506.80], ["2023-07", 13414.50, 11402.32],
+  ["2024-01", 20002.50, 17002.12], ["2025-01", 26005.50, 22104.67], ["2026-01", 33030.00, 28075.50]],
+ "not": "Aylik tutar, TL. 2026'da Temmuz ara zammi yok (haberler). Net seri AGI ve vergi duzenlemelerinden etkilenir, brut daha temiz."}

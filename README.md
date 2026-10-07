@@ -2,27 +2,61 @@
 
 Hedef Endeksli Kapali Ic Senet. Bos konut stokunu kullandirmanin stok-akim hesabi. Uc defter ayri tutulur: mulkiyet, oturan, senet. Esit gostermek cifte yazimdir.
 
-Bu bir politika vaadi degil, hesap makinesidir. Repo ozel, kisisel modelleme. Dogrulanmis bir kamu maliyesi modeli degildir. Gozlem ile varsayim ayri tutulur, ayri dosyalarda: `data/VARSAYIM.md`.
+Bu bir politika vaadi degil, hesap makinesidir. Kisisel modelleme. Dogrulanmis bir kamu maliyesi modeli degildir. Gozlem ile varsayim ayri tutulur, ayri dosyalarda: `data/VARSAYIM.md`.
 
-**Kapsam: simdilik yalniz Istanbul.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu 3,09 ADNKS; kiraci payi %27 ulusal varsayim, Istanbul'a ozgu veri bulunamadi; hane geliri baz ulusal TUIK dagilimi, bant sendika 0,63 ile Istanbul TR10 1,31 arasi, `hekis.union`). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
+**Kapsam: Istanbul; Anadolu 7 buyuksehir ayri bir sistem olarak `SISTEMLER.md` ve `hekis/systems.py` altinda.** Nufus 15,75 mn, 5,11 mn hane, 1,38 mn kiraci hane (hane buyuklugu 3,09 ADNKS; kiraci payi %27 ulusal varsayim, Istanbul'a ozgu veri bulunamadi; hane geliri baz ulusal TUIK dagilimi, bant sendika 0,63 ile Istanbul TR10 1,31 arasi, `hekis.union`). Diger sehirler 7c'de ayri, kapsam disi tutulur; ulusal hane sayisi artik kullanilmaz.
+
+## Ilk halka ve varlik enflasyonu (main'den gelen not)
+
+Asagidaki blok `main` dalindan geldi (ilk halka: havuz, oturan, senet; TUFE arastirmasi `ENFLASYON.md` altinda ayri). Bu dosyanin geri kalani Istanbul/Anadolu sistem modelini anlatir; ikisi ayri calisma cizgileridir.
+
+Ilk halka budur: havuz, oturan, senet. Bu halka bitmeden senet piyasasi ve kanun maddesi acilmaz. Sira `data/SIRA.md`.
+
+Bu bir politika vaadi degil, uc defteri ayiran bir hesap makinesidir. Mulkiyet, oturan ve senet ayni sayiyi tasimak zorunda degildir. Esit gostermek cifte yazimdir.
+
+Calisma taslagidir, dogrulanmis bir kamu maliyesi modeli degildir. Not kopyasi: `saydamonur2002-tech/modeller` icinde `HEKIS_Kapali_Kira_Uretim_Devresi.md`.
+
+## Bu halkanin kanali: varlik enflasyonu
+
+HEKIS TUFE modeli degildir. Kendi nesnesi varlik enflasyonudur: satis fiyati ile kira getirisi arasindaki stok, bos tutulan birimin elde tutma karari, anaparanin reel erimesi.
+
+Ilk halka icin asagidaki hesap yeter. TUFE ayrismasi, atalet, kur, OVP, NOP ve rezerv bu halkanin sonucu degildir. O arastirma `ENFLASYON.md` dosyasina alindi. Oradaki sayilar kanonik HEKIS sonucu degildir.
+
+Varlik enflasyonu uc satirdan okunur:
+
+- Giris degeri mulkiyet defteridir. Havuz neti kira eksi aidattir. Ikisi ayni sayi degildir.
+- Kira endekslenirse havuz anaparayi reel yer. Kira nominal sabit kalirsa enflasyon havuzu yer. Ikisi de varlik fiyatinin getiriye karsi hareketidir.
+- Oturanin odeyecegi ile sahip getirisi ayri satirdir. Fark butcedir, havuzdan kesilmez.
 
 ## Calistirma
 
 Python 3 yeter. Ek paket yok, testler `unittest`.
 
 ```bash
-python -m unittest discover -s tests   # 29 test
+python -m unittest discover -s tests   # 60+ test
 python -m hekis.checks                 # gerceklik kontrolleri
 python -m hekis.analysis               # tornado, Monte Carlo, rank korelasyonu, ters stres
 python -m hekis.final                  # uc sistem, luks ayrimi, luks bedel
 python -m hekis.bind_cli               # stok-akim, eski A/B/C karsilastirmasi
 python -m hekis.calibrate              # beklenti kurali kalibrasyonu, katilim bandi
 python -m hekis.selffinance            # kendini finanse etme cebiri
+python -m hekis.pilot                # mikro pilot, kapi esikleri
+python -m hekis.horizon              # 10 yillik kademeli yol, sok, MC
+python -m hekis.social               # sosyal etki ve yasam maliyeti, iki sistem
+python -m hekis.systems              # Istanbul ve Anadolu ayri sistemler
+# main'den (ilk halka)
+python -m hekis.mulkiyet
+python -m hekis.simulate
+python -m hekis.bind_cli
 ```
 
 ## Veri
 
 `data/`: istanbul_2026.json (girdiler), OKUMA.md, TEYIT.md, KFE.md (TCMB konut fiyat endeksi), KREDI.md (ipotekli pay), FAIZ_KUR.md, GELIR.md (TUIK), ANALOG.md (Vancouver, Irlanda, Fransa, Portekiz, Ispanya), VARSAYIM.md (varsayim envanteri ve etki sirasi).
+
+Ilk defterin kosusu `python -m hekis.mulkiyet`. Not `MULKIYET.md`. Havuz kosusu ayri. `python -m hekis.sonuc` ve enflasyon modulleri `ENFLASYON.md` altindadir.
+
+## 2026 bagi, 1000+1000+500 olcek
 
 ## 0. Hangi komut hangi kurali kosar
 
@@ -169,6 +203,16 @@ Etki (8 sehir nufusu, 12,7 mn hane, 3,4 mn kiraci hane): 210 bin hane (uygun alt
 
 Model, bos stoku kullandirmanin maliyetini kira farkindan ve abonelikten ibaret gosteriyor, stoku kullandirmanin kendisi bedava. Kendini finanse etme olcek meselesi: kucuk programlar finanse eder, buyukler etmez. Yon sonuclari sagdir (ters dongululuk, olcek erozyonu, bedelin katilimi artirmada zayifligi), buyukluk sonuclari degildir (katilim, tahsilat ve beklenti kalibre edilemez).
 
+Bu tablo varlik enflasyonunun iki ayagidir: fiyat stoku ile kira akimi. Geri donus yili, varligin kendi getirisinden ne kadar yavas odendigini gosterir. Reel erime, anaparanin enflasyon karsisinda ne kadar kaldigini. TUFE'ye kac puan etki ettigi bu tablonun isi degildir.
+
 ## Sinir
 
 Katilim orani gozlem degil, kalibre edilmemis en onemli girdidir. Tadilat, kiraci bulma gecikmesi, dairenin oturulabilir olup olmadigi, bakim orani Turkiye verisi, hane sayisi, 2024-2026 gelir artisi ve etkin tahsilat yok veya varsayimdir. Esenyurt satis fiyati gozlem degil, turetilmistir. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Fiziki uretim endeksi hala disaridan. Model yeni konut istahini kapatmaz, kacinma tek bir parametreyle temsil edilir, hukuki cerceve (bedelin vergi mi harc mi oldugu, anayasal sinir) hic modellenmedi.
+
+Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati Endeksa-Emlakjet ilan endeksi, tapu islemi degil; 18 yil turevi dusuruldu. Ilce stok adedi bilinmiyor. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Model yeni konut istahini kapatmaz.
+
+Ilk halka bu sinirlar kapanmadan bitmis sayilmaz. Senet notu `data/SENET.md`, yaptirim iskeleti `data/KANUN_TASLAGI.md`. Ikisi de model kapanmadan yazildi. 1/7 ve yuzde 4 gozlem degil, esik.
+
+## Disari alinan
+
+TUFE arastirmasi `ENFLASYON.md`. Kod duruyor, ilk halkanin kanonik kosusu degil.

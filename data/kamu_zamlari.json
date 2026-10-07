@@ -1,0 +1,8 @@
+{"kaynak": "WebSearch ozetleri (haber/mevzuat aktarimlari). Resmi Gazete/SGK/Maliye PDF'i dogrudan okunamadi. GUVEN: 'yuksek' = birden cok ozet ayni, ic tutarli; 'dusuk' = tek ozet ya da celiskili.",
+ "emekli_ssk_bagkur": [
+  ["2023-01", 30.50, "orta"], ["2023-07", 25.02, "orta"], ["2024-01", 49.25, "dusuk: 6 aylik TUFE'nin ustunde olabilir (siyasi ek), dogrulanmadi"],
+  ["2024-07", 24.73, "orta"], ["2025-01", 15.75, "yuksek"], ["2025-07", 16.67, "yuksek"], ["2026-01", 12.19, "yuksek"], ["2026-07", 17.76, "yuksek"]],
+ "memur_toplam": [
+  ["2024-01", 49.25, "dusuk"], ["2024-07", 19.31, "dusuk"], ["2025-01", 11.54, "orta"], ["2026-01", 18.60, "yuksek: %11 + %6,85 fark, 1,11*1,0685"], ["2026-07", 13.52, "yuksek: %7 + %6,09 fark, 1,07*1,0609"]],
+ "memur_toplu_sozlesme_oranlari": {"2024": "15+10 (hafizadan/ozet)", "2025": "6+5 (ozet)"},
+ "not": "Emekli artisi yasal mekanik: onceki 6 aylik TUFE (2023-24 ilk donemde siyasi ek olabilir). Memur: toplu sozlesme + enflasyon farki. 2015-2022 memur dizisi celiskili ozetlerden gelmis, KULLANILMADI."}

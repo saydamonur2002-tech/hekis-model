@@ -1,0 +1,8 @@
+{"kaynak": "TCMB Piyasa Katilimcilari Anketi, Eylul 2026, 67 katilimci (52 finansal, 15 reel). Kullanici PDF yukledi 2026-10-05. Uygun ortalama.",
+ "tufe_aylik": {"cari_ay": 2.12, "1_ay": 1.97, "2_ay": 1.13},
+ "tufe_yillik": {"2026_sonu": 29.61, "gelecek_yil_sonu_2027": 22.69, "12_ay_sonrasi": 23.70, "24_ay_sonrasi": 18.32, "uzun_vade_baslik_kesik": 12.09},
+ "onceki_anket": {"2026_sonu": 29.43, "12_ay_sonrasi": 23.69, "24_ay_sonrasi": 18.03},
+ "kur": {"cari_ay_sonu": 49.0048, "2026_sonu": 51.5716, "12_ay_sonrasi": 58.6049},
+ "politika_faizi": {"ilk_toplanti": 37.00, "ikinci": 36.00, "ucuncu": 35.07, "2026_sonu": 35.07, "12_ay_sonrasi": 29.22, "2027_sonu": 27.16, "24_ay_sonrasi": 22.43},
+ "cari_islemler_mlr_usd": {"2026": -50.1, "2027": -44.4},
+ "gsyh_buyume": {"2026": 3.0, "2027": 3.9}}

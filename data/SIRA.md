@@ -4,6 +4,16 @@ Durum, 2026-10-05. Kapsam Istanbul. **ISTANBUL KISMI KAPANDI (kagit uzerinde).**
 
 Kapanis olcutu: model, kademeli pilot, kapi esikleri, 10 yillik ufuk, sok testleri, sosyal etki ve yasam maliyeti tamam (60 test); kanun taslagi kademeli yururluk ve kapiyla guncel. Acik kalanlar model degil, veri ve karar: luks tahsilatini ancak pilot olcer; bos stok, duran insaat sayisi, erozyon, kira esnekligi varsayim; senet acik noktalari (fiziki endeks, anapara garantisi, banka kanali, geri odemenin uretime yonlendirilmesi); mekansal yogunlasma; sokta geri cekilme kurali. `HEKIS_Sistem_Anlatimi.docx` eski (uc bolge oncesi), yeniden uretilmedi.
 
+**Main'den gelen (ilk halka) notlar:**
+
+1. Model. Ilk defter mulkiyet: `python -m hekis.mulkiyet`, not `MULKIYET.md`. Havuz ve senet bu defterde yazilmaz. Elde tutma kurali `hekis/owner.py` akisin icindedir.
+2. Finansal sistem. Senet, kupon, uretim hedefi. Model kapanmadan acilmaz.
+3. Yaptirim kanun taslagi. Oranlar once modelde denenir, madde sonra yazilir.
+
+TUFE arastirmasi bu siranin disindadir: `ENFLASYON.md`. Atalet, kur, OVP, NOP ilk halkanin sonucu degildir.
+
+Esenyurt ortalama 3.619.875 TL. Havuz piyasanin yuzde 80'ini verirse fark 723.975 TL.
+
 1. Model. TAMAM. Havuz, oturan, senet, elde tutma karari, uc bolge, luks tarife, abonelik, dereceli kira, duran insaat, havuz kirasi carpani. 46 test, 15 gerceklik kontrolu, Monte Carlo. Ozet `SONUC.md`, ayrinti `README.md`, varsayimlar `data/VARSAYIM.md`.
 2. Finansal sistem. ACILABILIR, ama model sonucuyla senet tasarimi cakisiyor (asagida).
 3. Yaptirim kanun taslagi. GUNCELLENDI (`KANUN_TASLAGI.md`, 2026-10-05): bolge ayrimi, luks tarife, tespit, tamamlama maddesi, model bagi. Anadolu buyuksehirleri icin ayri tarife yazildi (`ANADOLU_TARIFE.md`, %0,5 genel / %3 luks, veri `ANADOLU.md`).
@@ -39,3 +49,5 @@ Taslaktaki "Anayasa madde 35 ve 73" siniri hala ayri sinav, modellenmedi.
 ## Sirada
 1. Senet tasarimi yeniden yazildi (`SENET.md`): hedef odakli ic senet, ihrac 89,2 mr TL, prim mevduatla yaris edemiyor. Acik: fiziki endeks, odenmeyen anapara garantisi, banka kanali.
 2. TOKI-HEKIS is bolumu (`TOKI_HEKIS_IS_BOLUMU.md`) taslak maddelere baglanir.
+
+Yuzde 2 yetmez. Bes yilda gelmesi icin ucuncu ve sonrasinda yillik oran en az yuzde 4 olmali. Bu oran gozlem degil, esik. Havuz tam piyasa verirse stok gelir ama sermaye konutta kalir.
