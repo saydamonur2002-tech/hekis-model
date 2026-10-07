@@ -1,8 +1,10 @@
 # Sira
 
-1. Model. Havuz, oturan, senet. Buna elde tutma karari eklendi: `hekis/owner.py`.
+1. Model. Havuz, oturan, senet. Buna elde tutma karari eklendi: `hekis/owner.py`. Ilk halka icin bu yeter. Kanal varlik enflasyonudur: fiyat stoku, kira akimi, reel erime.
 2. Finansal sistem. Senet, kupon, uretim hedefi. Model kapanmadan acilmaz.
 3. Yaptirim kanun taslagi. Oranlar once modelde denenir, madde sonra yazilir.
+
+TUFE arastirmasi bu siranin disindadir: `ENFLASYON.md`. Atalet, kur, OVP, NOP ilk halkanin sonucu degildir.
 
 Esenyurt ortalama 3.619.875 TL. Havuz piyasanin yuzde 80'ini verirse fark 723.975 TL.
 
