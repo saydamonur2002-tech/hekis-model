@@ -25,13 +25,14 @@ Varlik enflasyonu uc satirdan okunur:
 Python 3 yeter. Ek paket yok.
 
 ```bash
+python -m hekis.mulkiyet
 python -m hekis.simulate
 python -m hekis.bind_cli
 ```
 
 `bind_cli` fiyati, kirayi ve enflasyonu `data/istanbul_2026.json` dosyasindan okur. Kaynaklar `data/OKUMA.md` icindedir. Eski `scenarios/` uydurma fiyatla duruyor. Gercek kosu o degil.
 
-Ilk halkanin kosusu bunlardir. `python -m hekis.sonuc` ve enflasyon modulleri `ENFLASYON.md` altindadir.
+Ilk defterin kosusu `python -m hekis.mulkiyet`. Not `MULKIYET.md`. Havuz kosusu ayri. `python -m hekis.sonuc` ve enflasyon modulleri `ENFLASYON.md` altindadir.
 
 ## 2026 bagi, 1000+1000+500 olcek
 
@@ -52,7 +53,7 @@ Bu tablo varlik enflasyonunun iki ayagidir: fiyat stoku ile kira akimi. Geri don
 
 ## Sinir
 
-Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati gozlem degil, 18 yil iddiasindan turetilmistir. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Model yeni konut istahini kapatmaz.
+Tip fiyati m2 carpi 40/60/95 olcek varsayimidir, sayim degil. Esenyurt satis fiyati Endeksa-Emlakjet ilan endeksi, tapu islemi degil; 18 yil turevi dusuruldu. Ilce stok adedi bilinmiyor. Fiziki uretim endeksi hala disaridan. Ulusal %27 bos stok ile %3,7 elektrik boslugu ayni sey degil. Model yeni konut istahini kapatmaz.
 
 Ilk halka bu sinirlar kapanmadan bitmis sayilmaz. Senet notu `data/SENET.md`, yaptirim iskeleti `data/KANUN_TASLAGI.md`. Ikisi de model kapanmadan yazildi. 1/7 ve yuzde 4 gozlem degil, esik.
 
