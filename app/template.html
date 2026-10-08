@@ -1,0 +1,314 @@
+<title>HEKİS Simülatörü</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Düzen: solda kontroller (masaüstünde yapışkan), sağda sonuçlar; dar ekranda tek sütun. Renk: yeşilimsi gri zemin, derin deniz yeşili vurgu. */
+:root {
+  --bg: #f3f6f5; --panel: #ffffff; --line: #d5dedb; --fg: #17302d; --muted: #5a6f6b;
+  --accent: #0e6b62; --accent-soft: #dcefec; --ok: #2b7a4b; --warn: #b87613; --bad: #ae3a32;
+  --ok-soft: #dff0e5; --warn-soft: #f7ebd2; --bad-soft: #f6dedb;
+  --on-accent: #ffffff; --f-body: 'IBM Plex Sans', system-ui, sans-serif; --f-head: 'IBM Plex Serif', Georgia, serif; --f-num: 'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1716; --panel: #172321; --line: #2a3b38; --fg: #e3edeb; --muted: #94aaa6;
+  --accent: #4cc2b2; --accent-soft: #1b3330; --ok: #5fc287; --warn: #e0a64a; --bad: #ee7b72;
+  --ok-soft: #1a3325; --warn-soft: #3a2f16; --bad-soft: #3d1f1c; --on-accent: #07201d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1716; --panel: #172321; --line: #2a3b38; --fg: #e3edeb; --muted: #94aaa6;
+  --accent: #4cc2b2; --accent-soft: #1b3330; --ok: #5fc287; --warn: #e0a64a; --bad: #ee7b72;
+  --ok-soft: #1a3325; --warn-soft: #3a2f16; --bad-soft: #3d1f1c; --on-accent: #07201d; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 56px; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+header h1 { font-family: var(--f-head); font-size: 30px; line-height: 1.15; margin: 0 0 6px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.tabs { display: flex; gap: 8px; margin: 18px 0 14px; flex-wrap: wrap; }
+.tab { font: inherit; font-weight: 500; padding: 8px 16px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 6px; cursor: pointer; }
+.tab[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; position: sticky; top: 12px; }
+@media (max-width: 860px) { aside { position: static; } }
+aside h2, section h2 { font-family: var(--f-head); font-size: 19px; margin: 0 0 10px; }
+.grp { margin: 0 0 14px; }
+.grp-title { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 14px 0 8px; }
+.ctl { margin-bottom: 11px; }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.ctl output { font-family: var(--f-num); color: var(--accent); font-size: 14px; }
+.ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+.ctl small { color: var(--muted); display: block; font-size: 12px; line-height: 1.35; }
+select { width: 100%; font: inherit; padding: 7px 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 6px; }
+.btn { font: inherit; padding: 7px 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 6px; cursor: pointer; margin-top: 6px; }
+main { display: grid; gap: 18px; min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; min-width: 0; }
+.card .k { font-size: 12px; color: var(--muted); }
+.card .v { font-family: var(--f-num); font-size: 21px; font-weight: 500; overflow-wrap: anywhere; }
+.card .s { font-size: 12px; color: var(--muted); }
+.pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.warn { background: var(--warn-soft); color: var(--warn); } .pill.bad { background: var(--bad-soft); color: var(--bad); }
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 6px 9px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); }
+td { font-family: var(--f-num); }
+tr.sel td { background: var(--accent-soft); }
+tr.stop td:nth-child(2) { color: var(--warn); }
+.note { font-size: 13px; color: var(--muted); margin: 8px 0 0; max-width: 80ch; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+svg text { fill: var(--muted); font-family: var(--f-num); font-size: 11px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: -1px; border-radius: 2px; }
+.warnbox { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--fg); border-radius: 6px; padding: 10px 12px; font-size: 13.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { font: inherit; font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 99px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.scdesc { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; min-height: 2.8em; }
+tr.cur td { background: var(--accent-soft); }
+ul.lim { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; } ul.lim li { margin-bottom: 4px; }
+</style>
+
+<div class="wrap">
+<header>
+  <h1>HEKİS Simülatörü</h1>
+  <p>Boş konutu elde tutmayı pahalı, havuza vermeyi ucuz yapan; havuzdaki konutu düşük gelirli haneye dereceli kirayla açan sistemin kişisel modeli. Parametreleri oynatın, 10 yıllık kademeli yolu ve şokları görün. Doğrulanmış bir kamu maliyesi modeli değildir.</p>
+</header>
+<div class="tabs" role="group" aria-label="Sistem">
+  <button class="tab" id="tab-istanbul" aria-pressed="true">İstanbul</button>
+  <button class="tab" id="tab-anadolu" aria-pressed="false">Anadolu (7 büyükşehir)</button>
+</div>
+
+<div class="layout">
+<aside aria-label="Parametreler">
+  <h2>Senaryo</h2>
+  <div class="chips" id="chips" role="group" aria-label="Senaryo seçimi"></div>
+  <p class="scdesc" id="scdesc"></p>
+  <h2>Parametreler</h2>
+  <div class="grp-title">Politika</div>
+  <div class="ctl"><label for="fee">Genel bedel <output id="o-fee"></output></label><input type="range" id="fee" min="0" max="3" step="0.1"><small>Boş konutun beyan değerine yıllık oran (HEKİS bandı ve tampon).</small></div>
+  <div class="ctl"><label for="lux">Lüks bedel <output id="o-lux"></output></label><input type="range" id="lux" min="0" max="10" step="0.5"><small>Üst %20 değer bandındaki boş konut. %5 üstü kaçınma riski yüksek.</small></div>
+  <div class="ctl"><label for="growth">Yıllık büyüme sınırı <output id="o-growth"></output></label><input type="range" id="growth" min="1.5" max="4" step="0.5"><small>Kapı geçilirse ertesi yıl kapsamın en çok kaç katına çıkacağı.</small></div>
+  <div class="grp-title">Varsayımlar (doğrulanmadı)</div>
+  <div class="ctl"><label for="cap">Katılım tavanı <output id="o-cap"></output></label><input type="range" id="cap" min="5" max="60" step="1"><small>Havuza uygun boş stoktan finansal amaçla tutulan pay.</small></div>
+  <div class="ctl"><label for="ge">Beklenen reel konut artışı <output id="o-ge"></output></label><input type="range" id="ge" min="-15" max="15" step="0.5"><small>Sahibin fiyat beklentisi. Yükselirse havuza verme isteği düşer.</small></div>
+  <div class="ctl"><label for="coll">Genel bedel tahsilatı <output id="o-coll"></output></label><input type="range" id="coll" min="0" max="90" step="1"></div>
+  <div class="ctl"><label for="lcoll">Lüks bedel tahsilatı <output id="o-lcoll"></output></label><input type="range" id="lcoll" min="0" max="90" step="1"><small>Hiçbir yerde ölçülmedi. İrlanda'da işaretlenenin ~%6'sı bedele tabi kaldı.</small></div>
+  <div class="ctl"><label for="eros">Ölçek erozyonu <output id="o-eros"></output></label><input type="range" id="eros" min="0" max="60" step="5"><small>Tahsilatın pilottan tam ölçeğe inerken kaybettiği pay.</small></div>
+  <div class="ctl"><label for="elas">Kira talep esnekliği <output id="o-elas"></output></label><input type="range" id="elas" min="0.3" max="1" step="0.1"><small>Yalnız yaşam maliyeti tablosunu etkiler.</small></div>
+  <div class="grp-title">Şok (3. yıldan itibaren)</div>
+  <div class="ctl"><select id="shock" aria-label="Şok"></select></div>
+  <button class="btn" id="reset">Varsayılana dön</button>
+</aside>
+
+<main>
+  <section aria-labelledby="h-ozet">
+    <h2 id="h-ozet">Tam ölçekte durum</h2>
+    <div class="cards" id="cards"></div>
+    <p class="note" id="ozet-note"></p>
+  </section>
+
+  <section aria-labelledby="h-kar">
+    <h2 id="h-kar">Senaryo karşılaştırması</h2>
+    <div class="tw"><table id="kar"></table></div>
+    <p class="note">Her satır, seçili sistemin kendi tarifesiyle ve ilgili varsayımlarla hesaplanır (100 rastgele çekim; olasılıklarda yaklaşık ±5 puan örnekleme hatası, çekim aralığı senaryo merkezine göre kaydırılır). Satıra tıklayınca parametreler o senaryoya ayarlanır. "Tam ölçek" sütunları şoksuzdur; şok senaryolarında yol 3. yıldan sonra bozulur. Katılım alt sınırı (%15) benim kararımdır: reel faiz sıfıra yaklaşınca katılım bu sınırın altına iner ve kapı hiç geçilmez.</p>
+  </section>
+
+  <section aria-labelledby="h-yol">
+    <h2 id="h-yol">10 yıllık kademeli yol</h2>
+    <div id="chart"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>yerleşen hane (bin)</span><span><i style="background:var(--warn)"></i>kümülatif net (milyar TL)</span></div>
+    <div class="tw"><table id="path"></table></div>
+    <p class="note">Her yıl sonunda kapı: katılım ≥%15, kiracı tahsilatı ≥%80, ölçülen gelir ≥%85, bedel/sübvansiyon ≥1,25. Geçilmezse kapsam büyümez (sarı satır).</p>
+  </section>
+
+  <section aria-labelledby="h-mc">
+    <h2 id="h-mc">Belirsizlik: 200 rastgele çekim</h2>
+    <div class="cards" id="mc"></div>
+    <p class="note" id="mc-note"></p>
+  </section>
+
+  <section aria-labelledby="h-sos">
+    <h2 id="h-sos">Sosyal etki ve yaşam maliyeti</h2>
+    <div class="ctl" style="max-width:360px"><label for="year">Yıl <output id="o-year"></output></label><input type="range" id="year" min="1" max="10" step="1"></div>
+    <div class="two" id="sos"></div>
+    <p class="note" id="sos-note"></p>
+  </section>
+
+  <section aria-labelledby="h-lim">
+    <h2 id="h-lim">Sınırlar</h2>
+    <div class="warnbox">Bu bir iç tutarlılık modelidir. Lüks bedelin gerçek tahsilatı hiçbir yerde ölçülmedi; yalnız pilot ölçer.</div>
+    <ul class="lim">
+      <li>Boş stok (İstanbul 450 bin; aralık 225-750 bin), erozyon, kira esnekliği ve katılım tavanı varsayımdır.</li>
+      <li>Anadolu'da Kocaeli, Konya, Adana fiyat ve kira verisi yer tutucudur; Gini ulusal gelir dağılımıyla hesaplanır.</li>
+      <li>Kur krizi ve sermaye çıkışı kurulmuş modeller değil, parametre vekilidir.</li>
+      <li>TÜFE etkisi tek seferlik düzey etkisidir; ulusal değer hane payına göre ölçeklenir.</li>
+      <li>JS modeli Python modelinden çıkarıldı; 80 rastgele noktada en büyük fark %0,7.</li>
+    </ul>
+  </section>
+</main>
+</div>
+</div>
+
+<script>
+const K = /*CONSTANTS*/;
+/*MODEL*/
+const M = HEKIS.make(K);
+const SH = Object.keys(HEKIS.SHOCKS);
+const SHLABEL = { 'yok': 'Şok yok', 'Fiyat rallisi (beklenen reel artis +10 puan)': 'Fiyat rallisi (beklenen artış +10 puan)', 'Luks tahsilat cokusu (x0,4)': 'Lüks tahsilat çöküşü (×0,4)', 'Genel tahsilat cokusu (x0,5)': 'Genel tahsilat çöküşü (×0,5)', 'Enflasyon sokunu (+10 puan)': 'Enflasyon şoku (+10 puan)', 'Hane geliri -%30': 'Hane geliri −%30', 'Bedel iptali (hukuki, tum bedel)': 'Bedel iptali (hukuki, tüm bedel)', 'Kismi iptal (yalniz luks bedel)': 'Kısmi iptal (yalnız lüks bedel)', 'Gelir erimesi (hane -%20, kiraci tahsilat x0,8)': 'Gelir erimesi (hane −%20, kiracı tahsilatı ×0,8)', 'Kur krizi + sermaye cikisi': 'Kur krizi + sermaye çıkışı', 'Agir kriz (ralli + luks iptali + gelir erimesi)': 'Ağır kriz (ralli + lüks iptali + gelir erimesi)' };
+const $ = (id) => document.getElementById(id);
+const nf = (v, d = 0) => v.toLocaleString('tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pc = (v, d = 1) => '%' + nf(v * 100, d);
+const bn = (v, d = 2) => nf(v / 1e9, d);
+const SCEN = [
+  { id: 'baz', ad: 'En olası', not: 'Bugünkü veri: katılım tavanı %25, tahsilat genel %30 / lüks %40, reel konut fiyatı düşüyor (−%3,7).', o: {} },
+  { id: 'iyi', ad: 'İyimser', not: 'Güçlü yaptırım ve iyi tahsilat: katılım tavanı %55, tahsilat %60 / %60, erozyon %10.', o: { cap: 55, coll: 60, lcoll: 60, eros: 10 } },
+  { id: 'kotu', ad: 'Kötümser', not: 'Gönüllü ve zayıf: katılım tavanı %8, tahsilat %15 / %30, erozyon %40. Katılım kapının %15 alt sınırının altında kalır.', o: { cap: 8, coll: 15, lcoll: 30, eros: 40 } },
+  { id: 'rf0', ad: 'Reel faiz sıfıra iner', not: 'Faiz kanalı: reel faiz 0 iken beklenen reel konut artışı +%0,5 (2019-2025 regresyonu, n=7). Katılım düşer.', o: { ge: 0.5 } },
+  { id: 'rf5', ad: 'Reel faiz −%5', not: 'Reel faiz −%5 iken beklenen artış ≈ +%7,2. Konut yeniden değer saklama aracı olur, katılım çöker.', o: { ge: 7.2 } },
+  { id: 'irl', ad: 'Tahsilat İrlanda gibi', not: 'Lüks tahsilat %10, genel %15: İrlanda\'da işaretlenenin yalnız ~%6\'sı bedele tabi kaldı.', o: { coll: 15, lcoll: 10 } },
+  { id: 'huk', ad: 'Hukuki iptal (3. yıl)', not: 'Bedel 3. yılda tamamen iptal edilir. Yeni yerleştirme durur, yerleşmiş haneler korunur.', o: { shock: 'Bedel iptali (hukuki, tum bedel)' } },
+  { id: 'agir', ad: 'Ağır kriz', not: 'Fiyat rallisi + lüks bedelin iptali + gelir erimesi 3. yıldan itibaren.', o: { shock: 'Agir kriz (ralli + luks iptali + gelir erimesi)' } },
+];
+let scId = 'baz';
+let sysKey = 'istanbul';
+try { const h = location.hash.replace('#', ''); if (h === 'anadolu') sysKey = 'anadolu'; } catch (e) {}
+const DEF = (s) => ({ fee: s.tarife[0] * 100, lux: s.tarife[1] * 100, growth: 2.5, cap: 25, ge: -3.7, coll: 30, lcoll: 40, eros: 25, elas: 0.6, shock: 'yok', year: 10 });
+let S = DEF(K.sistem[sysKey]);
+const scenState = (id) => ({ ...DEF(K.sistem[sysKey]), ...SCEN.find(s => s.id === id).o });
+
+SH.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = SHLABEL[k] || k; $('shock').appendChild(o); });
+
+function buildChips() {
+  $('chips').innerHTML = SCEN.map(s => `<button class="chip" data-id="${s.id}" aria-pressed="${s.id === scId}">${s.ad}</button>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => pickScenario(b.dataset.id)));
+  $('scdesc').textContent = (SCEN.find(s => s.id === scId) || {}).not || 'Özel ayar (kaydırıcılar elle değiştirildi).';
+}
+function pickScenario(id) { scId = id; S = scenState(id); sync(); schedule(); }
+function bindControls() {
+  const map = { fee: ['fee', v => pc(v / 100, 1)], lux: ['lux', v => pc(v / 100, 1)], growth: ['growth', v => '×' + nf(v, 1)], cap: ['cap', v => pc(v / 100, 0)], ge: ['ge', v => (v >= 0 ? '+' : '−') + nf(Math.abs(v), 1) + '%'], coll: ['coll', v => pc(v / 100, 0)], lcoll: ['lcoll', v => pc(v / 100, 0)], eros: ['eros', v => pc(v / 100, 0)], elas: ['elas', v => nf(v, 1)], year: ['year', v => v + '. yıl'] };
+  for (const id in map) { const el = $(id); el.value = S[id]; $('o-' + id).textContent = map[id][1](+S[id]); }
+  $('shock').value = S.shock;
+  return map;
+}
+const MAP = bindControls();
+function sync() { buildChips(); for (const id in MAP) { $(id).value = S[id]; $('o-' + id).textContent = MAP[id][1](+S[id]); } $('shock').value = S.shock; $('tab-istanbul').setAttribute('aria-pressed', sysKey === 'istanbul'); $('tab-anadolu').setAttribute('aria-pressed', sysKey === 'anadolu'); }
+for (const id in MAP) $(id).addEventListener('input', e => { S[id] = +e.target.value; $('o-' + id).textContent = MAP[id][1](S[id]); if (id !== 'year') { scId = ''; buildChips(); } schedule(); });
+$('shock').addEventListener('change', e => { S.shock = e.target.value; scId = ''; buildChips(); schedule(); });
+$('reset').addEventListener('click', () => pickScenario('baz'));
+function setSys(k) { sysKey = k; scId = 'baz'; S = scenState('baz'); sync(); schedule(); try { history.replaceState(null, '', '#' + k); } catch (e) {} }
+$('tab-istanbul').addEventListener('click', () => setSys('istanbul'));
+$('tab-anadolu').addEventListener('click', () => setSys('anadolu'));
+
+let timer = null;
+function schedule() { clearTimeout(timer); timer = setTimeout(render, 60); }
+
+function badge(r) { return r >= 1.25 ? ['ok', 'yeterli'] : r >= 1 ? ['warn', 'sınırda'] : ['bad', 'açık veriyor']; }
+function card(k, v, s) { return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div>${s ? `<div class="s">${s}</div>` : ''}</div>`; }
+
+function render() {
+  const sys = K.sistem[sysKey];
+  const st = { g_e: S.ge / 100, cap: S.cap / 100, coll: S.coll / 100, lux_coll: S.lcoll / 100, fee: S.fee / 100, lux_fee: S.lux / 100, inc: 1, alpha: 1, cost: 1 };
+  const full = M.runSystem(sys, st, sys.full);
+  const [bc, bt] = badge(full.ratio);
+  $('cards').innerHTML =
+    card('Yerleşen hane', nf(full.N), `uygun kiracının ${pc(full.coverage)}'i`) +
+    card('Yıllık sübvansiyon', bn(full.sub) + ' mr TL', `hane başına ${nf(full.sub / Math.max(full.N, 1) / 12)} TL/ay`) +
+    card('Yıllık bedel geliri', bn(full.rev) + ' mr TL', 'erozyonsuz, tam ölçek') +
+    card('Bedel / sübvansiyon', `${nf(full.ratio, 2)} <span class="pill ${bc}">${bt}</span>`, 'kapı eşiği 1,25') +
+    card('Bedel baskısıyla boşalan', nf(full.freed), 'piyasaya dönen daire');
+  $('ozet-note').textContent = `${sys.ad}: ${nf(sys.full)} boş birim tam ölçek. Katılım ${pc(full.p)} (havuza uygun stokun). Erozyon ve kademeli büyüme aşağıdaki yolda.`;
+
+  const shock = HEKIS.SHOCKS[S.shock];
+  const opt = { erosion: S.eros / 100, growth: S.growth, years: 10, tariff: [st.fee, st.lux_fee] };
+  const P0 = { g_e: st.g_e, cap: st.cap, coll: st.coll, lux_coll: st.lux_coll };
+  const rows = M.onePath(sys, P0, null, Object.keys(shock).length ? shock : null, opt);
+  let cum = 0; rows.forEach(r => { cum += r.rev - r.sub; r.cum = cum; });
+  drawChart(rows);
+  let h = '<tr><th>Yıl</th><th>Ölçek</th><th>Yerleşen</th><th>Kapsam</th><th>Sübv. (mr)</th><th>Bedel (mr)</th><th>Oran</th><th>Küm. net (mr)</th><th>Kapı</th></tr>';
+  rows.forEach(r => { h += `<tr class="${r.yil === +S.year ? 'sel' : ''} ${r.gecti ? '' : 'stop'}"><td>${r.yil}</td><td>${nf(r.stok)}</td><td>${nf(r.N)}</td><td>${pc(r.coverage, 2)}</td><td>${bn(r.sub)}</td><td>${bn(r.rev)}</td><td>${nf(r.ratio, 2)}</td><td>${bn(r.cum)}</td><td>${r.gecti ? 'geçti' : 'durdu'}</td></tr>`; });
+  $('path').innerHTML = h;
+
+  const paths = M.monteCarlo(sys, 200, 11, Object.keys(shock).length ? shock : null, opt, P0);
+  const sm = M.summarize(paths, sys);
+  $('mc').innerHTML =
+    card('Tam ölçeğe ulaşma', pc(sm.full, 0), '10. yılda') +
+    card('Pilotta takılma', pc(sm.stuck, 0), 'kapı hiç geçilmez') +
+    card('10 yıl net, medyan', bn(sm.net, 1) + ' mr TL', `P10 ${bn(sm.p10, 1)} / P90 ${bn(sm.p90, 1)}`) +
+    card('Zarar eden çekim', pc(sm.deficit, 0), '10 yıl net < 0');
+  $('mc-note').textContent = 'Sonuç iki kutuplu: ya kapı hiç geçilmez (katılım %15 altında kalır) ya da sistem 7. yıl civarında tam ölçeğe ulaşır. Medyan bu iki küme arasında kararsız; olasılıklara bakın.';
+
+  compare(sys);
+  social(sys, rows, full);
+}
+
+function scenMetrics(sys, s) {
+  const st = { g_e: s.ge / 100, cap: s.cap / 100, coll: s.coll / 100, lux_coll: s.lcoll / 100, fee: s.fee / 100, lux_fee: s.lux / 100, inc: 1, alpha: 1, cost: 1 };
+  const full = M.runSystem(sys, st, sys.full);
+  const shock = HEKIS.SHOCKS[s.shock]; const sk = Object.keys(shock).length ? shock : null;
+  const opt = { erosion: s.eros / 100, growth: s.growth, years: 10, tariff: [st.fee, st.lux_fee] };
+  const P0 = { g_e: st.g_e, cap: st.cap, coll: st.coll, lux_coll: st.lux_coll };
+  const line = M.onePath(sys, P0, null, sk, opt);
+  const sm = M.summarize(M.monteCarlo(sys, 100, 11, sk, opt, P0), sys);
+  return { full, N10: line[9].N, sm };
+}
+let cmpCache = {};
+function compare(sys) {
+  let h = '<tr><th>Senaryo</th><th>Tam ölçek: hane</th><th>Oran</th><th>10. yılda hane (kusursuz yol)</th><th>Tam ölçeğe ulaşma</th><th>Pilotta takılma</th><th>10 yıl net, medyan (mr TL)</th></tr>';
+  SCEN.forEach(sc => {
+    const s = scenState(sc.id);
+    const key = sysKey + sc.id; const m = cmpCache[key] || (cmpCache[key] = scenMetrics(sys, s));
+    const [bc] = badge(m.full.ratio);
+    h += `<tr class="${sc.id === scId ? 'cur' : ''}" data-id="${sc.id}" style="cursor:pointer"><td>${sc.ad}</td><td>${nf(m.full.N)}</td><td>${nf(m.full.ratio, 2)} <span class="pill ${bc}">${bc === 'ok' ? 'yeterli' : bc === 'warn' ? 'sınırda' : 'açık'}</span></td><td>${nf(m.N10)}</td><td>${pc(m.sm.full, 0)}</td><td>${pc(m.sm.stuck, 0)}</td><td>${bn(m.sm.net, 1)}</td></tr>`;
+  });
+  $('kar').innerHTML = h;
+  $('kar').querySelectorAll('tr[data-id]').forEach(r => r.addEventListener('click', () => pickScenario(r.dataset.id)));
+}
+
+function social(sys, rows, full) {
+  const r = rows[+S.year - 1];
+  const B = r.N > 0 ? r.sub / r.N : 0;
+  const g = M.giniBenefit(r.N, B, sys.households, 2000);
+  const c = M.costOfLiving(sys, r.N, r.freed, S.elas);
+  const sg = (v, d = 2) => (v > 0 ? '+' : v < 0 ? '−' : '') + nf(Math.abs(v), d);
+  $('o-year').textContent = S.year + '. yıl';
+  $('sos').innerHTML =
+    `<div class="cards">` +
+    card('Yerleşen hane', nf(r.N), `${pc(r.coverage, 2)} uygun kiracı`) +
+    card('Hane başına fayda', nf(B) + ' TL/yıl', `ayda ${nf(B / 12)} TL`) +
+    card('Gini', `${nf(g.g0, 4)} → ${nf(g.g1, 4)}`, `değişim ${sg(g.g1 - g.g0, 4)}`) +
+    card('Göreli yoksulluk', `${pc(g.p0, 2)} → ${pc(g.p1, 2)}`, `${sg((g.p1 - g.p0) * 100, 2)} puan`) + `</div>` +
+    `<div class="cards">` +
+    card('Piyasa kirası', '−' + pc(-c.rent[0], 1), `yalnız talep etkisi; arz dahil üst sınır −${pc(-c.rent[1], 1)}`) +
+    card('TÜFE, yerel', sg(c.cpi[0], 2) + ' puan', `üst sınır ${sg(c.cpi[1], 2)}`) +
+    card('TÜFE, ulusal', sg(c.cpiNat[0], 3) + ' puan', `hane payı ${pc(c.natShare, 0)}`) + `</div>`;
+  $('sos-note').textContent = 'Fayda büyük ama kapsam küçük: Gini ve yoksulluk neredeyse hiç değişmez. TÜFE etkisi tek seferlik düzey etkisidir, yıllık enflasyona eklenmez. Kira esnekliği doğrulanmadı.';
+}
+
+function drawChart(rows) {
+  const W = 760, H = 230, L = 46, R = 46, T = 14, B = 28;
+  const n = rows.length, bw = (W - L - R) / n;
+  const maxN = Math.max(1000, ...rows.map(r => r.N)) / 1000;
+  const cums = rows.map(r => r.cum / 1e9);
+  const cmin = Math.min(0, ...cums), cmax = Math.max(0.5, ...cums);
+  const nice = (v) => { const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; };
+  const yN = nice(maxN), yC = nice(cmax - Math.min(0, cmin)) ;
+  const sy = (v) => T + (H - T - B) * (1 - v / yN);
+  const cy = (v) => T + (H - T - B) * (1 - (v - Math.min(0, cmin)) / (cmax > cmin ? (Math.max(cmax, yC + Math.min(0, cmin)) - Math.min(0, cmin)) : 1));
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Yıllara göre yerleşen hane ve kümülatif net" style="width:100%;height:auto;display:block">`;
+  for (let i = 0; i <= 4; i++) { const v = yN * i / 4, y = sy(v); s += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L - 6}" y="${y + 4}" text-anchor="end">${nf(v, v < 10 ? 1 : 0)}</text>`; }
+  rows.forEach((r, i) => {
+    const x = L + i * bw + bw * 0.18, w = bw * 0.64, y = sy(r.N / 1000);
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${H - B - y}" fill="${r.gecti ? 'var(--accent)' : 'var(--warn)'}" fill-opacity="${r.gecti ? 1 : 0.75}" rx="2"/>`;
+    s += `<text x="${x + w / 2}" y="${H - 10}" text-anchor="middle">${r.yil}</text>`;
+  });
+  const pts = rows.map((r, i) => `${L + i * bw + bw / 2},${cy(r.cum / 1e9)}`).join(' ');
+  s += `<polyline points="${pts}" fill="none" stroke="var(--fg)" stroke-width="2"/>`;
+  rows.forEach((r, i) => { s += `<circle cx="${L + i * bw + bw / 2}" cy="${cy(r.cum / 1e9)}" r="3" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>`; });
+  const last = rows[n - 1];
+  s += `<text x="${W - R + 6}" y="${cy(last.cum / 1e9) + 4}">${nf(last.cum / 1e9, 1)}</text>`;
+  s += `<text x="${L}" y="9">bin hane</text><text x="${W - R}" y="9" text-anchor="end">mr TL</text></svg>`;
+  $('chart').innerHTML = s;
+}
+sync(); render();
+</script>

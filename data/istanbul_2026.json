@@ -46,7 +46,151 @@
     "aidat": 3000,
     "kaynak": "model varsayimi, gozlem degil"
   },
-  "sizes_m2": {"1+0": 40, "1+1": 60, "2+1": 95},
+  "aidat": {
+    "turkiye_ortalama_tl_ay": 600,
+    "istanbul_ortalama_tl_ay": 3330,
+    "istanbul_en_ucuz_catalca_tl_ay": 1450,
+    "istanbul_en_pahali_besiktas_tl_ay": 8400,
+    "kaynak": "Turkiye 600 TL: tek basliktan (Gazete Merhaba, 450'den 600'e), sayfa acilamadi, kapsam teyitsiz. Istanbul rakamlari 2026 site aidati haberi aktarimi. Ikisi ayni kapsam degil"
+  },
+  "bos_stok": {
+    "istanbul_konut_stoku": 4500000,
+    "elektrik_aboneligi_tabanli": 225000,
+    "ibb_elektrik_su_tabanli": 450000,
+    "ibb_ust_tahmin": 750000,
+    "esenyurt_aidat_varsayim_tl_ay": 1450,
+    "kaynak": "Istanbul boslugu: Buyukduman elektrik aboneligi 225 bin; IBB 450-750 bin; yontem farki, tek sayi degil. Stok 4,5 milyon, PREMAR 2025. Esenyurt aidati kaynaksiz, Catalca en ucuz rakami varsayim olarak alindi. Ortalama/ucuz semt payi bilinmiyor, senaryo girdisidir"
+  },
+  "kfe_reel_yillik": {
+    "2013": 0.05,
+    "2014": 0.048,
+    "2015": 0.058,
+    "2016": 0.031,
+    "2017": -0.023,
+    "2018": -0.123,
+    "2019": -0.018,
+    "2020": 0.152,
+    "2021": 0.202,
+    "2022": 0.533,
+    "2023": 0.111,
+    "2024": -0.104,
+    "2025": -0.015,
+    "2026_agustos_yillik": -0.065,
+    "kaynak": "TCMB KFE (EVDS) Aralik/Aralik, TUFE ile reel. Turkiye geneli, Istanbul degil. Detay data/KFE.md"
+  },
+  "abonelik": {
+    "elektrik_kwh_ay": 200,
+    "elektrik_tl_kwh": 3.24,
+    "dogalgaz_m3_yil": 1000,
+    "dogalgaz_tl_m3": 5.631,
+    "su_m3_ay": 10,
+    "su_tl_m3": 46.62,
+    "kaynak": "Elektrik: EPDK mesken tarifesi Nisan 2026, 100 kWh = 323,8 TL (vergiler dahil), konut ortalamasi yaklasik 200 kWh/ay. Dogalgaz: BOTAS konut tarifesi Eylul 2026 1000 m3 = 5.631 TL, dagitim bedeli ve vergi dahil degil, tuketim 1000 m3/yil varsayim. Su: ISKI konut 46,62 TL/m3 Haziran 2025, 2026'da aylik zamlarla eskimis, tuketim 10 m3/ay varsayim"
+  },
+  "sehirler": {
+    "hane_buyuklugu": 3.08,
+    "kiraci_payi": 0.27,
+    "bos_stok_kisi_basi": 0.02856,
+    "istanbul": {
+      "nufus": 15754053,
+      "satis": 7359550,
+      "kira": 45510,
+      "reel_gelir_artis_farki": 0.028,
+      "veri": "teyitli",
+      "hane_buyuklugu": 3.09,
+      "gelir_orani": 1.3065560769281608,
+      "gelir_veri": "teyitli TR10"
+    },
+    "ankara": {
+      "nufus": 5910320,
+      "satis": 5132140,
+      "kira": 34440,
+      "reel_gelir_artis_farki": 0.037,
+      "veri": "teyitli",
+      "hane_buyuklugu": 2.86,
+      "gelir_orani": 1.3506828245444331,
+      "gelir_veri": "teyitli TR51"
+    },
+    "izmir": {
+      "nufus": 4504185,
+      "satis": 6574320,
+      "kira": 33369,
+      "reel_gelir_artis_farki": 0.0,
+      "veri": "teyitli",
+      "hane_buyuklugu": 2.75,
+      "gelir_orani": 1.2193389849856706,
+      "gelir_veri": "teyitli TR31"
+    },
+    "bursa": {
+      "nufus": 3263011,
+      "satis": 4737460,
+      "kira": 24207,
+      "reel_gelir_artis_farki": 0.0,
+      "veri": "teyitli",
+      "hane_buyuklugu": 3.06,
+      "gelir_orani": 1.0,
+      "gelir_veri": "yer tutucu: ulusal"
+    },
+    "antalya": {
+      "nufus": 2777677,
+      "satis": 6132170,
+      "kira": 29306,
+      "reel_gelir_artis_farki": 0.012,
+      "veri": "teyitli",
+      "hane_buyuklugu": 2.9,
+      "gelir_orani": 1.0,
+      "gelir_veri": "yer tutucu: ulusal"
+    },
+    "konya": {
+      "nufus": 2343409,
+      "satis": 4646550,
+      "kira": 24738,
+      "reel_gelir_artis_farki": 0.0,
+      "veri": "teyitli (Emlakjet-Endeksa Agustos 2026 aktarimi)",
+      "hane_buyuklugu": 3.08,
+      "gelir_orani": 1.0,
+      "gelir_veri": "yer tutucu: ulusal"
+    },
+    "adana": {
+      "nufus": 2283609,
+      "satis": 4536140,
+      "kira": 22755,
+      "reel_gelir_artis_farki": 0.0,
+      "veri": "teyitli (Emlakjet-Endeksa Agustos 2026 aktarimi)",
+      "hane_buyuklugu": 3.08,
+      "gelir_orani": 1.0,
+      "gelir_veri": "yer tutucu: ulusal"
+    },
+    "kocaeli": {
+      "nufus": 2161171,
+      "satis": 5213375,
+      "kira": 26282,
+      "reel_gelir_artis_farki": 0.033,
+      "veri": "teyitli (Emlakjet-Endeksa Agustos 2026 aktarimi), fiyat artisi teyitli",
+      "hane_buyuklugu": 3.08,
+      "gelir_orani": 1.0,
+      "gelir_veri": "yer tutucu: ulusal"
+    },
+    "kaynak": "Nufus: TUIK ADNKS 2025. Satis ve kira: Emlakjet-Endeksa Agustos 2026 (Kocaeli, Konya, Adana icin yok). Fiyat artisi farki: sehir reel artisi eksi Turkiye (%-6,2) KFE'ye eklenir, yalniz Istanbul, Ankara, Kocaeli, Antalya icin var. Secim olcutu TUIK 2025 konut satisi sirasi (Istanbul 280 bin, Ankara 152 bin, Izmir 97 bin, Antalya 45 bin, Bursa 28 bin, Kocaeli 20 bin, Konya 20 bin, Adana 19 bin); Gaziantep, Mersin, Sanliurfa bu aramada gorulmedi. Bos stok kisi basi Istanbul 450 bin / 15,75 mn, tum sehirlere ayni uygulanir: varsayim. Gelir dagilimi ulusal, sehre ozgu degil: varsayim GUNCELLEME: Konya, Adana, Kocaeli satis ve kira Emlakjet-Endeksa Agustos 2026 aktarimidir (Konya m2 30.977 / kira m2 190, Adana 32.401 / 207, Kocaeli 41.707 / 239). Hane buyuklugu ADNKS 2025: Bursa 3,06, Antalya 2,90, Ankara 2,86, Izmir 2,75, Istanbul 3,09; Konya, Adana, Kocaeli bulunamadi, ulusal 3,08. Gelir orani = IBBS-2 ortalama esdeger gelir / Turkiye 332.882 TL: Ankara TR51 449.618, Izmir TR31 405.896, Istanbul TR10 434.929; Bursa, Antalya, Konya, Adana, Kocaeli bulunamadi, yer tutucu 1,0. Il bazli bos konut ve kiraci payi BULUNAMADI. Bir kaynak ulusal bos stok 'yuzde 34,44' veriyor (yapi izin ruhsati ile birinci el satis farki): yontem zayif, kullanilmadi."
+  },
+  "ovp_2027_2029": {
+    "2026": 0.284,
+    "2027": 0.21,
+    "2028": 0.135,
+    "2029": 0.09,
+    "kaynak": "Hazine ve Maliye Bakanligi OVP 2027-2029, 6 Eylul 2026, haber aktarimi. 2029 sonrasi %9 sabit: model varsayimi"
+  },
+  "opex": {
+    "emlak_vergisi_orani": 0.002,
+    "dask_tl_daire_yil": 2022,
+    "bakim_orani_giris_degeri": 0.01,
+    "kaynak": "Emlak vergisi binde 2, buyuksehir konut, vergi degeri uzerinden. Vergi degeri piyasa degerinin altindadir, binde 2 ust sinir. DASK Istanbul medyan Ocak 2026. Bakim orani %1: yabanci rehberlerde konut icin %1-3 araligi, Turkiye verisi degil. Apartmanda ortak alan bakimi aidatta oldugu icin alt uc alindi. Bos dairenin aidati sahibe yazilir"
+  },
+  "sizes_m2": {
+    "1+0": 40,
+    "1+1": 60,
+    "2+1": 95
+  },
   "vacancy": {
     "elektrik_abonelik_avrupa_yakasi": 0.037,
     "ulusal_bos_stok_iddiasi": 0.27,

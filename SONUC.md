@@ -1,0 +1,29 @@
+# Sonuc: en olasi senaryoda sistem calisiyor mu?
+
+**Guncelleme (kademeli pilot, erozyon, sok, 10 yil; ayrinti PILOT.md, SOSYAL_MALIYET.md, SISTEMLER.md):** Tam olcege kademeli yolla 7. yilda ulasilir (olcek erozyonu varsayimiyla bedel 7,0 mr, sub. 3,9 mr, oran 1,79; 10 yilda kumulatif net +17 mr TL). Etki kucuk: Gini -0,0007, yoksulluk -0,16 puan, Istanbul TUFE -0,3 puan (ulusal -0,05). Sistem finansal sokta ayakta, ama katilim fiyat beklentisine bagli: beklenen reel artis ~4 puan yukselirse katilim cokar. Luks tahsilati henuz olculmedi; pilot gerekli. **Monte Carlo duzeltmesi:** belirsiz degerli kademeli yol iki kutuplu: ~%37 pilotta takilir (katilim %15 altinda), ~%50 7. yilda tam olcege ulasir; 10 yil net medyan +11,1 mr TL (P10 +0,8, P90 +37,9; kapi duzeltmesi sonrasi). Asagidaki rakamlar erozyonsuz tam olcek, onceki hesap.
+
+Kisa cevap: evet, ama kucuk ve kirilgan. Kapsam Istanbul, veri Ekim 2026. Kisisel modelleme, dogrulanmis kamu maliyesi modeli degildir.
+
+## Senaryo
+Uc bolge (HEKIS, memur kesimi tampon, luks) ve 30 bin duran konut. Katilim tavani %25, genel bedel %1, luks bedel %5, etkin tahsilat genel %30 luks %40, beklenen reel konut artisi -%3,7, ulusal TUIK gelir dagilimi.
+
+## Calistigi yerler
+- Para tutuyor: yillik sub. 4,6 mr TL, bedel geliri 9,4 mr TL (yaklasik iki kati).
+- Yaklasik 43 bin daire sisteme girer (37 bin bos stok, 6 bin duran insaat).
+- Yerlesen hanenin konut yuku alt %10'da %81'den %30'a duser.
+- Yaklasik 107 bin bos daire bedel baskisiyla bosluktan cikip ozel piyasaya doner.
+
+## Zayif yerler
+- Kucuk: uygun kiracinin %7,7'sine ulasir. Sehir genelinde Gini ve yoksulluk neredeyse degismez.
+- Gelirin 6,5 mr'si luks dairelerin %5'lik bedelinden gelir ve %40 tahsilat varsayimina dayanir. Luks cikarilirsa gelir 2,9 mr TL, sub. 4,6 mr TL'nin altinda kalir.
+- Luks hesaba katmayan iki bolgeli modelde gelir / sub. 0,94, hane geliri varsayimina gore 0,6 ile 1,3.
+
+## En buyuk dis risk
+Reel faiz. Bugun +%4,2, katilim penceresi acik. Reel faiz sifira inerse katilim yaklasik %30 duser.
+
+## Basari kosullari
+1. Luks bedelin gercekten toplanmasi.
+2. Reel faizin pozitif kalmasi.
+3. Duran insaat icin hukuki engelin asilmasi.
+
+Ayrinti: README.md, data/VARSAYIM.md, HEKIS_Sistem_Anlatimi.docx.

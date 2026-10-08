@@ -1,3 +1,5 @@
+> ESKI NOT, koşan kodu temsil etmez. Bu dosya fiyati kira x 12 x 18 ile kuruyor (giris 9,53 mr TL, statik 23 yil, erime %87). Kosan `esenyurt_sub20_tufe` ve `esenyurt_tufe` teyitli Endeksa m2'sini (34.475 TL) kullanir: giris 6,03 mr TL, statik 14,5 yil. Asagidaki sayilar tarihsel kayit olarak durur, model sonucu degildir.
+
 # Esenyurt taban, TUFE, yuzde 20 kira subvansiyonu
 
 Kosu: `esenyurt_sub20_tufe`. Olcek 1000 adet 2+1, 1000 adet 1+1, 500 adet 1+0.

@@ -37,6 +37,13 @@ class Params:
     leakage_rate: float = 0.70
     horizon: int = 20
     rent_index: str = "none"
+    opex_rate: float = 0.0
+    tax_rate: float = 0.0
+    unit_fixed: float = 0.0
+    vacant_aidat: bool = False
+    tenant_aidat: bool = False
+    utility_sub: float = 0.0
+    prev_inflation: float = 0.0
 
     def validate(self) -> None:
         if not 0 <= self.vacancy < 1:
@@ -51,8 +58,10 @@ class Params:
             raise ValueError("leakage_rate 0 ile 1 arasinda olmali")
         if self.horizon < 1:
             raise ValueError("horizon en az 1")
-        if self.rent_index not in ("none", "tufe"):
-            raise ValueError("rent_index none veya tufe olmali")
+        if self.rent_index not in ("none", "tufe", "tufe_ort12"):
+            raise ValueError("rent_index none, tufe veya tufe_ort12 olmali")
+        if not 0 <= self.opex_rate < 1:
+            raise ValueError("opex_rate 0 ile 1 arasinda olmali")
 
 
 @dataclass
@@ -98,6 +107,11 @@ class Result:
         return sum(r.subsidy + r.premium + r.fiscal_gap for r in self.rows)
 
     @property
+    def total_fiscal_real(self) -> float:
+        """Bugunku TL. Nominal toplam enflasyonun toplamini da icerir, yaniltir."""
+        return sum((r.subsidy + r.premium + r.fiscal_gap) / r.cpi for r in self.rows)
+
+    @property
     def real_eroded(self) -> float:
         if not self.rows or self.wealth_locked <= 0:
             return 0.0
@@ -108,12 +122,24 @@ def _load_units(raw: Iterable[dict]) -> list[UnitType]:
     return [UnitType(**item) for item in raw]
 
 
+def holding_cost(units: list[UnitType], params: Params) -> float:
+    """Yillik elde tutma gideri, bugunku TL. Bakim ve vergi degerle, sigorta daire basina,
+    bos dairenin aidati sahibe yazilir. Dolu dairenin aidati kiradan dusuldugu icin ikinci kez girmez."""
+    value = sum(u.count * u.price for u in units)
+    cost = (params.opex_rate + params.tax_rate) * value
+    cost += params.unit_fixed * sum(u.count for u in units)
+    if params.vacant_aidat:
+        cost += sum(u.aidat * 12 * u.count * params.vacancy for u in units)
+    return cost
+
+
 def static_payback(units: list[UnitType], params: Params) -> float:
     """Fiyat / yillik net havuz. Aidat borc servisine girmez."""
     value = sum(u.count * u.price for u in units)
     net = 0.0
     for u in units:
-        net += (u.rent - u.aidat) * 12 * u.count * (1 - params.vacancy) * params.collection
+        net += (u.rent - (0.0 if params.tenant_aidat else u.aidat)) * 12 * u.count * (1 - params.vacancy) * params.collection
+    net -= holding_cost(units, params)
     if net <= 0:
         return float("inf")
     return value / net
@@ -124,7 +150,7 @@ def pool_and_subsidy(units: list[UnitType], params: Params) -> tuple[float, floa
     subsidy = 0.0
     occupied = 1 - params.vacancy
     for u in units:
-        pool += (u.rent - u.aidat) * 12 * u.count * occupied * params.collection
+        pool += (u.rent - (0.0 if params.tenant_aidat else u.aidat)) * 12 * u.count * occupied * params.collection
         gap = max(0.0, u.rent - u.tenant_pay)
         subsidy += gap * 12 * u.count * occupied
     return pool, subsidy
@@ -155,14 +181,22 @@ def simulate(
     quota = 1.0
     rows: list[YearRow] = []
     pool0, subsidy0 = pool_and_subsidy(units, params)
+    opex0 = holding_cost(units, params)
+    rent_scale = 1.0
+    prev_pi = params.prev_inflation
 
     for year in range(1, n + 1):
         pi = inflation[year - 1]
         cpi *= 1 + pi
         x = physical_index[year - 1]
-        scale = cpi if params.rent_index == "tufe" else 1.0
-        pool = pool0 * scale
-        subsidy = subsidy0 * scale
+        if params.rent_index == "tufe":
+            rent_scale = cpi
+        elif params.rent_index == "tufe_ort12":
+            # Yenileme artisi 12 aylik TUFE ortalamasi: yillik adimda onceki ve cari yilin ortalamasi.
+            rent_scale *= 1 + (prev_pi + pi) / 2
+        prev_pi = pi
+        pool = pool0 * rent_scale - opex0 * cpi
+        subsidy = subsidy0 * rent_scale + params.utility_sub * 12 * sum(u.count for u in units) * (1 - params.vacancy) * cpi
 
         production = quota * params.production_share * pool
         service_cash = pool - production
@@ -247,10 +281,11 @@ def format_report(result: Result) -> str:
         f"nakit kacisi: {tl(result.wealth_leaked)} TL",
         f"statik geri donus: {result.static_payback_years:.1f} yil",
         f"20. yil reel anapara: {tl(result.end_real_principal)} TL",
-        f"reel anapara erimesi: {result.real_eroded:.1%}",
+        f"reel anapara geri odenen (havuzun sahibe odedigi): {result.real_eroded:.1%}",
         f"toplam butce transferi (kira farki): {tl(result.total_subsidy)} TL",
         f"toplam hedef primi: {tl(result.total_premium)} TL",
         f"toplam mali acik (fark + prim + kupon acigi): {tl(result.total_fiscal)} TL",
+        f"ayni, bugunku TL: {tl(result.total_fiscal_real)} TL",
         "",
         "yil  enflasyon  fiziki  reel anapara   havuz neti    subvansiyon      prim     kota",
     ]
