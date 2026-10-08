@@ -33,7 +33,7 @@ Varlik enflasyonu uc satirdan okunur:
 Python 3 yeter. Ek paket yok, testler `unittest`.
 
 ```bash
-python -m unittest discover -s tests   # 60+ test
+python -m unittest discover -s tests   # 86 test (60 model + 26 main modulleri duman/gerileme)
 python -m hekis.checks                 # gerceklik kontrolleri
 python -m hekis.analysis               # tornado, Monte Carlo, rank korelasyonu, ters stres
 python -m hekis.final                  # uc sistem, luks ayrimi, luks bedel

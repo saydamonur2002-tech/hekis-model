@@ -1,0 +1,102 @@
+{
+ "acmaz": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "atalet": {
+  "GECTI": 3,
+  "KALDI": 0
+ },
+ "ayrisma": {
+  "GECTI": 1,
+  "KALDI": 0
+ },
+ "beklenti": {
+  "GECTI": 4,
+  "KALDI": 0
+ },
+ "birikim": {
+  "GECTI": 2,
+  "KALDI": 3
+ },
+ "borc_doviz": {
+  "GECTI": 6,
+  "KALDI": 4
+ },
+ "dezenf": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "enflasyon": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "entegre": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "gerceklik": {
+  "GECTI": 5,
+  "KALDI": 3
+ },
+ "ito": {
+  "GECTI": 3,
+  "KALDI": 0
+ },
+ "ito_alt": {
+  "GECTI": 3,
+  "KALDI": 2
+ },
+ "kalibre": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "kamu": {
+  "GECTI": 5,
+  "KALDI": 0
+ },
+ "kira": {
+  "GECTI": 5,
+  "KALDI": 0
+ },
+ "kirilma": {
+  "GECTI": 2,
+  "KALDI": 2
+ },
+ "metod": {
+  "GECTI": 4,
+  "KALDI": 0
+ },
+ "mulkiyet": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "olcum": {
+  "GECTI": 1,
+  "KALDI": 0
+ },
+ "ovp": {
+  "GECTI": 0,
+  "KALDI": 2
+ },
+ "reset": {
+  "GECTI": 1,
+  "KALDI": 1
+ },
+ "rezerv": {
+  "GECTI": 3,
+  "KALDI": 1
+ },
+ "sonuc": {
+  "GECTI": 0,
+  "KALDI": 0
+ },
+ "tampon": {
+  "GECTI": 3,
+  "KALDI": 2
+ },
+ "ucret": {
+  "GECTI": 4,
+  "KALDI": 1
+ }
+}
