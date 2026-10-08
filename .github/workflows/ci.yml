@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  test:
+    name: Python testleri, JS-Python dogrulamasi
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Birim testleri
+        run: python -m unittest discover -s tests
+      - name: Gerceklik kontrolleri
+        run: python -m hekis.checks
+      - name: JS modeli Python ciktisiyla karsilastir
+        run: |
+          python -m hekis.verify_app
+          node app/verify.js
+
+  app-guncel:
+    name: Simulator ciktisi guncel mi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: constants.json ve index.html yeniden uret
+        run: |
+          python -m hekis.export_app
+          python app/build.py
+      - name: Depodaki dosyalarla ayni mi
+        run: git diff --exit-code -- app/constants.json app/index.html
